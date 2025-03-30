@@ -12,9 +12,4 @@ It consists of two projects:
    This project gets information that was sent from the Windows project above and opens / closes shutters on 3D Glasses.
    The shutters must be connected directly to Arduino board using cable.
 
-![Connection Diagram](Images/SoftCollection%20ShootingRange1.gif)
-
-![Connection Diagram](Images/SoftCollection%20ShootingRange2.png)
-
-![Connection Diagram](Images/SoftCollection%20ShootingRange3.png)
  
