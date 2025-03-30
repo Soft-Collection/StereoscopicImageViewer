@@ -1,5 +1,3 @@
-[![Stereoscopic Image Viewer](https://youtu.be/-8sm6URLmYs/0.jpg)](https://youtu.be/-8sm6URLmYs "Shooting Range")
-
 # Stereoscopic Image Viewer
 SoftCollection Stereoscopic Image Viewer allows you to view stereo images on a regular screen of PC.
 It consists of two projects:
