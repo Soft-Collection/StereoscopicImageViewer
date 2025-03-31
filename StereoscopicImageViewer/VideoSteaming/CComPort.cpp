@@ -78,4 +78,9 @@ void CComPort::SendCommand(std::wstring comPortName, eTransparentLenses transpar
         End();
         return;
     }
+    if (!FlushFileBuffers(mHCom)) {
+        std::cerr << "Error: Unable to flush COM port." << std::endl;
+        End();
+        return;
+    }
 }

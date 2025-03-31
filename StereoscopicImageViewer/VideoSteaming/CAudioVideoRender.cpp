@@ -108,71 +108,75 @@ CAudioVideoRender::eAudioVideoRenderErrors CAudioVideoRender::DrawWindow()
 }
 CAudioVideoRender::eAudioVideoRenderErrors CAudioVideoRender::VideoRender()
 {
-	eAudioVideoRenderErrors retVal = eAudioVideoRenderErrors::NoError;
 	try
 	{
-		if ((mLeftImage->Width != mRightImage->Width) || (mLeftImage->Height != mRightImage->Height)) retVal = eAudioVideoRenderErrors::DifferentLeftRightImageDimensions;
-		else
+		if ((mLeftImage->Width != mRightImage->Width) || (mLeftImage->Height != mRightImage->Height)) return eAudioVideoRenderErrors::DifferentLeftRightImageDimensions;
+		auto start = std::chrono::high_resolution_clock::now();
+		//----------------------------------------------
+		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+		mImageToPlayIsLeft = !mImageToPlayIsLeft;
+		if (mAutoMemoryBase != NULL)
 		{
-			auto start = std::chrono::high_resolution_clock::now();
-			mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-			//----------------------------------------------
-			if (mAutoMemoryBase != NULL)
+			if (mImageToPlayIsLeft)
 			{
-				if (mImageToPlayIsLeft)
-				{
-					if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Left);
-					mAutoMemoryBase->DrawImage(mLeftImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
-				}
-				else
-				{
-					if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Right);
-					mAutoMemoryBase->DrawImage(mRightImage->PixelData.data(), mRightImage->Width, mRightImage->Height);
-				}
-				mImageToPlayIsLeft = !mImageToPlayIsLeft;
+				mAutoMemoryBase->DrawImage(mLeftImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
 			}
 			else
 			{
-				if (mRenderTarget == eVideoRenderTargets::GDI) retVal = eAudioVideoRenderErrors::DibIsNull;
-				else if (mRenderTarget == eVideoRenderTargets::D2D) retVal = eAudioVideoRenderErrors::Direct2DIsNull;
-				else if (mRenderTarget == eVideoRenderTargets::D3D) retVal = eAudioVideoRenderErrors::Direct3DIsNull;
+				mAutoMemoryBase->DrawImage(mRightImage->PixelData.data(), mRightImage->Width, mRightImage->Height);
 			}
-			retVal = DrawWindow();
-			//----------------------------------------------
-			mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
-			//----------------------------------------------
-			int tempDelay = 0;
-			if (mFrequency == eFrequencies::Default) {
-				int refreshRate = GetRefreshRate();
-				tempDelay = (refreshRate > 0) ? (1000000 / refreshRate) : (1000000 / 60);
-			}
-			else if (mFrequency == eFrequencies::F1Hz) {
-				tempDelay = 1000000 / 1;
-			}
-			else if (mFrequency == eFrequencies::F60Hz) {
-				tempDelay = 1000000 / 60;
-			}
-			else if (mFrequency == eFrequencies::F75Hz) {
-				tempDelay = 1000000 / 75;
-			}
-			else if (mFrequency == eFrequencies::F100Hz) {
-				tempDelay = 1000000 / 100;
-			}
-			else if (mFrequency == eFrequencies::F120Hz) {
-				tempDelay = 1000000 / 120;
-			}
-			else if (mFrequency == eFrequencies::F144Hz) {
-				tempDelay = 1000000 / 144;
-			}
-			while (std::chrono::high_resolution_clock::now() - start < std::chrono::microseconds(tempDelay));
 		}
+		else
+		{
+			if (mRenderTarget == eVideoRenderTargets::GDI) return eAudioVideoRenderErrors::DibIsNull;
+			else if (mRenderTarget == eVideoRenderTargets::D2D) return eAudioVideoRenderErrors::Direct2DIsNull;
+			else if (mRenderTarget == eVideoRenderTargets::D3D) return eAudioVideoRenderErrors::Direct3DIsNull;
+		}
+		eAudioVideoRenderErrors ret = DrawWindow();
+		if (ret != eAudioVideoRenderErrors::NoError) return ret;
+		if (mImageToPlayIsLeft)
+		{
+			if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Left);
+		}
+		else
+		{
+			if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Right);
+		}
+		//----------------------------------------------
+		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+		int tempDelay = 0;
+		if (mFrequency == eFrequencies::Default) {
+			int refreshRate = GetRefreshRate();
+			tempDelay = (refreshRate > 0) ? (1000000 / refreshRate) : (1000000 / 60);
+		}
+		else if (mFrequency == eFrequencies::F1Hz) {
+			tempDelay = 1000000 / 1;
+		}
+		else if (mFrequency == eFrequencies::F60Hz) {
+			tempDelay = 1000000 / 60;
+		}
+		else if (mFrequency == eFrequencies::F75Hz) {
+			tempDelay = 1000000 / 75;
+		}
+		else if (mFrequency == eFrequencies::F100Hz) {
+			tempDelay = 1000000 / 100;
+		}
+		else if (mFrequency == eFrequencies::F120Hz) {
+			tempDelay = 1000000 / 120;
+		}
+		else if (mFrequency == eFrequencies::F144Hz) {
+			tempDelay = 1000000 / 144;
+		}
+		while (std::chrono::high_resolution_clock::now() - start < std::chrono::microseconds(tempDelay));
 	}
 	catch(...)
 	{ 
-		retVal = eAudioVideoRenderErrors::ExceptionInVideoRender;
 		CExceptionReport::WriteExceptionReportToFile("CAudioVideoRender::VideoRender", "Exception in CAudioVideoRender VideoRender");
+		return eAudioVideoRenderErrors::ExceptionInVideoRender;
 	}
-	return (retVal);
+	return eAudioVideoRenderErrors::NoError;
 }
 int CAudioVideoRender::GetRefreshRate()
 {
