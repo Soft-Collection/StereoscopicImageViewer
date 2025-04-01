@@ -6,6 +6,7 @@
 class CAutoMemoryDib : public CAutoMemoryBase
 {
 private:
+	HWND        m_HWnd;
 	HDC         m_MemoryDC;
 	HBITMAP     m_MemoryBitmap;
 	PVOID       m_pvBits; 
@@ -13,12 +14,12 @@ private:
 	INT         m_ImageWidth;
 	INT         m_ImageHeight;
 private:
-	void ReInit(INT ImageWidth, INT ImageHeight);
+	void ReInit(HWND hWnd, INT ImageWidth, INT ImageHeight);
 public:
 	CAutoMemoryDib();
 	~CAutoMemoryDib();
-	BOOL DrawImageRGB32(BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight);
-	BOOL DrawImage(BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageRGB32(ImageDataPtr, ImageWidth, ImageHeight)); }
-	BOOL Blt(HWND hWnd);
+	BOOL DrawImageRGB32(HWND hWnd, BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight);
+	BOOL DrawImage(HWND hWnd, BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageRGB32(hWnd, ImageDataPtr, ImageWidth, ImageHeight)); }
+	BOOL Blt();
 };
 #endif // __CAUTOMEMORYDIB_H__

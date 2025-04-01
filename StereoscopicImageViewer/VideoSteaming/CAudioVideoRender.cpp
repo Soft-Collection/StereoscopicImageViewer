@@ -89,7 +89,7 @@ CAudioVideoRender::eAudioVideoRenderErrors CAudioVideoRender::DrawWindow()
 		//----------------------------------------------
 		if (mAutoMemoryBase != NULL)
 		{
-			mAutoMemoryBase->Blt(mHWnd);
+			mAutoMemoryBase->Blt();
 		}
 		else
 		{
@@ -120,11 +120,11 @@ CAudioVideoRender::eAudioVideoRenderErrors CAudioVideoRender::VideoRender()
 		{
 			if (mImageToPlayIsLeft)
 			{
-				mAutoMemoryBase->DrawImage(mLeftImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
+				mAutoMemoryBase->DrawImage(mHWnd, mLeftImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
 			}
 			else
 			{
-				mAutoMemoryBase->DrawImage(mRightImage->PixelData.data(), mRightImage->Width, mRightImage->Height);
+				mAutoMemoryBase->DrawImage(mHWnd, mRightImage->PixelData.data(), mRightImage->Width, mRightImage->Height);
 			}
 		}
 		else

@@ -6,6 +6,7 @@ CAutoMemoryDib::CAutoMemoryDib()
 {
 	try
 	{
+		m_HWnd = NULL;
 		m_MemoryDC = NULL;
 		m_MemoryBitmap = NULL;
 		m_pvBits = NULL;
@@ -37,11 +38,11 @@ CAutoMemoryDib::~CAutoMemoryDib()
 		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDib::~CAutoMemoryDib", "Exception in CAutoMemoryDib Destructor");
 	}
 }
-void CAutoMemoryDib::ReInit(int ImageWidth, int ImageHeight)
+void CAutoMemoryDib::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 {
 	try
 	{
-		if ((m_ImageWidth != ImageWidth) || (m_ImageHeight != ImageHeight))
+		if ((m_HWnd != hWnd) || (m_ImageWidth != ImageWidth) || (m_ImageHeight != ImageHeight))
 		{
 			if (m_MemoryBitmap != NULL)
 			{
@@ -63,6 +64,7 @@ void CAutoMemoryDib::ReInit(int ImageWidth, int ImageHeight)
 			SelectObject(m_MemoryDC, m_MemoryBitmap);
 			ReleaseDC(NULL, hDC);
 			//--------------------------------------------------------
+			m_HWnd = hWnd;
 			m_ImageWidth = ImageWidth;
 			m_ImageHeight = ImageHeight;
 		}
@@ -72,12 +74,12 @@ void CAutoMemoryDib::ReInit(int ImageWidth, int ImageHeight)
 		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDib::ReInit", "Exception in CAutoMemoryDib ReInit");
 	}		
 }
-BOOL CAutoMemoryDib::DrawImageRGB32(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
+BOOL CAutoMemoryDib::DrawImageRGB32(HWND hWnd, BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
 {
 	BOOL retVal = FALSE;
 	try
 	{
-		ReInit(ImageWidth, ImageHeight);
+		ReInit(hWnd, ImageWidth, ImageHeight);
 		if ((m_MemoryDC != NULL) && (m_MemoryBitmap != NULL))
 		{
 			CopyMemory(m_pvBits, ImageDataPtr, ImageWidth * ImageHeight * 4);
@@ -90,19 +92,19 @@ BOOL CAutoMemoryDib::DrawImageRGB32(BYTE* ImageDataPtr, int ImageWidth, int Imag
 	}
 	return (retVal);
 }
-BOOL CAutoMemoryDib::Blt(HWND hWnd)
+BOOL CAutoMemoryDib::Blt()
 {
 	BOOL retVal = TRUE;
 	try
 	{
-		if (hWnd != NULL)
+		if (m_HWnd != NULL)
 		{
-			HDC hDC = ::GetDC(hWnd);
+			HDC hDC = ::GetDC(m_HWnd);
 			RECT rect;
-			GetWindowRect(hWnd, &rect);
+			GetWindowRect(m_HWnd, &rect);
 			SetStretchBltMode(hDC, COLORONCOLOR);
 			if (StretchBlt(hDC, 0, 0, rect.right - rect.left, rect.bottom - rect.top, m_MemoryDC, 0, 0, m_ImageWidth, m_ImageHeight, SRCCOPY) != TRUE) retVal = FALSE;
-			ReleaseDC(hWnd, hDC);
+			ReleaseDC(m_HWnd, hDC);
 		}
 		else retVal = FALSE;
 	}

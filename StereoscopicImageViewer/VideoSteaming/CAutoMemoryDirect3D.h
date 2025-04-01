@@ -1,39 +1,40 @@
 #ifndef __CAUTOMEMORYDIRECT3D_H__
 #define __CAUTOMEMORYDIRECT3D_H__
 
-#include "CD3d.hpp"
 #include "CAutoMemoryBase.h"
+#include <windows.h>
+#include <d3d9.h>
+#include <tchar.h>
+#include <cassert>
+#include <cstring>
+
+// Link the Direct3D 9 library.
+#pragma comment(lib, "d3d9.lib")
+
+// Our custom vertex structure with pre-transformed coordinates.
+struct CUSTOMVERTEX {
+	float x, y, z, rhw; // screen/clip-space position (rhw = 1.0)
+	float tu, tv;       // texture coordinates
+};
+#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW | D3DFVF_TEX1)
 
 class CAutoMemoryDirect3D : public CAutoMemoryBase
 {
 private:
-	typedef enum _tagSTREAMFORMAT
-	{
-		NONE	= 0,
-		YUY2	= 1,
-		YV12	= 2,
-		RGB24   = 3,
-		RGB32   = 4,
-	}eSTREAMFORMAT;
-	#define	_D3D_SURFACE_COLORFORMAT	(CD3d::CF_BGRX) //(CD3d::CF_YUY2) //(CD3d::CF_BGR565)
-	#define _D3D_FONT_ALPHA				(168)
-	#define _D3D_FONT_RGB				(RGB(128,240,240))
-	#define _D3D_RECT_RGB				(RGB(240,128,128))
-private:
-	BYTE*       m_ImageDataPtr;
+	HWND        m_HWnd;
 	INT         m_ImageWidth;
 	INT         m_ImageHeight;
-	CD3d*       m_cD3d;
 private:
-	void ReInit(INT ImageWidth, INT ImageHeight);
-	HRESULT _D3DDrawString(LPCWSTR Message, INT _nX, INT _nY, DWORD _dwWidth, DWORD _dwHeight);
-	HRESULT _D3DDrawCaptureStream(LPBYTE _lpStream, DWORD _dwStreamWidth, DWORD _dwStreamHeight, eSTREAMFORMAT _eStreamFormat);
-	BOOL _D3DPrimaryPresentation();
+	LPDIRECT3D9             g_pD3D;
+	LPDIRECT3DDEVICE9       g_pd3dDevice;
+	LPDIRECT3DTEXTURE9      g_pTexture;
+private:
+	void ReInit(HWND hWnd, INT ImageWidth, INT ImageHeight);
 public:
 	CAutoMemoryDirect3D();
 	~CAutoMemoryDirect3D();
-	BOOL DrawImageRGB32(BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight);
-	BOOL DrawImage(BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageRGB32(ImageDataPtr, ImageWidth, ImageHeight)); }
-	BOOL Blt(HWND hWnd);
+	BOOL DrawImageRGB32(HWND hWnd, BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight);
+	BOOL DrawImage(HWND hWnd, BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageRGB32(hWnd, ImageDataPtr, ImageWidth, ImageHeight)); }
+	BOOL Blt();
 };
 #endif // __CAUTOMEMORYDIRECT3D_H__

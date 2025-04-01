@@ -74,6 +74,7 @@ private:
     ID2D1DCRenderTarget *m_pDCRT;
 	IDWriteFactory *m_pDWriteFactory;
 	//-------------------------------
+	HWND         m_HWnd;
 	ID2D1Bitmap* m_MemoryBitmap;
 	INT          m_ImageWidth;
 	INT          m_ImageHeight;
@@ -81,12 +82,12 @@ private:
     HRESULT CreateDeviceIndependentResources();
     HRESULT CreateDeviceResources();
     void DiscardDeviceResources();
-	void ReInit(INT ImageWidth, INT ImageHeight);
+	void ReInit(HWND hWnd, INT ImageWidth, INT ImageHeight);
 public:
 	CAutoMemoryDirect2D();
 	~CAutoMemoryDirect2D();
-	BOOL DrawImageBGR32(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight);
-	BOOL DrawImage(BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageBGR32(ImageDataPtr, ImageWidth, ImageHeight)); }
-	BOOL Blt(HWND hWnd);
+	BOOL DrawImageBGR32(HWND hWnd, BYTE* ImageDataPtr, int ImageWidth, int ImageHeight);
+	BOOL DrawImage(HWND hWnd, BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageBGR32(hWnd, ImageDataPtr, ImageWidth, ImageHeight)); }
+	BOOL Blt();
 };
 #endif // __CAUTOMEMORYDIRECT2D_H__

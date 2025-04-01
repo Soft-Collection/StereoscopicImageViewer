@@ -6,10 +6,12 @@ CAutoMemoryDirect3D::CAutoMemoryDirect3D()
 {
 	try
 	{
-		m_ImageDataPtr = NULL;
+		m_HWnd = NULL;
 		m_ImageWidth = 0;
 		m_ImageHeight = 0;
-		m_cD3d = NULL;
+		g_pD3D = NULL;
+		g_pd3dDevice = NULL;
+		g_pTexture = NULL;
 	}
 	catch(...)
 	{ 
@@ -20,46 +22,43 @@ CAutoMemoryDirect3D::~CAutoMemoryDirect3D()
 {
 	try
 	{
-		if (m_cD3d != NULL)
-		{
-			m_cD3d->m_Endup();
-			delete(m_cD3d);
-			m_cD3d = NULL;
-		}
-		if (m_ImageDataPtr != NULL)
-		{
-			delete(m_ImageDataPtr);
-			m_ImageDataPtr = NULL;
-		}
+		if (g_pTexture != NULL) g_pTexture->Release();
+		if (g_pd3dDevice != NULL) g_pd3dDevice->Release();
+		if (g_pD3D != NULL) g_pD3D->Release();
 	}
 	catch(...)
 	{ 
 		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::~CAutoMemoryDirect3D", "Exception in CAutoMemoryDirect3D Destructor");
 	}
 }
-void CAutoMemoryDirect3D::ReInit(int ImageWidth, int ImageHeight)
+void CAutoMemoryDirect3D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 {
 	try
 	{
-		if ((m_ImageWidth != ImageWidth) || (m_ImageHeight != ImageHeight))
+		if ((m_HWnd != hWnd) || (m_ImageWidth != ImageWidth) || (m_ImageHeight != ImageHeight))
 		{
-			if (m_ImageDataPtr != NULL)
-			{
-				delete(m_ImageDataPtr);
-				m_ImageDataPtr = NULL;
-			}
-			m_ImageDataPtr = new BYTE[ImageWidth * ImageHeight * 4];
+			if (g_pTexture != NULL) g_pTexture->Release();
+			if (g_pd3dDevice != NULL) g_pd3dDevice->Release();
+			if (g_pD3D != NULL) g_pD3D->Release();
 			//--------------------------------------------------------
-			if (m_cD3d != NULL)
-			{
-				m_cD3d->m_Endup();
-				delete(m_cD3d);
-				m_cD3d = NULL;
-			}
-			m_cD3d = new CD3d(NULL);
-			HRESULT hr = m_cD3d->m_Setup( 0, _D3D_SURFACE_COLORFORMAT, NULL/*_hwnd*/, ImageWidth, ImageHeight, ImageWidth, ImageHeight);
-			if ((hr != NOERROR) && ( hr != 1 ) && ( hr != 2 )) m_cD3d->m_Endup();
+			// Create the IDirect3D9 object.
+			if ((g_pD3D = Direct3DCreate9(D3D_SDK_VERSION)) == NULL) return;
+			// Set up the structure for creating a device.
+			D3DPRESENT_PARAMETERS d3dpp;
+			ZeroMemory(&d3dpp, sizeof(d3dpp));
+			d3dpp.Windowed = TRUE;
+			d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+			d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+			d3dpp.BackBufferCount = 1;
+			d3dpp.BackBufferWidth = ImageWidth;
+			d3dpp.BackBufferHeight = ImageHeight;
+			// Create the device.
+			if (FAILED(g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &g_pd3dDevice)))	return;
+			// Create the texture.
+			// We assume a ImageWidth x ImageHeight texture with 1 mip level, 0 usage, with the ARGB format.
+			if (FAILED(g_pd3dDevice->CreateTexture(ImageWidth, ImageHeight, 1, 0, D3DFMT_A8R8G8B8,	D3DPOOL_MANAGED, &g_pTexture, NULL))) return;
 			//--------------------------------------------------------
+			m_HWnd = hWnd;
 			m_ImageWidth = ImageWidth;
 			m_ImageHeight = ImageHeight;
 		}
@@ -69,91 +68,21 @@ void CAutoMemoryDirect3D::ReInit(int ImageWidth, int ImageHeight)
 		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::ReInit", "Exception in CAutoMemoryDib ReInit");
 	}		
 }
-HRESULT CAutoMemoryDirect3D::_D3DDrawString( LPCWSTR Message, INT _nX, INT _nY, DWORD _dwWidth, DWORD _dwHeight )
-{
-	try
-	{
-		RECT	rc3DCanvas;
-	#if 1
-		SetRect( &rc3DCanvas, 0, 0, _dwWidth, _dwHeight );
-	#else
-		SetRect( &rc3DCanvas, 0, 0, m_cD3d->m_GetCurrent3DCanvasSize().cx, m_cD3d->m_GetCurrent3DCanvasSize().cy );
-	#endif
-		SIZE	sizeImage = { _dwWidth, _dwHeight };
-		POINT	ptStartXY = { _nX, _nY };
-		if (Message == NULL) return (-1);
-		CHAR tempString[256] = {0, };
-		for (int i = 0; ((i < 255) && (Message[i] != 0)); i++) tempString[i] = (CHAR)Message[i];
-		m_cD3d->m_DrawText( rc3DCanvas,	// Target
-						   sizeImage,	// Src
-						   ptStartXY,
-						   tempString,
-						   _D3D_FONT_ALPHA,
-						   _D3D_FONT_RGB );
-	}
-	catch(...)
-	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::_D3DDrawString", "Exception in CAutoMemoryDirect3D _D3DDrawString");
-	}
-	return 0;
-}
-HRESULT CAutoMemoryDirect3D::_D3DDrawCaptureStream( LPBYTE _lpStream, DWORD _dwStreamWidth, DWORD _dwStreamHeight, eSTREAMFORMAT _eStreamFormat )
-{
-	try
-	{
-		if( _dwStreamWidth == 0 || _dwStreamHeight == 0 ) return -1;
-		RECT	rc3DCanvas;
-#if 1
-		SetRect( &rc3DCanvas, 0, 0, _dwStreamWidth, _dwStreamHeight );
-#else
-		SetRect( &rc3DCanvas, 0, 0, m_cD3d->m_GetCurrent3DCanvasSize().cx, m_cD3d->m_GetCurrent3DCanvasSize().cy );
-#endif
-		SIZE sizeImage = { _dwStreamWidth, _dwStreamHeight };
-		CD3d::eCOLORFORMAT eSrcCF;
-		if( _eStreamFormat == YUY2 )  eSrcCF = CD3d::CF_YUY2;
-		else
-		if( _eStreamFormat == YV12 )  eSrcCF = CD3d::CF_YV12;
-		else
-		if( _eStreamFormat == RGB32 ) eSrcCF = CD3d::CF_BGRX;
-		else
-			return -2;
-		m_cD3d->m_DrawImage( rc3DCanvas,	// Target
-						    sizeImage,		// Src
-							eSrcCF,			// CD3d::CF_BGRX,
-						    _lpStream );
-	}
-	catch(...)
-	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::_D3DDrawCaptureStream", "Exception in CAutoMemoryDirect3D _D3DDrawCaptureStream");
-	}
-	return 0;
-}
-BOOL CAutoMemoryDirect3D::_D3DPrimaryPresentation()
+BOOL CAutoMemoryDirect3D::DrawImageRGB32(HWND hWnd, BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
 {
 	BOOL retVal = FALSE;
 	try
 	{
-		RECT rc3DCanvas;
-		SetRect( &rc3DCanvas, 0, 0, m_cD3d->m_GetCurrent3DCanvasSize().cx, m_cD3d->m_GetCurrent3DCanvasSize().cy );
-		retVal = m_cD3d->m_PrimaryPresentation( NULL, &rc3DCanvas );
-	}
-	catch(...)
-	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::_D3DPrimaryPresentation", "Exception in CAutoMemoryDirect3D _D3DPrimaryPresentation");
-	}
-	return (retVal);
-}
-BOOL CAutoMemoryDirect3D::DrawImageRGB32(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
-{
-	BOOL retVal = FALSE;
-	try
-	{
-		ReInit(ImageWidth, ImageHeight);
-		if (m_ImageDataPtr != NULL)
-		{
-			CopyMemory(m_ImageDataPtr, ImageDataPtr, ImageWidth * ImageHeight * 4);
-			retVal = TRUE;
-		}
+		ReInit(hWnd, ImageWidth, ImageHeight);
+		// Lock the texture to copy our image bytes.
+		D3DLOCKED_RECT lockedRect;
+		if (FAILED(g_pTexture->LockRect(0, &lockedRect, NULL, 0))) return FALSE;
+		// Copy image data into the texture.
+		// Since our texture width is 2 and each pixel is 4 bytes, the pitch should be at least 8 bytes.
+		memcpy(lockedRect.pBits, ImageDataPtr, ImageWidth * ImageHeight * 4);
+		// Unlock the texture.
+		g_pTexture->UnlockRect(0);
+		retVal = TRUE;
 	}
 	catch(...)
 	{ 
@@ -161,18 +90,36 @@ BOOL CAutoMemoryDirect3D::DrawImageRGB32(BYTE* ImageDataPtr, int ImageWidth, int
 	}
 	return (retVal);
 }
-BOOL CAutoMemoryDirect3D::Blt(HWND hWnd)
+BOOL CAutoMemoryDirect3D::Blt()
 {
 	BOOL retVal = TRUE;
 	try
 	{
-		if (hWnd != NULL)
+		if (g_pd3dDevice == NULL) return FALSE;
+		// Clear the backbuffer to dark blue.
+		g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 255), 1.0f, 0);
+		// Begin the scene.
+		if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 		{
-			m_cD3d->m_SetDDClipperWindow(hWnd);
-			_D3DDrawCaptureStream(m_ImageDataPtr, m_ImageWidth, m_ImageHeight, CAutoMemoryDirect3D::RGB32);
-			_D3DPrimaryPresentation();
+			CUSTOMVERTEX vertices[] =
+			{
+				//        x                     y             z    rhw    tu    tv  
+				{                0.0f,                 0.0f, 0.5f, 1.0f, 0.0f, 0.0f }, // top-left
+				{ (FLOAT)m_ImageWidth,                 0.0f, 0.5f, 1.0f, 1.0f, 0.0f }, // top-right
+				{ (FLOAT)m_ImageWidth, (FLOAT)m_ImageHeight, 0.5f, 1.0f, 1.0f, 1.0f }, // bottom-right
+				{                0.0f, (FLOAT)m_ImageHeight, 0.5f, 1.0f, 0.0f, 1.0f }  // bottom-left
+			};
+			// Tell DirectX which vertex format we are using.
+			g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
+			// Set the texture to stage 0.
+			g_pd3dDevice->SetTexture(0, g_pTexture);
+			// Draw the quad as a triangle fan (2 triangles).
+			g_pd3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
+			// End the scene.
+			g_pd3dDevice->EndScene();
 		}
-		else retVal = FALSE;
+		// Present the backbuffer contents to the display.
+		g_pd3dDevice->Present(NULL, NULL, NULL, NULL);
 	}
 	catch(...)
 	{ 

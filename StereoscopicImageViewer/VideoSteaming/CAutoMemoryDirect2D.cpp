@@ -7,6 +7,7 @@ CAutoMemoryDirect2D::CAutoMemoryDirect2D() :
     m_pDCRT(NULL),
 	m_pDWriteFactory(NULL),
 	//----------------------
+	m_HWnd(NULL),
 	m_MemoryBitmap(NULL),
 	m_ImageWidth(0),
 	m_ImageHeight(0)
@@ -106,11 +107,11 @@ void CAutoMemoryDirect2D::DiscardDeviceResources()
 		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect2D::DiscardDeviceResources", "Exception in CAutoMemoryDirect2D DiscardDeviceResources");		
 	}
 }
-void CAutoMemoryDirect2D::ReInit(int ImageWidth, int ImageHeight)
+void CAutoMemoryDirect2D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 {
 	try
 	{
-		if ((m_ImageWidth != ImageWidth) || (m_ImageHeight != ImageHeight))
+		if ((m_HWnd != hWnd) || (m_ImageWidth != ImageWidth) || (m_ImageHeight != ImageHeight))
 		{
 			if (m_MemoryBitmap != NULL)
 			{
@@ -130,6 +131,7 @@ void CAutoMemoryDirect2D::ReInit(int ImageWidth, int ImageHeight)
 				m_pDCRT->CreateBitmap(size, NULL, ImageWidth * 4, p, &m_MemoryBitmap);
 			}
 			//--------------------------------------------------------
+			m_HWnd = hWnd;
 			m_ImageWidth = ImageWidth;
 			m_ImageHeight = ImageHeight;
 		}
@@ -139,12 +141,12 @@ void CAutoMemoryDirect2D::ReInit(int ImageWidth, int ImageHeight)
 		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect2D::ReInit", "Exception in CAutoMemoryDirect2D ReInit");
 	}		
 }
-BOOL CAutoMemoryDirect2D::DrawImageBGR32(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
+BOOL CAutoMemoryDirect2D::DrawImageBGR32(HWND hWnd, BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
 {
 	BOOL retVal = FALSE;
 	try
 	{
-		ReInit(ImageWidth, ImageHeight);
+		ReInit(hWnd, ImageWidth, ImageHeight);
 		if (m_MemoryBitmap != NULL)
 		{
 			D2D1_RECT_U rect = {0, 0, ImageWidth, ImageHeight};
@@ -158,20 +160,20 @@ BOOL CAutoMemoryDirect2D::DrawImageBGR32(BYTE* ImageDataPtr, int ImageWidth, int
 	}
 	return (retVal);
 }
-BOOL CAutoMemoryDirect2D::Blt(HWND hWnd)
+BOOL CAutoMemoryDirect2D::Blt()
 {
 	BOOL retVal = TRUE;
 	try
 	{
-		if (hWnd != NULL)
+		if (m_HWnd != NULL)
 		{
 			HRESULT hr;
 			RECT rc;
 			// Get the dimensions of the client drawing area.
-			GetClientRect(hWnd, &rc);
+			GetClientRect(m_HWnd, &rc);
 			// Draw the pie chart with Direct2D.
 			// Create the DC render target.
-			HDC hDC = ::GetDC(hWnd);
+			HDC hDC = ::GetDC(m_HWnd);
 			if (m_pDCRT != NULL)
 			{
 				// Bind the DC to the DC render target.
@@ -189,7 +191,7 @@ BOOL CAutoMemoryDirect2D::Blt(HWND hWnd)
 				hr = m_pDCRT->EndDraw();
 			}
 			else retVal = FALSE;
-			::ReleaseDC(hWnd, hDC);
+			::ReleaseDC(m_HWnd, hDC);
 		}
 		else retVal = FALSE;
 	}
