@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{37134340-0695-4C19-B053-D4F8025BACF9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>VideoSteaming</RootNamespace>
+    <RootNamespace>StereoImageManager</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -86,26 +86,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="CAudioVideoRender.h" />
-    <ClInclude Include="CAutoMemoryBase.h" />
-    <ClInclude Include="CAutoMemoryDib.h" />
-    <ClInclude Include="CAutoMemoryDirect2D.h" />
-    <ClInclude Include="CAutoMemoryDirect3D.h" />
+    <ClInclude Include="CStereoImageManager.h" />
     <ClInclude Include="CComPort.h" />
     <ClInclude Include="CImage.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SIMUtil.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="StreamingUtil.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CAudioVideoRender.cpp" />
-    <ClCompile Include="CAutoMemoryDib.cpp" />
-    <ClCompile Include="CAutoMemoryDirect2D.cpp" />
-    <ClCompile Include="CAutoMemoryDirect3D.cpp" />
+    <ClCompile Include="CStereoImageManager.cpp" />
     <ClCompile Include="CComPort.cpp" />
     <ClCompile Include="CImage.cpp" />
     <ClCompile Include="dllmain.cpp">
@@ -116,19 +106,22 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SIMUtil.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="StreamingUtil.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VideoCommon\VideoCommon.vcxproj">
-      <Project>{9e19b7d1-1100-4a0c-8c42-a3316e123060}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.vcxproj">
+      <Project>{9e19b7d1-1100-4a0c-8c42-a3316e123060}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\StereoRendering\StereoRendering.vcxproj">
+      <Project>{71cd25e8-7a58-47d9-9da9-5330c7135e52}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

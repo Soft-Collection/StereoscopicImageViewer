@@ -1,12 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
-public class clsAudioVideoWrap
+public class clsSIMWrap
 {
     #region Common
 
     #region Constants
-    private const string DllFileName = "VideoSteaming.dll";
+    private const string DllFileName = "StereoImageManager.dll";
     private const int MMSYSERR_BASE = 0;
     private const int WAVERR_BASE = 32;
     #endregion
@@ -216,35 +216,22 @@ public class clsAudioVideoWrap
 
     #endregion
 
-    #region Audio Video Renderer
+    #region Stereo Image Manager
 
     #region External Functions
 
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr AudioVideoRenderCreateNew(IntPtr hWnd, eVideoRenderTargets videoRenderTarget, eFrequencies frequency, clsAudioVideoWrap.eSignalSources signalSource, [MarshalAs(UnmanagedType.LPWStr)] string comPort, [MarshalAs(UnmanagedType.LPWStr)] string leftImageFilePath, [MarshalAs(UnmanagedType.LPWStr)] string rightImageFilePath);
+    public static extern IntPtr StereoImageManagerCreateNew(IntPtr hWnd, eFrequencies frequency, clsSIMWrap.eSignalSources signalSource, [MarshalAs(UnmanagedType.LPWStr)] string comPort, [MarshalAs(UnmanagedType.LPWStr)] string leftImageFilePath, [MarshalAs(UnmanagedType.LPWStr)] string rightImageFilePath);
 
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void AudioVideoRenderDispose(IntPtr AudioVideoRenderHandle);
+    public static extern void StereoImageManagerDispose(IntPtr StereoImageManagerHandle);
 
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern eAudioVideoRenderErrors AudioVideoRenderVideoRender(IntPtr AudioVideoRenderHandle);
-
-    [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern eAudioVideoRenderErrors AudioVideoRenderAudioRender(IntPtr AudioVideoRenderHandle, tWAVEFORMATEX tOutWFX, byte[] pStreamData, int _nStreamDataLength, byte cStreamType);
-
-    [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern eAudioVideoRenderErrors AudioVideoRenderAudioRender(IntPtr AudioVideoRenderHandle, tWAVEFORMATEX tOutWFX, IntPtr pStreamData, int _nStreamDataLength, byte cStreamType);
+    public static extern eStereoImageManagerErrors StereoImageManagerVideoRender(IntPtr StereoImageManagerHandle);
 
     #endregion
 
     #region Enums
-
-    public enum eVideoRenderTargets : int
-    {
-        GDI = 0,
-        D2D = 1,
-        D3D = 2
-    }
 
     public enum eFrequencies : int
     {
@@ -263,7 +250,7 @@ public class clsAudioVideoWrap
         COMPort = 1
     }
 
-    public enum eAudioVideoRenderErrors : int
+    public enum eStereoImageManagerErrors : int
     {
         NoError = 0,
         NullHandle = 1,

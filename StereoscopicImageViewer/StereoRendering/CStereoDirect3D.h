@@ -1,7 +1,6 @@
-#ifndef __CAUTOMEMORYDIRECT3D_H__
-#define __CAUTOMEMORYDIRECT3D_H__
+#ifndef __CSTEREODIRECT3D_H__
+#define __CSTEREODIRECT3D_H__
 
-#include "CAutoMemoryBase.h"
 #include <windows.h>
 #include <d3d9.h>
 #include <tchar.h>
@@ -18,7 +17,7 @@ struct CUSTOMVERTEX {
 };
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW | D3DFVF_TEX1)
 
-class CAutoMemoryDirect3D : public CAutoMemoryBase
+class CStereoDirect3D
 {
 private:
 	HWND        m_HWnd;
@@ -27,14 +26,15 @@ private:
 private:
 	LPDIRECT3D9             g_pD3D;
 	LPDIRECT3DDEVICE9       g_pd3dDevice;
-	LPDIRECT3DTEXTURE9      g_pTexture;
+	LPDIRECT3DTEXTURE9      g_pLeftTexture;
+	LPDIRECT3DTEXTURE9      g_pRightTexture;
 private:
 	void ReInit(HWND hWnd, INT ImageWidth, INT ImageHeight);
 public:
-	CAutoMemoryDirect3D();
-	~CAutoMemoryDirect3D();
-	BOOL DrawImageRGB32(HWND hWnd, BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight);
-	BOOL DrawImage(HWND hWnd, BYTE* ImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageRGB32(hWnd, ImageDataPtr, ImageWidth, ImageHeight)); }
-	BOOL Blt();
+	CStereoDirect3D();
+	~CStereoDirect3D();
+	BOOL DrawImageRGB32(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight);
+	BOOL DrawImage(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageRGB32(hWnd, LeftImageDataPtr, RightImageDataPtr, ImageWidth, ImageHeight)); }
+	BOOL Blt(bool isLeft);
 };
-#endif // __CAUTOMEMORYDIRECT3D_H__
+#endif // __CSTEREODIRECT3D_H__

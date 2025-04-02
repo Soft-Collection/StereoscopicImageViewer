@@ -41,10 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="clsAudioVideoRender.cs" />
-    <Compile Include="clsAudioVideoWrap.cs" />
-    <Compile Include="clsAutoBuffer.cs" />
-    <Compile Include="clsAutoBufferWithPriority.cs" />
+    <Compile Include="clsStereoImageManager.cs" />
+    <Compile Include="clsSIMWrap.cs" />
     <Compile Include="ExceptionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

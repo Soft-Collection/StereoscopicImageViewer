@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CComPort.h"
 
-#include "../VideoCommon/CTools.h"
+#include "../Common/CTools.h"
 
 CComPort::CComPort()
 {

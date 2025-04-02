@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "CAutoMemoryDirect3D.h"
-#include "../VideoCommon/CExceptionReport.h"
+#include "CStereoDirect3D.h"
+#include "../Common/CExceptionReport.h"
 
-CAutoMemoryDirect3D::CAutoMemoryDirect3D()
+CStereoDirect3D::CStereoDirect3D()
 {
 	try
 	{
@@ -11,33 +11,36 @@ CAutoMemoryDirect3D::CAutoMemoryDirect3D()
 		m_ImageHeight = 0;
 		g_pD3D = NULL;
 		g_pd3dDevice = NULL;
-		g_pTexture = NULL;
+		g_pLeftTexture = NULL;
+		g_pRightTexture = NULL;
 	}
 	catch(...)
 	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::~CAutoMemoryDirect3D", "Exception in CAutoMemoryDirect3D Destructor");
+		CExceptionReport::WriteExceptionReportToFile("CStereoDirect3D::~CStereoDirect3D", "Exception in CStereoDirect3D Destructor");
 	}
 }
-CAutoMemoryDirect3D::~CAutoMemoryDirect3D()
+CStereoDirect3D::~CStereoDirect3D()
 {
 	try
 	{
-		if (g_pTexture != NULL) g_pTexture->Release();
+		if (g_pRightTexture != NULL) g_pRightTexture->Release();
+		if (g_pLeftTexture != NULL) g_pLeftTexture->Release();
 		if (g_pd3dDevice != NULL) g_pd3dDevice->Release();
 		if (g_pD3D != NULL) g_pD3D->Release();
 	}
 	catch(...)
 	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::~CAutoMemoryDirect3D", "Exception in CAutoMemoryDirect3D Destructor");
+		CExceptionReport::WriteExceptionReportToFile("CStereoDirect3D::~CStereoDirect3D", "Exception in CStereoDirect3D Destructor");
 	}
 }
-void CAutoMemoryDirect3D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
+void CStereoDirect3D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 {
 	try
 	{
 		if ((m_HWnd != hWnd) || (m_ImageWidth != ImageWidth) || (m_ImageHeight != ImageHeight))
 		{
-			if (g_pTexture != NULL) g_pTexture->Release();
+			if (g_pRightTexture != NULL) g_pRightTexture->Release();
+			if (g_pLeftTexture != NULL) g_pLeftTexture->Release();
 			if (g_pd3dDevice != NULL) g_pd3dDevice->Release();
 			if (g_pD3D != NULL) g_pD3D->Release();
 			//--------------------------------------------------------
@@ -56,7 +59,8 @@ void CAutoMemoryDirect3D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 			if (FAILED(g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &g_pd3dDevice)))	return;
 			// Create the texture.
 			// We assume a ImageWidth x ImageHeight texture with 1 mip level, 0 usage, with the ARGB format.
-			if (FAILED(g_pd3dDevice->CreateTexture(ImageWidth, ImageHeight, 1, 0, D3DFMT_A8R8G8B8,	D3DPOOL_MANAGED, &g_pTexture, NULL))) return;
+			if (FAILED(g_pd3dDevice->CreateTexture(ImageWidth, ImageHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &g_pLeftTexture, NULL))) return;
+			if (FAILED(g_pd3dDevice->CreateTexture(ImageWidth, ImageHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &g_pRightTexture, NULL))) return;
 			//--------------------------------------------------------
 			m_HWnd = hWnd;
 			m_ImageWidth = ImageWidth;
@@ -65,10 +69,10 @@ void CAutoMemoryDirect3D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 	}
 	catch(...)
 	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::ReInit", "Exception in CAutoMemoryDib ReInit");
+		CExceptionReport::WriteExceptionReportToFile("CStereoDirect3D::ReInit", "Exception in CStereoDib ReInit");
 	}		
 }
-BOOL CAutoMemoryDirect3D::DrawImageRGB32(HWND hWnd, BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
+BOOL CStereoDirect3D::DrawImageRGB32(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, int ImageWidth, int ImageHeight)
 {
 	BOOL retVal = FALSE;
 	try
@@ -76,21 +80,30 @@ BOOL CAutoMemoryDirect3D::DrawImageRGB32(HWND hWnd, BYTE* ImageDataPtr, int Imag
 		ReInit(hWnd, ImageWidth, ImageHeight);
 		// Lock the texture to copy our image bytes.
 		D3DLOCKED_RECT lockedRect;
-		if (FAILED(g_pTexture->LockRect(0, &lockedRect, NULL, 0))) return FALSE;
+		//-----------------------------------------------------------------------------------------------
+		if (FAILED(g_pLeftTexture->LockRect(0, &lockedRect, NULL, 0))) return FALSE;
 		// Copy image data into the texture.
 		// Since our texture width is 2 and each pixel is 4 bytes, the pitch should be at least 8 bytes.
-		memcpy(lockedRect.pBits, ImageDataPtr, ImageWidth * ImageHeight * 4);
+		memcpy(lockedRect.pBits, LeftImageDataPtr, ImageWidth * ImageHeight * 4);
 		// Unlock the texture.
-		g_pTexture->UnlockRect(0);
+		g_pLeftTexture->UnlockRect(0);
+		//-----------------------------------------------------------------------------------------------
+		if (FAILED(g_pRightTexture->LockRect(0, &lockedRect, NULL, 0))) return FALSE;
+		// Copy image data into the texture.
+		// Since our texture width is 2 and each pixel is 4 bytes, the pitch should be at least 8 bytes.
+		memcpy(lockedRect.pBits, RightImageDataPtr, ImageWidth * ImageHeight * 4);
+		// Unlock the texture.
+		g_pRightTexture->UnlockRect(0);
+		//-----------------------------------------------------------------------------------------------
 		retVal = TRUE;
 	}
 	catch(...)
 	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::DrawImageRGB32", "Exception in CAutoMemoryDirect3D DrawImageRGB32");
+		CExceptionReport::WriteExceptionReportToFile("CStereoDirect3D::DrawImageRGB32", "Exception in CStereoDirect3D DrawImageRGB32");
 	}
 	return (retVal);
 }
-BOOL CAutoMemoryDirect3D::Blt()
+BOOL CStereoDirect3D::Blt(bool isLeft)
 {
 	BOOL retVal = TRUE;
 	try
@@ -112,7 +125,7 @@ BOOL CAutoMemoryDirect3D::Blt()
 			// Tell DirectX which vertex format we are using.
 			g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 			// Set the texture to stage 0.
-			g_pd3dDevice->SetTexture(0, g_pTexture);
+			g_pd3dDevice->SetTexture(0, (isLeft) ? g_pLeftTexture : g_pRightTexture);
 			// Draw the quad as a triangle fan (2 triangles).
 			g_pd3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
 			// End the scene.
@@ -123,7 +136,7 @@ BOOL CAutoMemoryDirect3D::Blt()
 	}
 	catch(...)
 	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAutoMemoryDirect3D::Blt", "Exception in CAutoMemoryDirect3D Blt");
+		CExceptionReport::WriteExceptionReportToFile("CStereoDirect3D::Blt", "Exception in CStereoDirect3D Blt");
 	}
 	return (retVal);
 }

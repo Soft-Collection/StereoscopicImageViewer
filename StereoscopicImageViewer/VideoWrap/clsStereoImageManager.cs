@@ -1,6 +1,6 @@
 using System;
 
-public class clsAudioVideoRender
+public class clsStereoImageManager
 {
     #region External Functions
     #endregion
@@ -11,11 +11,11 @@ public class clsAudioVideoRender
     #endregion
 
     #region New / Dispose
-    public clsAudioVideoRender(IntPtr hWnd, clsAudioVideoWrap.eVideoRenderTargets videoRenderTarget, clsAudioVideoWrap.eFrequencies frequency, clsAudioVideoWrap.eSignalSources signalSource, string comPort, string leftImageFilePath, string rightImageFilePath)
+    public clsStereoImageManager(IntPtr hWnd, clsSIMWrap.eFrequencies frequency, clsSIMWrap.eSignalSources signalSource, string comPort, string leftImageFilePath, string rightImageFilePath)
     {
         try
         {
-            mHandle = clsAudioVideoWrap.AudioVideoRenderCreateNew(hWnd, videoRenderTarget, frequency, signalSource, comPort, leftImageFilePath, rightImageFilePath);
+            mHandle = clsSIMWrap.StereoImageManagerCreateNew(hWnd, frequency, signalSource, comPort, leftImageFilePath, rightImageFilePath);
         }
         catch (Exception ex)
         {
@@ -28,7 +28,7 @@ public class clsAudioVideoRender
         try
         {
             GC.SuppressFinalize(this);
-            clsAudioVideoWrap.AudioVideoRenderDispose(mHandle);
+            clsSIMWrap.StereoImageManagerDispose(mHandle);
         }
         catch (Exception ex)
         {
@@ -36,14 +36,14 @@ public class clsAudioVideoRender
         }
     }
 
-    ~clsAudioVideoRender()
+    ~clsStereoImageManager()
     {
         Dispose();
     }
     #endregion
 
     #region Methods
-    public clsAudioVideoWrap.eAudioVideoRenderErrors VideoRender()
+    public clsSIMWrap.eStereoImageManagerErrors VideoRender()
     {
         try
         {
@@ -51,7 +51,7 @@ public class clsAudioVideoRender
             {
                 lock (mLock)
                 {
-                    return clsAudioVideoWrap.AudioVideoRenderVideoRender(mHandle);
+                    return clsSIMWrap.StereoImageManagerVideoRender(mHandle);
                 }
             }
         }
@@ -62,7 +62,7 @@ public class clsAudioVideoRender
         finally
         {
         }
-        return clsAudioVideoWrap.eAudioVideoRenderErrors.NullHandle;
+        return clsSIMWrap.eStereoImageManagerErrors.NullHandle;
     }
     #endregion
 }

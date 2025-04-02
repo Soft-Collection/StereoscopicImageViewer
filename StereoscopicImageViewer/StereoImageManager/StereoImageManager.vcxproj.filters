@@ -15,31 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CAudioVideoRender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CAutoMemoryBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CAutoMemoryDib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CAutoMemoryDirect2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CAutoMemoryDirect3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StreamingUtil.h">
+    <ClInclude Include="CStereoImageManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -51,6 +33,9 @@
     <ClInclude Include="CComPort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SIMUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -59,25 +44,16 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CAudioVideoRender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CAutoMemoryDib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CAutoMemoryDirect2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CAutoMemoryDirect3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StreamingUtil.cpp">
+    <ClCompile Include="CStereoImageManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CComPort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SIMUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

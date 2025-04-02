@@ -1,23 +1,19 @@
 #include "stdafx.h"
-#include "CAudioVideoRender.h"
-#include "../VideoCommon/CExceptionReport.h"
-#include "../VideoCommon/CCriticalSectionPool.h"
+#include "CStereoImageManager.h"
+#include "../Common/CExceptionReport.h"
+#include "../Common/CCriticalSectionPool.h"
 #include <chrono>
 #include <thread>
 #include <Windows.h>
 #include <iostream>
 
-CAudioVideoRender::CAudioVideoRender(HWND hWnd, eVideoRenderTargets renderTarget, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+CStereoImageManager::CStereoImageManager(HWND hWnd, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
 {
 	mCriticalSectionPool = new CCriticalSectionPool(eCriticalSections::Size);
 	mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 	//----------------------------------------------------
 	mHWnd = hWnd;
-	mAutoMemoryBase = NULL;
-	mRenderTarget = renderTarget;
-	if (mRenderTarget == eVideoRenderTargets::GDI) mAutoMemoryBase = new CAutoMemoryDib();
-	else if (mRenderTarget == eVideoRenderTargets::D2D) mAutoMemoryBase = new CAutoMemoryDirect2D();
-	else if (mRenderTarget == eVideoRenderTargets::D3D) mAutoMemoryBase = new CAutoMemoryDirect3D();
+	mStereoDirect3D = new CStereoDirect3D();
 	mFrequency = frequency;
 	mSignalSource = signalSource;
 	mComPortName = std::wstring(comPort);
@@ -40,11 +36,13 @@ CAudioVideoRender::CAudioVideoRender(HWND hWnd, eVideoRenderTargets renderTarget
 	mRightImage->RectanglesMustBeDrawn = (mSignalSource == eSignalSources::ScreenSensor);
 	CImage::LoadPNG(mRightImage);
 	//----------------------------------------------------
+	mStereoDirect3D->DrawImage(mHWnd, mLeftImage->PixelData.data(), mRightImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
+	//----------------------------------------------------
 	mImageToPlayIsLeft = true;
 	//----------------------------------------------------
 	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
 }
-CAudioVideoRender::~CAudioVideoRender()
+CStereoImageManager::~CStereoImageManager()
 {
 	mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 	//----------------------------------------------------
@@ -66,10 +64,10 @@ CAudioVideoRender::~CAudioVideoRender()
 		mComPort = NULL;
 	}
 	//----------------------------------------------------
-	if (mAutoMemoryBase != NULL)
+	if (mStereoDirect3D != NULL)
 	{
-		delete mAutoMemoryBase;
-		mAutoMemoryBase = NULL;
+		delete mStereoDirect3D;
+		mStereoDirect3D = NULL;
 	}
 	//----------------------------------------------------
 	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
@@ -80,61 +78,24 @@ CAudioVideoRender::~CAudioVideoRender()
 		mCriticalSectionPool = NULL;
 	}
 }
-CAudioVideoRender::eAudioVideoRenderErrors CAudioVideoRender::DrawWindow()
-{
-	eAudioVideoRenderErrors retVal = eAudioVideoRenderErrors::NoError;
-	try
-	{
-		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
-		if (mAutoMemoryBase != NULL)
-		{
-			mAutoMemoryBase->Blt();
-		}
-		else
-		{
-			if (mRenderTarget == eVideoRenderTargets::GDI) retVal = eAudioVideoRenderErrors::DibIsNull;
-			else if (mRenderTarget == eVideoRenderTargets::D2D) retVal = eAudioVideoRenderErrors::Direct2DIsNull;
-			else if (mRenderTarget == eVideoRenderTargets::D3D) retVal = eAudioVideoRenderErrors::Direct3DIsNull;
-		}
-		//----------------------------------------------
-		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
-	}
-	catch(...)
-	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAudioVideoRender::DrawAllWindows", "Exception in CAudioVideoRender DrawAllWindows");
-	}
-	return (retVal);
-}
-CAudioVideoRender::eAudioVideoRenderErrors CAudioVideoRender::VideoRender()
+CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender()
 {
 	try
 	{
-		if ((mLeftImage->Width != mRightImage->Width) || (mLeftImage->Height != mRightImage->Height)) return eAudioVideoRenderErrors::DifferentLeftRightImageDimensions;
+		if ((mLeftImage->Width != mRightImage->Width) || (mLeftImage->Height != mRightImage->Height)) return eStereoImageManagerErrors::DifferentLeftRightImageDimensions;
 		auto start = std::chrono::high_resolution_clock::now();
 		//----------------------------------------------
 		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
 		mImageToPlayIsLeft = !mImageToPlayIsLeft;
-		if (mAutoMemoryBase != NULL)
+		if (mStereoDirect3D != NULL)
 		{
-			if (mImageToPlayIsLeft)
-			{
-				mAutoMemoryBase->DrawImage(mHWnd, mLeftImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
-			}
-			else
-			{
-				mAutoMemoryBase->DrawImage(mHWnd, mRightImage->PixelData.data(), mRightImage->Width, mRightImage->Height);
-			}
+			mStereoDirect3D->Blt(mImageToPlayIsLeft);
 		}
 		else
 		{
-			if (mRenderTarget == eVideoRenderTargets::GDI) return eAudioVideoRenderErrors::DibIsNull;
-			else if (mRenderTarget == eVideoRenderTargets::D2D) return eAudioVideoRenderErrors::Direct2DIsNull;
-			else if (mRenderTarget == eVideoRenderTargets::D3D) return eAudioVideoRenderErrors::Direct3DIsNull;
+			return eStereoImageManagerErrors::Direct3DIsNull;
 		}
-		eAudioVideoRenderErrors ret = DrawWindow();
-		if (ret != eAudioVideoRenderErrors::NoError) return ret;
 		if (mImageToPlayIsLeft)
 		{
 			if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Left);
@@ -173,12 +134,12 @@ CAudioVideoRender::eAudioVideoRenderErrors CAudioVideoRender::VideoRender()
 	}
 	catch(...)
 	{ 
-		CExceptionReport::WriteExceptionReportToFile("CAudioVideoRender::VideoRender", "Exception in CAudioVideoRender VideoRender");
-		return eAudioVideoRenderErrors::ExceptionInVideoRender;
+		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager VideoRender");
+		return eStereoImageManagerErrors::ExceptionInVideoRender;
 	}
-	return eAudioVideoRenderErrors::NoError;
+	return eStereoImageManagerErrors::NoError;
 }
-int CAudioVideoRender::GetRefreshRate()
+int CStereoImageManager::GetRefreshRate()
 {
 	// Structure to store display settings
 	DEVMODE dm;

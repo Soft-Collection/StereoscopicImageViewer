@@ -1,19 +1,16 @@
-#ifndef __CAUDIOVIDEORENDER_H__
-#define __CAUDIOVIDEORENDER_H__
+#ifndef __CSTEREOIMAGEMANAGER_H__
+#define __CSTEREOIMAGEMANAGER_H__
 
 #include "CImage.h"
 #include "CComPort.h"
-#include "CAutoMemoryBase.h"
-#include "CAutoMemoryDib.h"
-#include "CAutoMemoryDirect2D.h"
-#include "CAutoMemoryDirect3D.h"
-#include "../VideoCommon/CCriticalSectionPool.h"
+#include "../StereoRendering/CStereoDirect3D.h"
+#include "../Common/CCriticalSectionPool.h"
 #include <list>
 
-class CAudioVideoRender
+class CStereoImageManager
 {
 public:
-	enum eAudioVideoRenderErrors : int
+	enum eStereoImageManagerErrors : int
 	{
 		NoError = 0,
 		NullHandle = 1,
@@ -36,12 +33,6 @@ public:
 		WaveIsNull = 18,
 		UUCoreIsNull = 19,
 		DifferentLeftRightImageDimensions = 20
-	};
-	enum eVideoRenderTargets : int
-	{
-		GDI = 0,
-		D2D = 1,
-		D3D = 2
 	};
 	enum eFrequencies : int
 	{
@@ -68,24 +59,22 @@ private:
 	CCriticalSectionPool* mCriticalSectionPool;
 	//----------------------------------------
 	HWND mHWnd;
-	eVideoRenderTargets mRenderTarget;
 	eFrequencies mFrequency;
 	eSignalSources mSignalSource;
 	std::wstring mComPortName;
 	CComPort* mComPort;
-	CAutoMemoryBase* mAutoMemoryBase;
+	CStereoDirect3D* mStereoDirect3D;
 	//----------------------------------------
 	CImage* mLeftImage;
 	CImage* mRightImage;
 	//----------------------------------------
 	bool mImageToPlayIsLeft;
 public:
-	CAudioVideoRender(HWND hWnd, eVideoRenderTargets renderTarget, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath);
-	~CAudioVideoRender();
+	CStereoImageManager(HWND hWnd, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath);
+	~CStereoImageManager();
 private:
-	eAudioVideoRenderErrors DrawWindow();
 	int GetRefreshRate();
 public:
-	eAudioVideoRenderErrors VideoRender();
+	eStereoImageManagerErrors VideoRender();
 };
-#endif // __CAUDIOVIDEORENDER_H__
+#endif // __CSTEREOIMAGEMANAGER_H__

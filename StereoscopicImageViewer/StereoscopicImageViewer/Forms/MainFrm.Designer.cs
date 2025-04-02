@@ -49,9 +49,6 @@
             this.tsbOpenLeft = new System.Windows.Forms.ToolStripButton();
             this.tsbOpenRight = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
-            this.tscbRenderTarget = new System.Windows.Forms.ToolStripComboBox();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.tscbFrequency = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -198,9 +195,6 @@
             this.tsbOpenLeft,
             this.tsbOpenRight,
             this.toolStripSeparator2,
-            this.toolStripLabel2,
-            this.tscbRenderTarget,
-            this.toolStripSeparator3,
             this.toolStripLabel1,
             this.tscbFrequency,
             this.toolStripSeparator4,
@@ -239,29 +233,6 @@
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 30);
-            // 
-            // toolStripLabel2
-            // 
-            this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(89, 27);
-            this.toolStripLabel2.Text = "Rendering Type";
-            // 
-            // tscbRenderTarget
-            // 
-            this.tscbRenderTarget.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tscbRenderTarget.Items.AddRange(new object[] {
-            "GDI",
-            "D2D",
-            "D3D"});
-            this.tscbRenderTarget.Name = "tscbRenderTarget";
-            this.tscbRenderTarget.Size = new System.Drawing.Size(75, 30);
-            this.tscbRenderTarget.ToolTipText = "Select Rendering Type";
-            this.tscbRenderTarget.SelectedIndexChanged += new System.EventHandler(this.tscbRenderTarget_SelectedIndexChanged);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 30);
             // 
             // toolStripLabel1
             // 
@@ -424,8 +395,6 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem1;
         private System.Windows.Forms.ToolStrip toolStrip;
-        private System.Windows.Forms.ToolStripComboBox tscbRenderTarget;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.PictureBox pbVideoPanel;
         private System.Windows.Forms.ToolStripButton tsbStartStop;
         private System.Windows.Forms.ToolStripMenuItem visitWebSiteToolStripMenuItem;
@@ -439,7 +408,6 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripComboBox tscbFrequency;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripLabel toolStripLabel3;
         private System.Windows.Forms.ToolStripComboBox tscbSignalSource;
