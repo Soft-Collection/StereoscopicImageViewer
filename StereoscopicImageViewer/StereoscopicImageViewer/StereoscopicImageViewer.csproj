@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\clsFrequencyCounter.cs" />
+    <Compile Include="Classes\clsStereoImageManager.cs" />
+    <Compile Include="Classes\clsStereoImageManagerWrap.cs" />
+    <Compile Include="Classes\ExceptionManager.cs" />
     <Compile Include="Forms\AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,14 +104,11 @@
     <Content Include="3d.ico" />
     <Content Include="Icons\3d.ico" />
     <Content Include="Images\mylogo.jpg" />
+    <Content Include="Images\openleft.png" />
+    <Content Include="Images\openright.png" />
+    <Content Include="Images\refresh2.png" />
     <None Include="Images\play.png" />
     <None Include="Images\stop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VideoWrap\VideoWrap.csproj">
-      <Project>{2955d9b6-5f2f-4332-af23-ddddec44cd2e}</Project>
-      <Name>VideoWrap</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

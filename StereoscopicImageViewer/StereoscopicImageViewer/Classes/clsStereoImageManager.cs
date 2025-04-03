@@ -11,11 +11,11 @@ public class clsStereoImageManager
     #endregion
 
     #region New / Dispose
-    public clsStereoImageManager(IntPtr hWnd, clsSIMWrap.eFrequencies frequency, clsSIMWrap.eSignalSources signalSource, string comPort, string leftImageFilePath, string rightImageFilePath)
+    public clsStereoImageManager(IntPtr hWnd, clsStereoImageManagerWrap.eFrequencies frequency, clsStereoImageManagerWrap.eSignalSources signalSource, string comPort, string leftImageFilePath, string rightImageFilePath)
     {
         try
         {
-            mHandle = clsSIMWrap.StereoImageManagerCreateNew(hWnd, frequency, signalSource, comPort, leftImageFilePath, rightImageFilePath);
+            mHandle = clsStereoImageManagerWrap.StereoImageManagerCreateNew(hWnd, frequency, signalSource, comPort, leftImageFilePath, rightImageFilePath);
         }
         catch (Exception ex)
         {
@@ -28,7 +28,7 @@ public class clsStereoImageManager
         try
         {
             GC.SuppressFinalize(this);
-            clsSIMWrap.StereoImageManagerDispose(mHandle);
+            clsStereoImageManagerWrap.StereoImageManagerDispose(mHandle);
         }
         catch (Exception ex)
         {
@@ -43,7 +43,7 @@ public class clsStereoImageManager
     #endregion
 
     #region Methods
-    public clsSIMWrap.eStereoImageManagerErrors VideoRender()
+    public clsStereoImageManagerWrap.eStereoImageManagerErrors VideoRender()
     {
         try
         {
@@ -51,7 +51,7 @@ public class clsStereoImageManager
             {
                 lock (mLock)
                 {
-                    return clsSIMWrap.StereoImageManagerVideoRender(mHandle);
+                    return clsStereoImageManagerWrap.StereoImageManagerVideoRender(mHandle);
                 }
             }
         }
@@ -62,7 +62,7 @@ public class clsStereoImageManager
         finally
         {
         }
-        return clsSIMWrap.eStereoImageManagerErrors.NullHandle;
+        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
     }
     #endregion
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-public class clsSIMWrap
+public class clsStereoImageManagerWrap
 {
     #region Common
 
@@ -221,7 +221,7 @@ public class clsSIMWrap
     #region External Functions
 
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr StereoImageManagerCreateNew(IntPtr hWnd, eFrequencies frequency, clsSIMWrap.eSignalSources signalSource, [MarshalAs(UnmanagedType.LPWStr)] string comPort, [MarshalAs(UnmanagedType.LPWStr)] string leftImageFilePath, [MarshalAs(UnmanagedType.LPWStr)] string rightImageFilePath);
+    public static extern IntPtr StereoImageManagerCreateNew(IntPtr hWnd, eFrequencies frequency, clsStereoImageManagerWrap.eSignalSources signalSource, [MarshalAs(UnmanagedType.LPWStr)] string comPort, [MarshalAs(UnmanagedType.LPWStr)] string leftImageFilePath, [MarshalAs(UnmanagedType.LPWStr)] string rightImageFilePath);
 
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void StereoImageManagerDispose(IntPtr StereoImageManagerHandle);

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "SIMUtil.h"
+#include "StereoImageManagerWrap.h"
 
 void* StereoImageManagerCreateNew(HWND hWnd, CStereoImageManager::eFrequencies frequency, CStereoImageManager::eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
 {

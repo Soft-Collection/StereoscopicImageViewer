@@ -44,7 +44,7 @@ namespace StereoscopicImageViewer
             //-----------------------------------
             tscbFrequency.SelectedIndex = (int)Settings.Frequency;
             tscbSignalSource.SelectedIndex = (int)Settings.SignalSource;
-            if (tscbSignalSource.SelectedIndex == (int)clsSIMWrap.eSignalSources.COMPort)
+            if (tscbSignalSource.SelectedIndex == (int)clsStereoImageManagerWrap.eSignalSources.COMPort)
             {
                 if (tscbComPort.Items.Contains(Settings.ComPort))
                 {
@@ -216,7 +216,7 @@ namespace StereoscopicImageViewer
         private Task mTask = null;
         private bool mTaskQuit = false;
         private int mFrequencyInHz = 0;
-        private int mLastError = (int)clsSIMWrap.eStereoImageManagerErrors.NoError;
+        private int mLastError = (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError;
         #endregion
 
         #region Initialize
@@ -247,18 +247,19 @@ namespace StereoscopicImageViewer
         }
         private void tscbFrequency_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Settings.Frequency = (clsSIMWrap.eFrequencies)tscbFrequency.SelectedIndex;
+            Settings.Frequency = (clsStereoImageManagerWrap.eFrequencies)tscbFrequency.SelectedIndex;
         }
         private void tscbSignalSource_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tscbSignalSource.SelectedIndex == 0)
             {
-                Settings.SignalSource = clsSIMWrap.eSignalSources.ScreenSensor;
+                Settings.SignalSource = clsStereoImageManagerWrap.eSignalSources.ScreenSensor;
                 tscbComPort.Visible = false;
+                tsbRefresh.Visible = false;
             }
             else if (tscbSignalSource.SelectedIndex == 1)
             {
-                Settings.SignalSource = clsSIMWrap.eSignalSources.COMPort;
+                Settings.SignalSource = clsStereoImageManagerWrap.eSignalSources.COMPort;
                 // Get a list of all available COM ports
                 string[] ports = SerialPort.GetPortNames();
                 tscbComPort.Items.Clear();
@@ -275,11 +276,30 @@ namespace StereoscopicImageViewer
                     tscbComPort.SelectedIndex = 0;
                 }
                 tscbComPort.Visible = true;
+                tsbRefresh.Visible = true;
             }
         }
         private void tscbComPort_SelectedIndexChanged(object sender, EventArgs e)
         {
             Settings.ComPort = (string)tscbComPort.SelectedItem;
+        }
+        private void tsbRefresh_Click(object sender, EventArgs e)
+        {
+            // Get a list of all available COM ports
+            string[] ports = SerialPort.GetPortNames();
+            tscbComPort.Items.Clear();
+            foreach (string port in ports)
+            {
+                tscbComPort.Items.Add(port);
+            }
+            if (tscbComPort.Items.Contains(Settings.ComPort))
+            {
+                tscbComPort.SelectedItem = Settings.ComPort;
+            }
+            else
+            {
+                tscbComPort.SelectedIndex = 0;
+            }
         }
         private void tsbStartStop_Click(object sender, EventArgs e)
         {
@@ -302,14 +322,14 @@ namespace StereoscopicImageViewer
         }
         private void timerErrors_Tick(object sender, EventArgs e)
         {
-            int tempLastError = (int)clsSIMWrap.eStereoImageManagerErrors.NoError;
-            if (mLastError != (int)clsSIMWrap.eStereoImageManagerErrors.NoError)
+            int tempLastError = (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError;
+            if (mLastError != (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError)
             {
                 PerformStop();
                 Interlocked.Exchange(ref tempLastError, mLastError);
-                Interlocked.Exchange(ref mLastError, (int)clsSIMWrap.eStereoImageManagerErrors.NoError);
+                Interlocked.Exchange(ref mLastError, (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError);
             }
-            if (tempLastError == (int)clsSIMWrap.eStereoImageManagerErrors.DifferentLeftRightImageDimensions)
+            if (tempLastError == (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.DifferentLeftRightImageDimensions)
             {
                 MessageBox.Show(
                     "Left and Right Images have different dimensions.", // Message
@@ -334,6 +354,7 @@ namespace StereoscopicImageViewer
             tscbFrequency.Enabled = false;
             tscbSignalSource.Enabled = false;
             tscbComPort.Enabled = false;
+            tsbRefresh.Enabled = false;
             tsbOpenLeft.Enabled = false;
             tsbOpenRight.Enabled = false;
             mIsStarted = true;
@@ -348,6 +369,7 @@ namespace StereoscopicImageViewer
             tscbFrequency.Enabled = true;
             tscbSignalSource.Enabled = true;
             tscbComPort.Enabled = true;
+            tsbRefresh.Enabled = true;
             tsbOpenLeft.Enabled = true;
             tsbOpenRight.Enabled = true;
             mIsStarted = false;
@@ -381,8 +403,8 @@ namespace StereoscopicImageViewer
                     while (!mTaskQuit)
                     {
                         int frequencyInHz = 0;
-                        clsSIMWrap.eStereoImageManagerErrors res = mStereoImageManager.VideoRender();
-                        if (res == clsSIMWrap.eStereoImageManagerErrors.NoError)
+                        clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.VideoRender();
+                        if (res == clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError)
                         {
                             frequencyInHz += mFrequencyCounter.GetFrequencyInHzValue();
                             mFrequencyCounter.Increment();

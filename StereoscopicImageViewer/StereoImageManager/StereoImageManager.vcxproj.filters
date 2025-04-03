@@ -33,7 +33,7 @@
     <ClInclude Include="CComPort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SIMUtil.h">
+    <ClInclude Include="StereoImageManagerWrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClCompile Include="CComPort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SIMUtil.cpp">
+    <ClCompile Include="StereoImageManagerWrap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

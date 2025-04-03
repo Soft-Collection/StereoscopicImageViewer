@@ -55,6 +55,7 @@
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.tscbSignalSource = new System.Windows.Forms.ToolStripComboBox();
             this.tscbComPort = new System.Windows.Forms.ToolStripComboBox();
+            this.tsbRefresh = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbStartStop = new System.Windows.Forms.ToolStripButton();
             this.pbVideoPanel = new System.Windows.Forms.PictureBox();
@@ -201,6 +202,7 @@
             this.toolStripLabel3,
             this.tscbSignalSource,
             this.tscbComPort,
+            this.tsbRefresh,
             this.toolStripSeparator5,
             this.tsbStartStop});
             this.toolStrip.Location = new System.Drawing.Point(0, 24);
@@ -287,6 +289,16 @@
             this.tscbComPort.Size = new System.Drawing.Size(100, 30);
             this.tscbComPort.Visible = false;
             this.tscbComPort.SelectedIndexChanged += new System.EventHandler(this.tscbComPort_SelectedIndexChanged);
+            // 
+            // tsbRefresh
+            // 
+            this.tsbRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsbRefresh.Image = global::StereoscopicImageViewer.Properties.Resources.refresh;
+            this.tsbRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbRefresh.Name = "tsbRefresh";
+            this.tsbRefresh.Size = new System.Drawing.Size(28, 27);
+            this.tsbRefresh.Text = "Refresh COM Ports";
+            this.tsbRefresh.Click += new System.EventHandler(this.tsbRefresh_Click);
             // 
             // toolStripSeparator5
             // 
@@ -414,6 +426,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripComboBox tscbComPort;
         private System.Windows.Forms.Timer timerErrors;
+        private System.Windows.Forms.ToolStripButton tsbRefresh;
     }
 }
 
