@@ -104,9 +104,9 @@
     <Content Include="3d.ico" />
     <Content Include="Icons\3d.ico" />
     <Content Include="Images\mylogo.jpg" />
+    <Content Include="Images\open.png" />
     <Content Include="Images\openleft.png" />
     <Content Include="Images\openright.png" />
-    <Content Include="Images\refresh2.png" />
     <None Include="Images\play.png" />
     <None Include="Images\stop.png" />
   </ItemGroup>

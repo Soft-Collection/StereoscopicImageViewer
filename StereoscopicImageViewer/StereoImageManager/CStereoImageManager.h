@@ -80,5 +80,6 @@ private:
 	int GetRefreshRate();
 public:
 	eStereoImageManagerErrors VideoRender();
+	eStereoImageManagerErrors SetGlassesTimeOffset(int offset);
 };
 #endif // __CSTEREOIMAGEMANAGER_H__

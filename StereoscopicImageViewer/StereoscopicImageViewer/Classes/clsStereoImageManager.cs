@@ -64,5 +64,26 @@ public class clsStereoImageManager
         }
         return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
     }
+    public clsStereoImageManagerWrap.eStereoImageManagerErrors SetGlassesTimeOffset(int offset)
+    {
+        try
+        {
+            if (mHandle != IntPtr.Zero)
+            {
+                lock (mLock)
+                {
+                    return clsStereoImageManagerWrap.StereoImageManagerSetGlassesTimeOffset(mHandle, offset);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ExceptionManager.Publish(ex);
+        }
+        finally
+        {
+        }
+        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
+    }
     #endregion
 }

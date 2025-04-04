@@ -22,6 +22,7 @@ public:
 	CComPort();
 	~CComPort();
 	void SendCommand(std::wstring comPortName, eTransparentLenses transparentLenses);
+	void SendGlassesTimeOffset(std::wstring comPortName, int offset);
 };
 
 #endif // __CCOMPORT_H__

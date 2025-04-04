@@ -18,3 +18,9 @@ CStereoImageManager::eStereoImageManagerErrors StereoImageManagerVideoRender(voi
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
 	return(cStereoImageManager->VideoRender());
 }
+CStereoImageManager::eStereoImageManagerErrors StereoImageManagerSetGlassesTimeOffset(void* handle, int offset)
+{
+	if (handle == NULL) return(CStereoImageManager::eStereoImageManagerErrors::NullHandle);
+	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
+	return(cStereoImageManager->SetGlassesTimeOffset(offset));
+}

@@ -12,11 +12,11 @@ namespace StereoscopicImageViewer
         private static bool VisibleValue = true;
         private static bool AlwaysOnTopValue = true;
         private static bool RunAtStartupValue = false;
-        private static string LeftImagePathValue = string.Empty;
-        private static string RightImagePathValue = string.Empty;
+        private static string FolderPathValue = string.Empty;
         private static clsStereoImageManagerWrap.eFrequencies FrequencyValue = clsStereoImageManagerWrap.eFrequencies.Default;
         private static clsStereoImageManagerWrap.eSignalSources SignalSourceValue = clsStereoImageManagerWrap.eSignalSources.ScreenSensor;
         private static string ComPortValue = "COM1";
+        private static int GlassesTimeOffsetValue = 0;
 
         //Location Property.
         public static Point Location
@@ -118,38 +118,20 @@ namespace StereoscopicImageViewer
         }
 
         // Left Image Path
-        public static string LeftImagePath
+        public static string FolderPath
         {
             get
             {
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
                 if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                LeftImagePathValue = (string)key.GetValue("LeftImagePath", string.Empty);
-                return (LeftImagePathValue);
+                FolderPathValue = (string)key.GetValue("FolderPath", null);
+                return (FolderPathValue);
             }
             set
             {
-                LeftImagePathValue = value;
+                FolderPathValue = value;
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
-                key.SetValue("LeftImagePath", LeftImagePathValue);
-            }
-        }
-
-        // Right Image Path
-        public static string RightImagePath
-        {
-            get
-            {
-                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                RightImagePathValue = (string)key.GetValue("RightImagePath", string.Empty);
-                return (RightImagePathValue);
-            }
-            set
-            {
-                RightImagePathValue = value;
-                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
-                key.SetValue("RightImagePath", RightImagePathValue);
+                key.SetValue("FolderPath", FolderPathValue);
             }
         }
 
@@ -204,6 +186,24 @@ namespace StereoscopicImageViewer
                 ComPortValue = value;
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
                 key.SetValue("ComPort", ComPortValue);
+            }
+        }
+
+        //Glasses Time Offset
+        public static int GlassesTimeOffset
+        {
+            get
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                GlassesTimeOffsetValue = (int)key.GetValue("GlassesTimeOffset", 0);
+                return (GlassesTimeOffsetValue);
+            }
+            set
+            {
+                GlassesTimeOffsetValue = value;
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
+                key.SetValue("GlassesTimeOffset", GlassesTimeOffsetValue);
             }
         }
     }

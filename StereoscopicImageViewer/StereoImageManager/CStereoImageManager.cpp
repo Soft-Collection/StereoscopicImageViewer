@@ -104,11 +104,23 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 		}
 		if (mImageToPlayIsLeft)
 		{
-			if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Left);
+			if (mSignalSource == eSignalSources::COMPort)
+			{
+				if (mComPort != NULL)
+				{
+					mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Left);
+				}
+			}
 		}
 		else
 		{
-			if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Right);
+			if (mSignalSource == eSignalSources::COMPort)
+			{
+				if (mComPort != NULL)
+				{
+					mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Right);
+				}
+			}
 		}
 		mFrameCounter++;
 		//----------------------------------------------
@@ -141,6 +153,31 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 	}
 	catch(...)
 	{ 
+		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager VideoRender");
+		return eStereoImageManagerErrors::ExceptionInVideoRender;
+	}
+	return eStereoImageManagerErrors::NoError;
+}
+CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetGlassesTimeOffset(int offset)
+{
+	try
+	{
+		//----------------------------------------------
+		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+		if (mSignalSource == eSignalSources::COMPort)
+		{
+			if (mComPort != NULL)
+			{
+				mComPort->SendGlassesTimeOffset(mComPortName, offset);
+			}
+		}
+		//----------------------------------------------
+		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+	}
+	catch (...)
+	{
 		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager VideoRender");
 		return eStereoImageManagerErrors::ExceptionInVideoRender;
 	}
