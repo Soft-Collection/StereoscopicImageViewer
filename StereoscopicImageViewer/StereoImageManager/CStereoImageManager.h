@@ -6,6 +6,7 @@
 #include "../StereoRendering/CStereoDirect3D.h"
 #include "../Common/CCriticalSectionPool.h"
 #include <list>
+#include <chrono>
 
 class CStereoImageManager
 {
@@ -69,6 +70,9 @@ private:
 	CImage* mRightImage;
 	//----------------------------------------
 	bool mImageToPlayIsLeft;
+	bool mFirstFrameAlreadyArrived;
+	UINT32 mFrameCounter;
+	std::chrono::time_point<std::chrono::high_resolution_clock> mMeasureTimeFromFirstFrame;
 public:
 	CStereoImageManager(HWND hWnd, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath);
 	~CStereoImageManager();

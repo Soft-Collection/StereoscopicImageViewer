@@ -2,7 +2,6 @@
 #include "CStereoImageManager.h"
 #include "../Common/CExceptionReport.h"
 #include "../Common/CCriticalSectionPool.h"
-#include <chrono>
 #include <thread>
 #include <Windows.h>
 #include <iostream>
@@ -39,6 +38,9 @@ CStereoImageManager::CStereoImageManager(HWND hWnd, eFrequencies frequency, eSig
 	mStereoDirect3D->DrawImage(mHWnd, mLeftImage->PixelData.data(), mRightImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
 	//----------------------------------------------------
 	mImageToPlayIsLeft = true;
+	mFirstFrameAlreadyArrived = false;
+	mFrameCounter = 0;
+	mMeasureTimeFromFirstFrame = std::chrono::high_resolution_clock::now();
 	//----------------------------------------------------
 	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
 }
@@ -83,7 +85,11 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 	try
 	{
 		if ((mLeftImage->Width != mRightImage->Width) || (mLeftImage->Height != mRightImage->Height)) return eStereoImageManagerErrors::DifferentLeftRightImageDimensions;
-		auto start = std::chrono::high_resolution_clock::now();
+		if (!mFirstFrameAlreadyArrived)
+		{
+			mMeasureTimeFromFirstFrame = std::chrono::high_resolution_clock::now();
+			mFirstFrameAlreadyArrived = true;
+		}
 		//----------------------------------------------
 		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
@@ -104,33 +110,34 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 		{
 			if (mSignalSource == eSignalSources::COMPort) mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Right);
 		}
+		mFrameCounter++;
 		//----------------------------------------------
 		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
-		int tempDelay = 0;
+		long long timeThreshold = 0;
 		if (mFrequency == eFrequencies::Default) {
 			int refreshRate = GetRefreshRate();
-			tempDelay = (refreshRate > 0) ? (1000000 / refreshRate) : (1000000 / 60);
+			timeThreshold = (long long)((refreshRate > 0) ? ((double)mFrameCounter * (double)1000000 / (double)refreshRate) : ((double)mFrameCounter * (double)1000000 / (double)60));
 		}
 		else if (mFrequency == eFrequencies::F1Hz) {
-			tempDelay = 1000000 / 1;
+			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)1);
 		}
 		else if (mFrequency == eFrequencies::F60Hz) {
-			tempDelay = 1000000 / 60;
+			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)60);
 		}
 		else if (mFrequency == eFrequencies::F75Hz) {
-			tempDelay = 1000000 / 75;
+			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)75);
 		}
 		else if (mFrequency == eFrequencies::F100Hz) {
-			tempDelay = 1000000 / 100;
+			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)100);
 		}
 		else if (mFrequency == eFrequencies::F120Hz) {
-			tempDelay = 1000000 / 120;
+			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)120);
 		}
 		else if (mFrequency == eFrequencies::F144Hz) {
-			tempDelay = 1000000 / 144;
+			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)144);
 		}
-		while (std::chrono::high_resolution_clock::now() - start < std::chrono::microseconds(tempDelay));
+		while (std::chrono::high_resolution_clock::now() - mMeasureTimeFromFirstFrame < std::chrono::microseconds(timeThreshold));
 	}
 	catch(...)
 	{ 
