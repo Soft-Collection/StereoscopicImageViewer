@@ -73,12 +73,8 @@ void CComPort::Send(std::wstring comPortName, BYTE byteToSend)
 }
 void CComPort::SendCommand(std::wstring comPortName, eTransparentLenses transparentLenses)
 {
-    BYTE byteToSend = 78; // 78 = N (None).
-    if (transparentLenses == eTransparentLenses::None)
-    {
-        byteToSend = 78; // 78 = N (None).
-    }
-    else if (transparentLenses == eTransparentLenses::Left)
+    BYTE byteToSend = 76; // 76 = L (Left).
+    if (transparentLenses == eTransparentLenses::Left)
     {
         byteToSend = 76; // 76 = L (Left).
     }

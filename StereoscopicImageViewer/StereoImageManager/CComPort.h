@@ -11,9 +11,8 @@ private:
 public:
 	enum eTransparentLenses : int
 	{
-		None = 0,
-		Left = 1,
-		Right = 2
+		Left = 0,
+		Right = 1
 	};
 private:
 	void Begin(std::wstring comPortName);
