@@ -4,16 +4,35 @@
 #define LEFT_SHUTTER_PIN 6
 #define COMMON_SHUTTER_PIN 7
 #define RIGHT_SHUTTER_PIN 8
-//--------------------------------------------------------------------------------
 
-volatile bool isLeftTransparent = true;
-volatile bool isRightTransparent = true;
-volatile uint8_t leftOutput = LOW;
-volatile uint8_t commonOutput = LOW;
-volatile uint8_t rightOutput = LOW;
-volatile uint32_t transparentTimeCounter = 0;
-volatile uint32_t lowTransparencyBound = 0;
-volatile uint32_t highTransparencyBound = 0;
+typedef struct
+{
+  volatile uint8_t Left;
+  volatile uint8_t Common;
+  volatile uint8_t Right;
+} Output;
+typedef struct
+{
+  volatile uint32_t Counter;
+  volatile uint32_t Value;
+} Duration;
+typedef struct
+{
+  volatile uint32_t Begin;
+  volatile uint32_t End;
+} Transparancy;
+
+volatile uint32_t timeCounter = 0;
+//--------------------------------------------
+Output output = {LOW, };
+//--------------------------------------------
+Duration frameDuration = {0, };
+//--------------------------------------------
+Transparancy leftTransparency = {0, }; 
+Transparancy rightTransparency = {0, }; 
+//--------------------------------------------
+volatile uint32_t glassesTimeOffset = 0;
+volatile uint32_t transparentTimePercent = 30;
 
 void SetupSerial();
 void WaitForLRSyncFromSerial();
@@ -43,16 +62,35 @@ void SetupSerial() {
 }
 
 void WaitForLRSyncFromSerial() {
-  char inChar;
+  uint8_t inByte;
   while (!Serial.available()) {}
   while (Serial.available()) {
-    inChar = (char)Serial.read();
+    inByte = (uint8_t)Serial.read();
   }
-  lowTransparencyBound = transparentTimeCounter * 30 / 100;
-  highTransparencyBound = transparentTimeCounter * 50 / 100;
-  transparentTimeCounter = 0;
-  isLeftTransparent = ((inChar == 'L') && (inChar != 'N'));
-  isRightTransparent = ((inChar == 'R') && (inChar != 'N'));
+  //-------------------------------------------------------
+  if ((inByte >= 0) && (inByte < 100)) {
+    if (inByte == 0x4C)  //Left Transparent
+    {
+      leftTransparency.Begin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
+      leftTransparency.End = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
+      rightTransparency.Begin = timeCounter - frameDuration.Value + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
+      rightTransparency.End = timeCounter - frameDuration.Value + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
+      frameDuration.Value = frameDuration.Counter;
+      frameDuration.Counter = 0;
+    } else if (inByte == 0x52)  //Right Transparent
+    {
+      leftTransparency.Begin = timeCounter - frameDuration.Value + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
+      leftTransparency.End = timeCounter - frameDuration.Value + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
+      rightTransparency.Begin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
+      rightTransparency.End = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
+      frameDuration.Value = frameDuration.Counter;
+      frameDuration.Counter = 0;
+    }
+  } else if ((inByte >= 100) && (inByte <= 150)) {
+    glassesTimeOffset = inByte - 100;
+  } else if ((inByte >= 200) && (inByte <= 250)) {
+    transparentTimePercent = inByte - 200;
+  }
 }
 
 void SetupTimer1() {
@@ -79,17 +117,20 @@ void SetupTimer1() {
 
 // Interrupt Service Routine for Timer1 compare match
 ISR(TIMER1_COMPA_vect) {
-  commonOutput = !commonOutput;
-  leftOutput = (isLeftTransparent) ? commonOutput : !commonOutput;
-  rightOutput = (isRightTransparent) ? commonOutput : !commonOutput;
-  leftOutput = ((transparentTimeCounter > lowTransparencyBound) && (transparentTimeCounter < highTransparencyBound)) ? leftOutput : !commonOutput;
-  rightOutput = ((transparentTimeCounter > lowTransparencyBound) && (transparentTimeCounter < highTransparencyBound)) ? rightOutput : !commonOutput;
-  if (transparentTimeCounter > 40000) {
-    leftOutput = commonOutput;
-    rightOutput = commonOutput;
+  output.Common = !output.Common;
+  //----------------------------------------------------------------
+  uint32_t timeCounterWithOffset = timeCounter - glassesTimeOffset;
+  output.Left = ((leftTransparency.Begin < timeCounterWithOffset) && (timeCounterWithOffset < leftTransparency.End)) ? output.Common : !output.Common;
+  output.Right = ((rightTransparency.Begin < timeCounterWithOffset) && (timeCounterWithOffset < rightTransparency.End)) ? output.Common : !output.Common;
+  if (frameDuration.Counter > 2 * frameDuration.Value) {
+    output.Left = output.Common;
+    output.Right = output.Common;
   }
-  digitalWrite(LEFT_SHUTTER_PIN, leftOutput);
-  digitalWrite(COMMON_SHUTTER_PIN, commonOutput);
-  digitalWrite(RIGHT_SHUTTER_PIN, rightOutput);
-  transparentTimeCounter++;
+  //----------------------------------------------------------------
+  digitalWrite(LEFT_SHUTTER_PIN, output.Left);
+  digitalWrite(COMMON_SHUTTER_PIN, output.Common);
+  digitalWrite(RIGHT_SHUTTER_PIN, output.Right);
+  //----------------------------------------------------------------
+  timeCounter++;
+  frameDuration.Counter++;
 }
