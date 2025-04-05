@@ -2961,7 +2961,7 @@
     <value>719, 17</value>
   </metadata>
   <metadata name="fbdOpenFolder.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>919, 17</value>
+    <value>981, 17</value>
   </metadata>
   <metadata name="timerSendSettings.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>831, 17</value>

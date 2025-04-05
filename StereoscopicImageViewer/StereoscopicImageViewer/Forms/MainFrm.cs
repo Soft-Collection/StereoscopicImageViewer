@@ -342,7 +342,7 @@ namespace StereoscopicImageViewer
         {
             if (!mAlreadySent)
             {
-                if (mAlreadySentCounter > 10)
+                if (mAlreadySentCounter > 5)
                 {
                     clsStereoImageManagerWrap.eStereoImageManagerErrors res1 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
                     clsStereoImageManagerWrap.eStereoImageManagerErrors res2 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
