@@ -15,3 +15,5 @@ It consists of two projects:
 ![Connection Diagram](Images/Connection%20Diagram.png)
 
 ![Connection Diagram](Images/AssembledDevice.png)
+
+![Connection Diagram](Images/StereoscopicImageViewer.png)
