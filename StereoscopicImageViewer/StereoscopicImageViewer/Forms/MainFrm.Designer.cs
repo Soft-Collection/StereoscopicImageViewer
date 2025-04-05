@@ -406,11 +406,13 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbTransparentTimePercent.AutoSize = false;
             this.tbTransparentTimePercent.Location = new System.Drawing.Point(6, 19);
-            this.tbTransparentTimePercent.Maximum = 50;
+            this.tbTransparentTimePercent.Maximum = 70;
+            this.tbTransparentTimePercent.Minimum = 20;
             this.tbTransparentTimePercent.Name = "tbTransparentTimePercent";
             this.tbTransparentTimePercent.Size = new System.Drawing.Size(113, 23);
             this.tbTransparentTimePercent.TabIndex = 32;
             this.tbTransparentTimePercent.TickFrequency = 5;
+            this.tbTransparentTimePercent.Value = 20;
             this.tbTransparentTimePercent.Scroll += new System.EventHandler(this.tbTransparentTimePercent_Scroll);
             this.tbTransparentTimePercent.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbTransparentTimePercent_KeyUp);
             this.tbTransparentTimePercent.MouseUp += new System.Windows.Forms.MouseEventHandler(this.tbTransparentTimePercent_MouseUp);

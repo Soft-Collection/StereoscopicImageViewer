@@ -24,12 +24,20 @@ typedef struct
 
 volatile uint32_t timeCounter = 0;
 //--------------------------------------------
-Output output = {LOW, };
+Output output = {
+  LOW,
+};
 //--------------------------------------------
-Duration frameDuration = {0, };
+Duration frameDuration = {
+  0,
+};
 //--------------------------------------------
-Transparancy leftTransparency = {0, }; 
-Transparancy rightTransparency = {0, }; 
+Transparancy leftTransparency = {
+  0,
+};
+Transparancy rightTransparency = {
+  0,
+};
 //--------------------------------------------
 volatile uint32_t glassesTimeOffset = 0;
 volatile uint32_t transparentTimePercent = 30;
@@ -68,27 +76,27 @@ void WaitForLRSyncFromSerial() {
     inByte = (uint8_t)Serial.read();
   }
   //-------------------------------------------------------
-  if ((inByte >= 0) && (inByte < 100)) {
+  if ((inByte == 0x4C) || (inByte == 0x52)) {
+    uint32_t timeForTransparencyBegin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
+    uint32_t timeForTransparencyEnd = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
     if (inByte == 0x4C)  //Left Transparent
     {
-      leftTransparency.Begin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
-      leftTransparency.End = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
-      rightTransparency.Begin = timeCounter - frameDuration.Value + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
-      rightTransparency.End = timeCounter - frameDuration.Value + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
-      frameDuration.Value = frameDuration.Counter;
-      frameDuration.Counter = 0;
+      leftTransparency.Begin = timeForTransparencyBegin;
+      leftTransparency.End = timeForTransparencyEnd;
+      rightTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
+      rightTransparency.End = timeForTransparencyEnd - frameDuration.Value;
     } else if (inByte == 0x52)  //Right Transparent
     {
-      leftTransparency.Begin = timeCounter - frameDuration.Value + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
-      leftTransparency.End = timeCounter - frameDuration.Value + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
-      rightTransparency.Begin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
-      rightTransparency.End = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
-      frameDuration.Value = frameDuration.Counter;
-      frameDuration.Counter = 0;
+      leftTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
+      leftTransparency.End = timeForTransparencyEnd - frameDuration.Value;
+      rightTransparency.Begin = timeForTransparencyBegin;
+      rightTransparency.End = timeForTransparencyEnd;
     }
-  } else if ((inByte >= 100) && (inByte <= 150)) {
+    frameDuration.Value = frameDuration.Counter;
+    frameDuration.Counter = 0;
+  } else if ((inByte >= 100) && (inByte <= 199)) {
     glassesTimeOffset = inByte - 100;
-  } else if ((inByte >= 200) && (inByte <= 250)) {
+  } else if ((inByte >= 200) && (inByte <= 299)) {
     transparentTimePercent = inByte - 200;
   }
 }
