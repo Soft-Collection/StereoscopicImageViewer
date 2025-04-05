@@ -61,6 +61,9 @@ namespace StereoscopicImageViewer
             tbGlassesTimeOffset.Value = Settings.GlassesTimeOffset;
             lblGlassesTimeOffset.Text = Settings.GlassesTimeOffset.ToString();
             tbGlassesTimeOffset.Enabled = false;
+            tbTransparentTimePercent.Value = Settings.TransparentTimePercent;
+            lblTransparentTimePercent.Text = Settings.TransparentTimePercent.ToString();
+            tbTransparentTimePercent.Enabled = false;
             tsslFrequencyLabel.Visible = false;
             tsslFrequency.Visible = false;
             //-----------------------------------
@@ -226,6 +229,7 @@ namespace StereoscopicImageViewer
         private string mLeftImagePath = null;
         private string mRightImagePath = null;
         private int mGlassesTimeOffset = 0;
+        private int mTransparentTimePercent = 30;
         #endregion
 
         #region Initialize
@@ -366,6 +370,28 @@ namespace StereoscopicImageViewer
         {
             lblGlassesTimeOffset.Text = tbGlassesTimeOffset.Value.ToString();
         }
+        private void tbTransparentTimePercent_MouseUp(object sender, MouseEventArgs e)
+        {
+            Settings.TransparentTimePercent = tbTransparentTimePercent.Value;
+            Interlocked.Exchange(ref mTransparentTimePercent, tbTransparentTimePercent.Value);
+            if (mStereoImageManager != null)
+            {
+                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+            }
+        }
+        private void tbTransparentTimePercent_KeyUp(object sender, KeyEventArgs e)
+        {
+            Settings.TransparentTimePercent = tbTransparentTimePercent.Value;
+            Interlocked.Exchange(ref mTransparentTimePercent, tbTransparentTimePercent.Value);
+            if (mStereoImageManager != null)
+            {
+                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+            }
+        }
+        private void tbTransparentTimePercent_Scroll(object sender, EventArgs e)
+        {
+            lblTransparentTimePercent.Text = tbTransparentTimePercent.Value.ToString();
+        }
         #endregion
 
         #region Methods
@@ -384,6 +410,7 @@ namespace StereoscopicImageViewer
                 tsbRefresh.Enabled = false;
                 tsbOpenFolder.Enabled = false;
                 tbGlassesTimeOffset.Enabled = true;
+                tbTransparentTimePercent.Enabled = true;
                 tsslFrequencyLabel.Visible = true;
                 tsslFrequency.Visible = true;
                 Start();
@@ -404,6 +431,7 @@ namespace StereoscopicImageViewer
                 tsbRefresh.Enabled = true;
                 tsbOpenFolder.Enabled = true;
                 tbGlassesTimeOffset.Enabled = false;
+                tbTransparentTimePercent.Enabled = false;
                 tsslFrequencyLabel.Visible = false;
                 tsslFrequency.Visible = false;
                 pbVideoPanel.Refresh();
@@ -412,7 +440,7 @@ namespace StereoscopicImageViewer
         }
         private void Start()
         {
-            pbVideoPanel.BackColor = System.Drawing.Color.Blue;
+            pbVideoPanel.BackColor = System.Drawing.Color.DarkGray;
             //------------------------------------------------------
             mStereoImageManager = new clsStereoImageManager(pbVideoPanel.Handle, Settings.Frequency, Settings.SignalSource, Settings.ComPort, mLeftImagePath, mRightImagePath);
             mFrequencyCounter = new clsFrequencyCounter();
@@ -422,7 +450,7 @@ namespace StereoscopicImageViewer
                 mTaskQuit = false;
                 mTask = new Task(() =>
                 {
-                    bool glassesTimeOffsetSet = false;
+                    bool alreadyInitialized = false;
                     while (!mTaskQuit)
                     {
                         int frequencyInHz = 0;
@@ -438,18 +466,21 @@ namespace StereoscopicImageViewer
                             Interlocked.Exchange(ref mLastError, (int)res);
                             mTaskQuit = true;
                         }
-                        if (!glassesTimeOffsetSet)
+                        if (!alreadyInitialized)
                         {
                             clsStereoImageManagerWrap.eStereoImageManagerErrors res2 = mStereoImageManager.SetGlassesTimeOffset(mGlassesTimeOffset);
-                            if (res2 == clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError)
-                            {
-                            }
-                            else
+                            if (res2 != clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError)
                             {
                                 Interlocked.Exchange(ref mLastError, (int)res);
                                 mTaskQuit = true;
                             }
-                            glassesTimeOffsetSet = true;
+                            clsStereoImageManagerWrap.eStereoImageManagerErrors res3 = mStereoImageManager.SetTransparentTimePercent(mTransparentTimePercent);
+                            if (res2 != clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError)
+                            {
+                                Interlocked.Exchange(ref mLastError, (int)res);
+                                mTaskQuit = true;
+                            }
+                            alreadyInitialized = true;
                         }
                     }
                 });

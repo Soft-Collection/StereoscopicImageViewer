@@ -81,5 +81,6 @@ private:
 public:
 	eStereoImageManagerErrors VideoRender();
 	eStereoImageManagerErrors SetGlassesTimeOffset(int offset);
+	eStereoImageManagerErrors SetTransparentTimePercent(int percent);
 };
 #endif // __CSTEREOIMAGEMANAGER_H__

@@ -17,6 +17,7 @@ namespace StereoscopicImageViewer
         private static clsStereoImageManagerWrap.eSignalSources SignalSourceValue = clsStereoImageManagerWrap.eSignalSources.ScreenSensor;
         private static string ComPortValue = "COM1";
         private static int GlassesTimeOffsetValue = 0;
+        private static int TransparentTimePercentValue = 30;
 
         //Location Property.
         public static Point Location
@@ -204,6 +205,24 @@ namespace StereoscopicImageViewer
                 GlassesTimeOffsetValue = value;
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
                 key.SetValue("GlassesTimeOffset", GlassesTimeOffsetValue);
+            }
+        }
+
+        //Transparent Time Percent
+        public static int TransparentTimePercent
+        {
+            get
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                TransparentTimePercentValue = (int)key.GetValue("TransparentTimePercent", 30);
+                return (TransparentTimePercentValue);
+            }
+            set
+            {
+                TransparentTimePercentValue = value;
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
+                key.SetValue("TransparentTimePercent", TransparentTimePercentValue);
             }
         }
     }

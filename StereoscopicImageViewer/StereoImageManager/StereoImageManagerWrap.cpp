@@ -24,3 +24,9 @@ CStereoImageManager::eStereoImageManagerErrors StereoImageManagerSetGlassesTimeO
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
 	return(cStereoImageManager->SetGlassesTimeOffset(offset));
 }
+CStereoImageManager::eStereoImageManagerErrors StereoImageManagerSetTransparentTimePercent(void* handle, int percent)
+{
+	if (handle == NULL) return(CStereoImageManager::eStereoImageManagerErrors::NullHandle);
+	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
+	return(cStereoImageManager->SetTransparentTimePercent(percent));
+}

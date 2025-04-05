@@ -53,12 +53,26 @@ void CComPort::End()
         mHCom = NULL;
     }
 }
+void CComPort::Send(std::wstring comPortName, BYTE byteToSend)
+{
+    if (mHCom == NULL) Begin(comPortName);
+    if (mHCom != NULL)
+    {
+        DWORD bytesWritten;
+        if (!WriteFile(mHCom, &byteToSend, 1, &bytesWritten, NULL)) {
+            std::cerr << "Error: Unable to write to COM port." << std::endl;
+            End();
+            return;
+        }
+        if (!FlushFileBuffers(mHCom)) {
+            std::cerr << "Error: Unable to flush COM port." << std::endl;
+            End();
+            return;
+        }
+    }
+}
 void CComPort::SendCommand(std::wstring comPortName, eTransparentLenses transparentLenses)
 {
-    if (mHCom == NULL)
-    {
-        Begin(comPortName);
-    }
     BYTE byteToSend = 78; // 78 = N (None).
     if (transparentLenses == eTransparentLenses::None)
     {
@@ -72,40 +86,13 @@ void CComPort::SendCommand(std::wstring comPortName, eTransparentLenses transpar
     {
         byteToSend = 82; // 82 = R (Right).
     }
-    DWORD bytesWritten;
-    if (mHCom != NULL)
-    {
-        if (!WriteFile(mHCom, &byteToSend, 1, &bytesWritten, NULL)) {
-            std::cerr << "Error: Unable to write to COM port." << std::endl;
-            End();
-            return;
-        }
-        if (!FlushFileBuffers(mHCom)) {
-            std::cerr << "Error: Unable to flush COM port." << std::endl;
-            End();
-            return;
-        }
-    }
+    Send(comPortName, byteToSend);
 }
 void CComPort::SendGlassesTimeOffset(std::wstring comPortName, int offset)
 {
-    if (mHCom == NULL)
-    {
-        Begin(comPortName);
-    }
-    BYTE byteToSend = (BYTE)(offset + 150);
-    DWORD bytesWritten;
-    if (mHCom != NULL)
-    {
-        if (!WriteFile(mHCom, &byteToSend, 1, &bytesWritten, NULL)) {
-            std::cerr << "Error: Unable to write to COM port." << std::endl;
-            End();
-            return;
-        }
-        if (!FlushFileBuffers(mHCom)) {
-            std::cerr << "Error: Unable to flush COM port." << std::endl;
-            End();
-            return;
-        }
-    }
+    Send(comPortName, (BYTE)(offset + 100));
+}
+void CComPort::SendTransparentTimePercent(std::wstring comPortName, int percent)
+{
+    Send(comPortName, (BYTE)(percent + 200));
 }

@@ -67,12 +67,19 @@
             this.lvStereoImages = new System.Windows.Forms.ListView();
             this.tbGlassesTimeOffset = new System.Windows.Forms.TrackBar();
             this.lblGlassesTimeOffset = new System.Windows.Forms.Label();
+            this.tbTransparentTimePercent = new System.Windows.Forms.TrackBar();
+            this.lblTransparentTimePercent = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbVideoPanel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbGlassesTimeOffset)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbTransparentTimePercent)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // popUpMenu
@@ -347,9 +354,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbVideoPanel.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pbVideoPanel.Location = new System.Drawing.Point(161, 57);
+            this.pbVideoPanel.Location = new System.Drawing.Point(171, 57);
             this.pbVideoPanel.Name = "pbVideoPanel";
-            this.pbVideoPanel.Size = new System.Drawing.Size(622, 433);
+            this.pbVideoPanel.Size = new System.Drawing.Size(606, 433);
             this.pbVideoPanel.TabIndex = 28;
             this.pbVideoPanel.TabStop = false;
             // 
@@ -358,10 +365,10 @@
             this.lvStereoImages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.lvStereoImages.HideSelection = false;
-            this.lvStereoImages.Location = new System.Drawing.Point(0, 57);
+            this.lvStereoImages.Location = new System.Drawing.Point(5, 57);
             this.lvStereoImages.MultiSelect = false;
             this.lvStereoImages.Name = "lvStereoImages";
-            this.lvStereoImages.Size = new System.Drawing.Size(155, 404);
+            this.lvStereoImages.Size = new System.Drawing.Size(160, 317);
             this.lvStereoImages.TabIndex = 0;
             this.lvStereoImages.UseCompatibleStateImageBehavior = false;
             this.lvStereoImages.View = System.Windows.Forms.View.List;
@@ -369,37 +376,87 @@
             // 
             // tbGlassesTimeOffset
             // 
-            this.tbGlassesTimeOffset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbGlassesTimeOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbGlassesTimeOffset.AutoSize = false;
-            this.tbGlassesTimeOffset.Location = new System.Drawing.Point(0, 467);
+            this.tbGlassesTimeOffset.Location = new System.Drawing.Point(6, 19);
             this.tbGlassesTimeOffset.Maximum = 50;
-            this.tbGlassesTimeOffset.Minimum = -50;
             this.tbGlassesTimeOffset.Name = "tbGlassesTimeOffset";
-            this.tbGlassesTimeOffset.Size = new System.Drawing.Size(116, 23);
+            this.tbGlassesTimeOffset.Size = new System.Drawing.Size(113, 23);
             this.tbGlassesTimeOffset.TabIndex = 30;
-            this.tbGlassesTimeOffset.TickFrequency = 10;
+            this.tbGlassesTimeOffset.TickFrequency = 5;
             this.tbGlassesTimeOffset.Scroll += new System.EventHandler(this.tbGlassesTimeOffset_Scroll);
             this.tbGlassesTimeOffset.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbGlassesTimeOffset_KeyUp);
             this.tbGlassesTimeOffset.MouseUp += new System.Windows.Forms.MouseEventHandler(this.tbGlassesTimeOffset_MouseUp);
             // 
             // lblGlassesTimeOffset
             // 
-            this.lblGlassesTimeOffset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblGlassesTimeOffset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblGlassesTimeOffset.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGlassesTimeOffset.Location = new System.Drawing.Point(104, 464);
+            this.lblGlassesTimeOffset.Location = new System.Drawing.Point(110, 16);
             this.lblGlassesTimeOffset.Name = "lblGlassesTimeOffset";
-            this.lblGlassesTimeOffset.Size = new System.Drawing.Size(51, 23);
+            this.lblGlassesTimeOffset.Size = new System.Drawing.Size(44, 23);
             this.lblGlassesTimeOffset.TabIndex = 31;
             this.lblGlassesTimeOffset.Text = "0";
             this.lblGlassesTimeOffset.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // tbTransparentTimePercent
+            // 
+            this.tbTransparentTimePercent.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbTransparentTimePercent.AutoSize = false;
+            this.tbTransparentTimePercent.Location = new System.Drawing.Point(6, 19);
+            this.tbTransparentTimePercent.Maximum = 50;
+            this.tbTransparentTimePercent.Name = "tbTransparentTimePercent";
+            this.tbTransparentTimePercent.Size = new System.Drawing.Size(113, 23);
+            this.tbTransparentTimePercent.TabIndex = 32;
+            this.tbTransparentTimePercent.TickFrequency = 5;
+            this.tbTransparentTimePercent.Scroll += new System.EventHandler(this.tbTransparentTimePercent_Scroll);
+            this.tbTransparentTimePercent.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbTransparentTimePercent_KeyUp);
+            this.tbTransparentTimePercent.MouseUp += new System.Windows.Forms.MouseEventHandler(this.tbTransparentTimePercent_MouseUp);
+            // 
+            // lblTransparentTimePercent
+            // 
+            this.lblTransparentTimePercent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTransparentTimePercent.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTransparentTimePercent.Location = new System.Drawing.Point(110, 16);
+            this.lblTransparentTimePercent.Name = "lblTransparentTimePercent";
+            this.lblTransparentTimePercent.Size = new System.Drawing.Size(44, 23);
+            this.lblTransparentTimePercent.TabIndex = 33;
+            this.lblTransparentTimePercent.Text = "0";
+            this.lblTransparentTimePercent.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Controls.Add(this.tbGlassesTimeOffset);
+            this.groupBox1.Controls.Add(this.lblGlassesTimeOffset);
+            this.groupBox1.Location = new System.Drawing.Point(5, 380);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(160, 52);
+            this.groupBox1.TabIndex = 34;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Glasses Time Offset";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox2.Controls.Add(this.tbTransparentTimePercent);
+            this.groupBox2.Controls.Add(this.lblTransparentTimePercent);
+            this.groupBox2.Location = new System.Drawing.Point(5, 438);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(160, 52);
+            this.groupBox2.TabIndex = 35;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Transparent Time Percent";
             // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(783, 515);
-            this.Controls.Add(this.tbGlassesTimeOffset);
-            this.Controls.Add(this.lblGlassesTimeOffset);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.pbVideoPanel);
             this.Controls.Add(this.lvStereoImages);
             this.Controls.Add(this.statusStrip);
@@ -422,6 +479,9 @@
             this.statusStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbVideoPanel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbGlassesTimeOffset)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbTransparentTimePercent)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -466,6 +526,10 @@
         private System.Windows.Forms.ListView lvStereoImages;
         private System.Windows.Forms.TrackBar tbGlassesTimeOffset;
         private System.Windows.Forms.Label lblGlassesTimeOffset;
+        private System.Windows.Forms.TrackBar tbTransparentTimePercent;
+        private System.Windows.Forms.Label lblTransparentTimePercent;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }
 

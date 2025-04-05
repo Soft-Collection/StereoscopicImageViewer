@@ -183,6 +183,31 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetGlassesTi
 	}
 	return eStereoImageManagerErrors::NoError;
 }
+CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetTransparentTimePercent(int percent)
+{
+	try
+	{
+		//----------------------------------------------
+		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+		if (mSignalSource == eSignalSources::COMPort)
+		{
+			if (mComPort != NULL)
+			{
+				mComPort->SendTransparentTimePercent(mComPortName, percent);
+			}
+		}
+		//----------------------------------------------
+		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+	}
+	catch (...)
+	{
+		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager VideoRender");
+		return eStereoImageManagerErrors::ExceptionInVideoRender;
+	}
+	return eStereoImageManagerErrors::NoError;
+}
 int CStereoImageManager::GetRefreshRate()
 {
 	// Structure to store display settings

@@ -33,6 +33,9 @@ public class clsStereoImageManagerWrap
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
     public static extern eStereoImageManagerErrors StereoImageManagerSetGlassesTimeOffset(IntPtr StereoImageManagerHandle, int offset);
 
+    [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern eStereoImageManagerErrors StereoImageManagerSetTransparentTimePercent(IntPtr StereoImageManagerHandle, int percent);
+
     #endregion
 
     #region Enums

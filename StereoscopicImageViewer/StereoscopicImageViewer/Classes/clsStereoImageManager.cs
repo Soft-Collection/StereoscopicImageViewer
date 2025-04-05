@@ -85,5 +85,26 @@ public class clsStereoImageManager
         }
         return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
     }
+    public clsStereoImageManagerWrap.eStereoImageManagerErrors SetTransparentTimePercent(int percent)
+    {
+        try
+        {
+            if (mHandle != IntPtr.Zero)
+            {
+                lock (mLock)
+                {
+                    return clsStereoImageManagerWrap.StereoImageManagerSetTransparentTimePercent(mHandle, percent);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ExceptionManager.Publish(ex);
+        }
+        finally
+        {
+        }
+        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
+    }
     #endregion
 }
