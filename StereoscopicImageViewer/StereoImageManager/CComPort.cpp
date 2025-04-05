@@ -90,5 +90,5 @@ void CComPort::SendGlassesTimeOffset(std::wstring comPortName, int offset)
 }
 void CComPort::SendTransparentTimePercent(std::wstring comPortName, int percent)
 {
-    Send(comPortName, (BYTE)(percent + 200));
+    Send(comPortName, (BYTE)(percent + 180));
 }

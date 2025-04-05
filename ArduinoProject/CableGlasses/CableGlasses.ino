@@ -74,30 +74,29 @@ void WaitForLRSyncFromSerial() {
   while (!Serial.available()) {}
   while (Serial.available()) {
     inByte = (uint8_t)Serial.read();
-  }
-  //-------------------------------------------------------
-  if ((inByte == 0x4C) || (inByte == 0x52)) {
-    uint32_t timeForTransparencyBegin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
-    uint32_t timeForTransparencyEnd = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
-    if (inByte == 0x4C)  //Left Transparent
-    {
-      leftTransparency.Begin = timeForTransparencyBegin;
-      leftTransparency.End = timeForTransparencyEnd;
-      rightTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
-      rightTransparency.End = timeForTransparencyEnd - frameDuration.Value;
-    } else if (inByte == 0x52)  //Right Transparent
-    {
-      leftTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
-      leftTransparency.End = timeForTransparencyEnd - frameDuration.Value;
-      rightTransparency.Begin = timeForTransparencyBegin;
-      rightTransparency.End = timeForTransparencyEnd;
+    if ((inByte == 0x4C) || (inByte == 0x52)) {
+      uint32_t timeForTransparencyBegin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
+      uint32_t timeForTransparencyEnd = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
+      if (inByte == 0x4C)  //Left Transparent
+      {
+        leftTransparency.Begin = timeForTransparencyBegin;
+        leftTransparency.End = timeForTransparencyEnd;
+        rightTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
+        rightTransparency.End = timeForTransparencyEnd - frameDuration.Value;
+      } else if (inByte == 0x52)  //Right Transparent
+      {
+        leftTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
+        leftTransparency.End = timeForTransparencyEnd - frameDuration.Value;
+        rightTransparency.Begin = timeForTransparencyBegin;
+        rightTransparency.End = timeForTransparencyEnd;
+      }
+      frameDuration.Value = frameDuration.Counter;
+      frameDuration.Counter = 0;
+    } else if ((inByte >= 100) && (inByte <= 179)) {
+      glassesTimeOffset = inByte - 100;
+    } else if (inByte >= 180) {
+      transparentTimePercent = inByte - 180;
     }
-    frameDuration.Value = frameDuration.Counter;
-    frameDuration.Counter = 0;
-  } else if ((inByte >= 100) && (inByte <= 199)) {
-    glassesTimeOffset = inByte - 100;
-  } else if ((inByte >= 200) && (inByte <= 299)) {
-    transparentTimePercent = inByte - 200;
   }
 }
 
