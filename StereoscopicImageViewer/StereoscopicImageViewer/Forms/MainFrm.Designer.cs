@@ -71,6 +71,7 @@
             this.lblTransparentTimePercent = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.timerSendSettings = new System.Windows.Forms.Timer(this.components);
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
@@ -452,6 +453,10 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Transparent Time Percent";
             // 
+            // timerSendSettings
+            // 
+            this.timerSendSettings.Tick += new System.EventHandler(this.timerSendSettings_Tick);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -532,6 +537,7 @@
         private System.Windows.Forms.Label lblTransparentTimePercent;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Timer timerSendSettings;
     }
 }
 
