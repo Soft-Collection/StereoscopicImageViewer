@@ -12,6 +12,9 @@ It consists of two projects:
    This project gets information that was sent from the Windows project above and opens / closes shutters on 3D Glasses.
    The shutters must be connected directly to Arduino board using cable.
 
+**Please note:** In the folder with stereo images, image for left eye must have extension **.left.png** and image for right eye must have extension **.right.png**
+For example: **my_photo.left.png** and **my_photo.right.png**
+
 ![Connection Diagram](Images/StereoscopicImageViewer.png)
 
 ![Connection Diagram](Images/Connection%20Diagram.png)
