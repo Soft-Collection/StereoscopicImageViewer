@@ -117,12 +117,14 @@ namespace StereoscopicImageViewer
         //Changes Visible state.
         private void ChangeVisible()
         {
-            if ((mLeftImagePath != null) && (mRightImagePath != null)) {
-                if (this.Visible) 
-                {
-                    if (mIsStarted) PerformStop();
-                }
-                else
+            if (this.Visible)
+            {
+                mWasStartedWhenMinimized = mIsStarted;
+                if (mIsStarted) PerformStop();
+            }
+            else
+            {
+                if (mWasStartedWhenMinimized)
                 {
                     if (!mIsStarted) PerformStart();
                 }
@@ -229,6 +231,7 @@ namespace StereoscopicImageViewer
 
         #region Variables
         private bool mIsStarted = false;
+        private bool mWasStartedWhenMinimized = false;
         private clsStereoImageManager mStereoImageManager = null;
         private clsFrequencyCounter mFrequencyCounter = null;
         private Task mTask = null;
