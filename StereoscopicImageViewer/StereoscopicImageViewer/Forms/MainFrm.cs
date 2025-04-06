@@ -243,7 +243,19 @@ namespace StereoscopicImageViewer
         #region Menu Events
         private void visitWebSiteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("http://www.soft-collection.com");
+            System.Diagnostics.Process.Start("https://www.soft-collection.com");
+        }
+        private void gitHubToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer");
+        }
+        private void arduinoProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/blob/master/ArduinoProject/CableGlasses/CableGlasses.ino");
+        }
+        private void stereoImagesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/tree/master/StereoImages");
         }
         #endregion
 

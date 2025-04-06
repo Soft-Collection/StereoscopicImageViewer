@@ -72,6 +72,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.timerSendSettings = new System.Windows.Forms.Timer(this.components);
+            this.gitHubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.arduinoProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stereoImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
@@ -180,6 +183,9 @@
             // 
             this.helpToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.visitWebSiteToolStripMenuItem,
+            this.gitHubToolStripMenuItem,
+            this.arduinoProjectToolStripMenuItem,
+            this.stereoImagesToolStripMenuItem,
             this.aboutToolStripMenuItem1});
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
             this.helpToolStripMenuItem1.Size = new System.Drawing.Size(44, 20);
@@ -188,14 +194,14 @@
             // visitWebSiteToolStripMenuItem
             // 
             this.visitWebSiteToolStripMenuItem.Name = "visitWebSiteToolStripMenuItem";
-            this.visitWebSiteToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.visitWebSiteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.visitWebSiteToolStripMenuItem.Text = "Visit Web Site";
             this.visitWebSiteToolStripMenuItem.Click += new System.EventHandler(this.visitWebSiteToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem1
             // 
             this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
+            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem1.Text = "About";
             this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -457,6 +463,27 @@
             // 
             this.timerSendSettings.Tick += new System.EventHandler(this.timerSendSettings_Tick);
             // 
+            // gitHubToolStripMenuItem
+            // 
+            this.gitHubToolStripMenuItem.Name = "gitHubToolStripMenuItem";
+            this.gitHubToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gitHubToolStripMenuItem.Text = "GitHub";
+            this.gitHubToolStripMenuItem.Click += new System.EventHandler(this.gitHubToolStripMenuItem_Click);
+            // 
+            // arduinoProjectToolStripMenuItem
+            // 
+            this.arduinoProjectToolStripMenuItem.Name = "arduinoProjectToolStripMenuItem";
+            this.arduinoProjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.arduinoProjectToolStripMenuItem.Text = "Arduino Project";
+            this.arduinoProjectToolStripMenuItem.Click += new System.EventHandler(this.arduinoProjectToolStripMenuItem_Click);
+            // 
+            // stereoImagesToolStripMenuItem
+            // 
+            this.stereoImagesToolStripMenuItem.Name = "stereoImagesToolStripMenuItem";
+            this.stereoImagesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stereoImagesToolStripMenuItem.Text = "Stereo Images";
+            this.stereoImagesToolStripMenuItem.Click += new System.EventHandler(this.stereoImagesToolStripMenuItem_Click);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -538,6 +565,9 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Timer timerSendSettings;
+        private System.Windows.Forms.ToolStripMenuItem gitHubToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem arduinoProjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stereoImagesToolStripMenuItem;
     }
 }
 
