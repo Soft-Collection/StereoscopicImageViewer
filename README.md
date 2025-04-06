@@ -14,6 +14,7 @@ It consists of two projects:
 
 **Please note:** In the folder with stereo images, image for left eye must have extension **.left.png** and image for right eye must have extension **.right.png**
 For example: **my_photo.left.png** and **my_photo.right.png**
+Left and Right images must be the same size.
 
 ![Connection Diagram](Images/StereoscopicImageViewer.png)
 
