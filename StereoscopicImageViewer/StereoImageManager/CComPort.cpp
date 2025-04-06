@@ -32,16 +32,16 @@ void CComPort::Begin(std::wstring comPortName)
     dcb.DCBlength = sizeof(DCB);
     if (!GetCommState(mHCom, &dcb)) {
         std::cerr << "Error: Unable to get COM port state." << std::endl;
-        CloseHandle(mHCom);
+        End();
         return;
     }
-    dcb.BaudRate = CBR_115200; // Set baud rate to 9600
-    dcb.ByteSize = 8;        // 8 data bits
-    dcb.Parity = NOPARITY;   // No parity
+    dcb.BaudRate = CBR_115200; // Set baud rate to 115200
+    dcb.ByteSize = 8;          // 8 data bits
+    dcb.Parity = NOPARITY;     // No parity
     dcb.StopBits = ONESTOPBIT; // 1 stop bit
     if (!SetCommState(mHCom, &dcb)) {
         std::cerr << "Error: Unable to configure COM port." << std::endl;
-        CloseHandle(mHCom);
+        End();
         return;
     }
 }

@@ -117,6 +117,16 @@ namespace StereoscopicImageViewer
         //Changes Visible state.
         private void ChangeVisible()
         {
+            if ((mLeftImagePath != null) && (mRightImagePath != null)) {
+                if (this.Visible) 
+                {
+                    if (mIsStarted) PerformStop();
+                }
+                else
+                {
+                    if (!mIsStarted) PerformStart();
+                }
+            }
             this.Visible = !this.Visible;
             SetVisible();
         }
@@ -356,8 +366,11 @@ namespace StereoscopicImageViewer
             {
                 if (mAlreadySentCounter > 5)
                 {
-                    clsStereoImageManagerWrap.eStereoImageManagerErrors res1 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
-                    clsStereoImageManagerWrap.eStereoImageManagerErrors res2 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                    if (mStereoImageManager != null)
+                    {
+                        clsStereoImageManagerWrap.eStereoImageManagerErrors res1 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                        clsStereoImageManagerWrap.eStereoImageManagerErrors res2 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                    }
                     mAlreadySent = true;
                 }
                 mAlreadySentCounter++;
