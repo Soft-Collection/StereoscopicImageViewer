@@ -43,7 +43,6 @@ volatile uint32_t glassesTimeOffset = 0;
 volatile uint32_t transparentTimePercent = 30;
 
 void SetupSerial();
-void SetupExternalInt();
 void SetupTimer1();
 
 void setup() {
