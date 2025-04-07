@@ -43,7 +43,6 @@ volatile uint32_t glassesTimeOffset = 0;
 volatile uint32_t transparentTimePercent = 30;
 
 void SetupSerial();
-void WaitForLRSyncFromSerial();
 void SetupExternalInt();
 void SetupTimer1();
 
@@ -61,18 +60,8 @@ void setup() {
 }
 
 void loop() {
-  WaitForLRSyncFromSerial();
-}
-
-void SetupSerial() {
-  Serial.begin(115200);
-  Serial.flush();
-}
-
-void WaitForLRSyncFromSerial() {
   uint8_t inByte;
-  while (!Serial.available()) {}
-  while (Serial.available()) {
+  if (Serial.available()) {
     inByte = (uint8_t)Serial.read();
     if ((inByte == 0x4C) || (inByte == 0x52)) {
       uint32_t timeForTransparencyBegin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
@@ -98,6 +87,11 @@ void WaitForLRSyncFromSerial() {
       transparentTimePercent = inByte - 180;
     }
   }
+}
+
+void SetupSerial() {
+  Serial.begin(115200);
+  Serial.flush();
 }
 
 void SetupTimer1() {
