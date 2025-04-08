@@ -131,23 +131,8 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 			int refreshRate = GetRefreshRate();
 			timeThreshold = (long long)((refreshRate > 0) ? ((double)mFrameCounter * (double)1000000 / (double)refreshRate) : ((double)mFrameCounter * (double)1000000 / (double)60));
 		}
-		else if (mFrequency == eFrequencies::F1Hz) {
+		else if (mFrequency == eFrequencies::Test) {
 			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)1);
-		}
-		else if (mFrequency == eFrequencies::F60Hz) {
-			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)60);
-		}
-		else if (mFrequency == eFrequencies::F75Hz) {
-			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)75);
-		}
-		else if (mFrequency == eFrequencies::F100Hz) {
-			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)100);
-		}
-		else if (mFrequency == eFrequencies::F120Hz) {
-			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)120);
-		}
-		else if (mFrequency == eFrequencies::F144Hz) {
-			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)144);
 		}
 		while (std::chrono::high_resolution_clock::now() - mMeasureTimeFromFirstFrame < std::chrono::microseconds(timeThreshold));
 	}

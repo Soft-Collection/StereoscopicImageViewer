@@ -43,12 +43,7 @@ public class clsStereoImageManagerWrap
     public enum eFrequencies : int
     {
         Default = 0,
-        F1Hz = 1,
-        F60Hz = 2,
-        F75Hz = 3,
-        F100Hz = 4,
-        F120Hz = 5,
-        F144Hz = 6
+        Test = 1
     }
 
     public enum eSignalSources : int

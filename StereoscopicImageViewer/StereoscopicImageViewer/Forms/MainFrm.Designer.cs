@@ -44,6 +44,9 @@
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.visitWebSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gitHubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.arduinoProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stereoImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.tsbOpenFolder = new System.Windows.Forms.ToolStripButton();
@@ -72,9 +75,6 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.timerSendSettings = new System.Windows.Forms.Timer(this.components);
-            this.gitHubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.arduinoProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stereoImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
@@ -194,14 +194,35 @@
             // visitWebSiteToolStripMenuItem
             // 
             this.visitWebSiteToolStripMenuItem.Name = "visitWebSiteToolStripMenuItem";
-            this.visitWebSiteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.visitWebSiteToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
             this.visitWebSiteToolStripMenuItem.Text = "Visit Web Site";
             this.visitWebSiteToolStripMenuItem.Click += new System.EventHandler(this.visitWebSiteToolStripMenuItem_Click);
+            // 
+            // gitHubToolStripMenuItem
+            // 
+            this.gitHubToolStripMenuItem.Name = "gitHubToolStripMenuItem";
+            this.gitHubToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.gitHubToolStripMenuItem.Text = "GitHub";
+            this.gitHubToolStripMenuItem.Click += new System.EventHandler(this.gitHubToolStripMenuItem_Click);
+            // 
+            // arduinoProjectToolStripMenuItem
+            // 
+            this.arduinoProjectToolStripMenuItem.Name = "arduinoProjectToolStripMenuItem";
+            this.arduinoProjectToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.arduinoProjectToolStripMenuItem.Text = "Arduino Project";
+            this.arduinoProjectToolStripMenuItem.Click += new System.EventHandler(this.arduinoProjectToolStripMenuItem_Click);
+            // 
+            // stereoImagesToolStripMenuItem
+            // 
+            this.stereoImagesToolStripMenuItem.Name = "stereoImagesToolStripMenuItem";
+            this.stereoImagesToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.stereoImagesToolStripMenuItem.Text = "Stereo Images";
+            this.stereoImagesToolStripMenuItem.Click += new System.EventHandler(this.stereoImagesToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem1
             // 
             this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(157, 22);
             this.aboutToolStripMenuItem1.Text = "About";
             this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -250,21 +271,9 @@
             // 
             // tscbFrequency
             // 
-            this.tscbFrequency.AutoCompleteCustomSource.AddRange(new string[] {
-            "1Hz",
-            "60Hz",
-            "75Hz",
-            "100Hz",
-            "120Hz",
-            "144Hz"});
             this.tscbFrequency.Items.AddRange(new object[] {
             "Default",
-            "1Hz",
-            "60Hz",
-            "75Hz",
-            "100Hz",
-            "120Hz",
-            "144Hz"});
+            "Test"});
             this.tscbFrequency.Name = "tscbFrequency";
             this.tscbFrequency.Size = new System.Drawing.Size(75, 30);
             this.tscbFrequency.SelectedIndexChanged += new System.EventHandler(this.tscbFrequency_SelectedIndexChanged);
@@ -462,27 +471,6 @@
             // timerSendSettings
             // 
             this.timerSendSettings.Tick += new System.EventHandler(this.timerSendSettings_Tick);
-            // 
-            // gitHubToolStripMenuItem
-            // 
-            this.gitHubToolStripMenuItem.Name = "gitHubToolStripMenuItem";
-            this.gitHubToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.gitHubToolStripMenuItem.Text = "GitHub";
-            this.gitHubToolStripMenuItem.Click += new System.EventHandler(this.gitHubToolStripMenuItem_Click);
-            // 
-            // arduinoProjectToolStripMenuItem
-            // 
-            this.arduinoProjectToolStripMenuItem.Name = "arduinoProjectToolStripMenuItem";
-            this.arduinoProjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.arduinoProjectToolStripMenuItem.Text = "Arduino Project";
-            this.arduinoProjectToolStripMenuItem.Click += new System.EventHandler(this.arduinoProjectToolStripMenuItem_Click);
-            // 
-            // stereoImagesToolStripMenuItem
-            // 
-            this.stereoImagesToolStripMenuItem.Name = "stereoImagesToolStripMenuItem";
-            this.stereoImagesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.stereoImagesToolStripMenuItem.Text = "Stereo Images";
-            this.stereoImagesToolStripMenuItem.Click += new System.EventHandler(this.stereoImagesToolStripMenuItem_Click);
             // 
             // MainFrm
             // 
