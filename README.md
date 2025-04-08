@@ -21,3 +21,5 @@ Left and Right images must be the same size.
 ![Connection Diagram](Images/Connection%20Diagram.png)
 
 ![Connection Diagram](Images/AssembledDevice.png)
+
+![Connection Diagram](Images/DeviceInBox.png)
