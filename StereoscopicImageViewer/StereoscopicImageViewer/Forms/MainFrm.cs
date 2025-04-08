@@ -371,7 +371,7 @@ namespace StereoscopicImageViewer
                 {
                     if (mStereoImageManager != null)
                     {
-                        clsStereoImageManagerWrap.eStereoImageManagerErrors res1 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                        clsStereoImageManagerWrap.eStereoImageManagerErrors res1 = mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
                         clsStereoImageManagerWrap.eStereoImageManagerErrors res2 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
                     }
                     mAlreadySent = true;
