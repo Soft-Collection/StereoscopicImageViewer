@@ -5,6 +5,10 @@
 #define COMMON_SHUTTER_PIN 7
 #define RIGHT_SHUTTER_PIN 8
 
+#define COMMAND_TYPE_FREQUENCY 0
+#define COMMAND_TYPE_GLASSES_TIME_OFFSET 1
+#define COMMAND_TYPE_TRANSPARENT_TIME_PERCENT 2
+
 typedef struct
 {
   volatile uint8_t Left;
@@ -13,35 +17,33 @@ typedef struct
 } Output;
 typedef struct
 {
-  volatile uint32_t Counter;
-  volatile uint32_t Value;
-} Duration;
-typedef struct
-{
   volatile uint32_t Begin;
   volatile uint32_t End;
-} Transparancy;
+} Transparency;
+typedef struct
+{
+  Transparency Left;
+  Transparency Right;
+} Shutters;
 
-volatile uint32_t timeCounter = 0;
-//--------------------------------------------
 Output output = {
   LOW,
 };
-//--------------------------------------------
-Duration frameDuration = {
-  0,
+Shutters shutters = {
+  0.0,
 };
-//--------------------------------------------
-Transparancy leftTransparency = {
-  0,
-};
-Transparancy rightTransparency = {
-  0,
-};
-//--------------------------------------------
-volatile uint32_t glassesTimeOffset = 0;
-volatile uint32_t transparentTimePercent = 30;
+//-------------------------------------------------------
+volatile uint8_t glassesTimeOffset = (uint8_t)(-1);
+volatile uint8_t transparentTimePercent = (uint8_t)(-1);
+//-------------------------------------------------------
+volatile uint32_t lastSyncTimeInUS = 0;
+volatile uint32_t insideTwoEyeCycleInUS = 0;
+//-------------------------------------------------------
+volatile uint32_t twoEyePeriodInUS = 0;
+volatile uint32_t glassesTimeOffsetInUS = 0;
 
+void UpdateVariables();
+uint8_t GetTransparencyTime(Transparency transparency, uint8_t common);
 void SetupSerial();
 void SetupTimer1();
 
@@ -60,30 +62,62 @@ void setup() {
 
 void loop() {
   uint8_t inByte;
-  if (Serial.available()) {
-    inByte = (uint8_t)Serial.read();
-    if ((inByte == 0x4C) || (inByte == 0x52)) {
-      uint32_t timeForTransparencyBegin = timeCounter + (frameDuration.Value * (50 - (transparentTimePercent / 2)) / 100);
-      uint32_t timeForTransparencyEnd = timeCounter + (frameDuration.Value * (50 + (transparentTimePercent / 2)) / 100);
-      if (inByte == 0x4C)  //Left Transparent
-      {
-        leftTransparency.Begin = timeForTransparencyBegin;
-        leftTransparency.End = timeForTransparencyEnd;
-        rightTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
-        rightTransparency.End = timeForTransparencyEnd - frameDuration.Value;
-      } else if (inByte == 0x52)  //Right Transparent
-      {
-        leftTransparency.Begin = timeForTransparencyBegin - frameDuration.Value;
-        leftTransparency.End = timeForTransparencyEnd - frameDuration.Value;
-        rightTransparency.Begin = timeForTransparencyBegin;
-        rightTransparency.End = timeForTransparencyEnd;
-      }
-      frameDuration.Value = frameDuration.Counter;
-      frameDuration.Counter = 0;
-    } else if ((inByte >= 100) && (inByte <= 179)) {
-      glassesTimeOffset = inByte - 100;
-    } else if (inByte >= 180) {
-      transparentTimePercent = inByte - 180;
+  //-------------------------------
+  while (!Serial.available());
+  inByte = (uint8_t)Serial.read();
+  if (inByte != 0x54) return;
+  //-------------------------------
+  while (!Serial.available());
+  inByte = (uint8_t)Serial.read();
+  if (inByte != 0xED) return;
+  //-------------------------------
+  while (Serial.available() < 3);
+  uint8_t command_type = (uint8_t)Serial.read();
+  uint8_t value = (uint8_t)Serial.read();
+  uint8_t checkSum = (uint8_t)Serial.read();
+  if (checkSum != (uint8_t)(0x54 + 0xED + command_type + value)) return;
+  //-------------------------------
+  if (command_type == COMMAND_TYPE_FREQUENCY) {
+    uint32_t timeInUS = micros();
+    twoEyePeriodInUS = timeInUS - lastSyncTimeInUS;
+    lastSyncTimeInUS = timeInUS;
+  } else if (command_type == COMMAND_TYPE_GLASSES_TIME_OFFSET) {
+    glassesTimeOffset = value;
+  } else if (command_type == COMMAND_TYPE_TRANSPARENT_TIME_PERCENT) {
+    transparentTimePercent = value;
+  }
+  //-------------------------------
+  UpdateVariables();
+}
+
+void UpdateVariables() {
+  if (twoEyePeriodInUS == 0) return;
+  //----------------------------------------------------------------
+  glassesTimeOffsetInUS = (int32_t)(twoEyePeriodInUS * (double)glassesTimeOffset / 100.0);
+  //----------------------------------------------------------------
+  shutters.Left.Begin = (int32_t)((double)twoEyePeriodInUS * (0.25 - ((double)transparentTimePercent / 400.0)));
+  shutters.Left.End = (int32_t)((double)twoEyePeriodInUS * (0.25 + ((double)transparentTimePercent / 400.0)));
+  shutters.Right.Begin = (int32_t)((double)shutters.Left.Begin + ((double)twoEyePeriodInUS / 2.0));
+  shutters.Right.End = (int32_t)((double)shutters.Left.End + ((double)twoEyePeriodInUS / 2.0));
+  //----------------------------------------------------------------
+  shutters.Left.Begin = (shutters.Left.Begin + glassesTimeOffsetInUS) % twoEyePeriodInUS;
+  shutters.Left.End = (shutters.Left.End + glassesTimeOffsetInUS) % twoEyePeriodInUS;
+  shutters.Right.Begin = (shutters.Right.Begin + glassesTimeOffsetInUS) % twoEyePeriodInUS;
+  shutters.Right.End = (shutters.Right.End + glassesTimeOffsetInUS) % twoEyePeriodInUS;
+}
+
+uint8_t GetTransparencyTime(Transparency transparency, uint8_t common) {
+  if (transparency.Begin <= transparency.End) {
+    if ((transparency.Begin < insideTwoEyeCycleInUS) && (insideTwoEyeCycleInUS < transparency.End)) {
+      return common;
+    } else {
+      return !common;
+    }
+  } else {
+    if ((transparency.Begin < insideTwoEyeCycleInUS) || (insideTwoEyeCycleInUS < transparency.End)) {
+      return common;
+    } else {
+      return !common;
     }
   }
 }
@@ -108,7 +142,7 @@ void SetupTimer1() {
   // Compare value = (Clock frequency / (Prescaler * Frequency)) - 1
   // Clock frequency = 16,000,000 Hz, Prescaler = 1024, Frequency in Hz
   // OCR1A = (16000000 / (1024 * Frequency in Hz)) - 1;
-  OCR1A = 1;  //3906.25 Hz
+  OCR1A = 1;  //7812.5 Hz
   // Enable Timer1 compare interrupt
   TIMSK1 |= (1 << OCIE1A);
   // Enable interrupts globally
@@ -117,12 +151,16 @@ void SetupTimer1() {
 
 // Interrupt Service Routine for Timer1 compare match
 ISR(TIMER1_COMPA_vect) {
+  if (glassesTimeOffset == (uint8_t)(-1)) return;
+  if (transparentTimePercent == (uint8_t)(-1)) return;
+  //----------------------------------------------------------------
   output.Common = !output.Common;
   //----------------------------------------------------------------
-  uint32_t timeCounterWithOffset = timeCounter - glassesTimeOffset;
-  output.Left = ((leftTransparency.Begin < timeCounterWithOffset) && (timeCounterWithOffset < leftTransparency.End)) ? output.Common : !output.Common;
-  output.Right = ((rightTransparency.Begin < timeCounterWithOffset) && (timeCounterWithOffset < rightTransparency.End)) ? output.Common : !output.Common;
-  if (frameDuration.Counter > 2 * frameDuration.Value) {
+  insideTwoEyeCycleInUS = micros() - lastSyncTimeInUS;
+  //----------------------------------------------------------------
+  output.Left = GetTransparencyTime(shutters.Left, output.Common);
+  output.Right = GetTransparencyTime(shutters.Right, output.Common);
+  if (insideTwoEyeCycleInUS > twoEyePeriodInUS * 2){
     output.Left = output.Common;
     output.Right = output.Common;
   }
@@ -130,7 +168,4 @@ ISR(TIMER1_COMPA_vect) {
   digitalWrite(LEFT_SHUTTER_PIN, output.Left);
   digitalWrite(COMMON_SHUTTER_PIN, output.Common);
   digitalWrite(RIGHT_SHUTTER_PIN, output.Right);
-  //----------------------------------------------------------------
-  timeCounter++;
-  frameDuration.Counter++;
 }
