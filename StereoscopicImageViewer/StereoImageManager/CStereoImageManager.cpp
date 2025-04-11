@@ -40,6 +40,7 @@ CStereoImageManager::CStereoImageManager(HWND hWnd, eFrequencies frequency, eSig
 	mImageToPlayIsLeft = true;
 	mFirstFrameAlreadyArrived = false;
 	mFrameCounter = 0;
+	mRefreshRate = GetRefreshRate();
 	mMeasureTimeFromFirstFrame = std::chrono::high_resolution_clock::now();
 	//----------------------------------------------------
 	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
@@ -94,6 +95,16 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
 		mImageToPlayIsLeft = !mImageToPlayIsLeft;
+		if (mImageToPlayIsLeft)
+		{
+			if (mSignalSource == eSignalSources::COMPort)
+			{
+				if (mComPort != NULL)
+				{
+					mComPort->SendFrequency(mComPortName, mRefreshRate);
+				}
+			}
+		}
 		if (mStereoDirect3D != NULL)
 		{
 			mStereoDirect3D->Blt(mImageToPlayIsLeft);
@@ -102,38 +113,11 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 		{
 			return eStereoImageManagerErrors::Direct3DIsNull;
 		}
-		if (mImageToPlayIsLeft)
-		{
-			if (mSignalSource == eSignalSources::COMPort)
-			{
-				if (mComPort != NULL)
-				{
-					mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Left);
-				}
-			}
-		}
-		else
-		{
-			if (mSignalSource == eSignalSources::COMPort)
-			{
-				if (mComPort != NULL)
-				{
-					mComPort->SendCommand(mComPortName, CComPort::eTransparentLenses::Right);
-				}
-			}
-		}
 		mFrameCounter++;
 		//----------------------------------------------
 		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
-		long long timeThreshold = 0;
-		if (mFrequency == eFrequencies::Default) {
-			int refreshRate = GetRefreshRate();
-			timeThreshold = (long long)((refreshRate > 0) ? ((double)mFrameCounter * (double)1000000 / (double)refreshRate) : ((double)mFrameCounter * (double)1000000 / (double)60));
-		}
-		else if (mFrequency == eFrequencies::Test) {
-			timeThreshold = (long long)((double)mFrameCounter * (double)1000000 / (double)1);
-		}
+		long long timeThreshold = (long long)((double)mFrameCounter * 1000000.0 / (double)mRefreshRate);
 		while (std::chrono::high_resolution_clock::now() - mMeasureTimeFromFirstFrame < std::chrono::microseconds(timeThreshold));
 	}
 	catch(...)
@@ -201,9 +185,12 @@ int CStereoImageManager::GetRefreshRate()
 	ZeroMemory(&dm, sizeof(dm));
 	dm.dmSize = sizeof(dm);
 	// Retrieve the current display settings
-	if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm)) 
+	if (mFrequency == eFrequencies::Default)
 	{
-		return dm.dmDisplayFrequency;
+		if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm))
+		{
+			return dm.dmDisplayFrequency;
+		}
 	}
-	return 0;
+	return 1;
 }

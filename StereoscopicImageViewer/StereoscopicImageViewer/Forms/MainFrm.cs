@@ -389,45 +389,23 @@ namespace StereoscopicImageViewer
                 if (!mIsStarted) PerformStart();
             }
         }
-        private void tbGlassesTimeOffset_MouseUp(object sender, MouseEventArgs e)
-        {
-            Settings.GlassesTimeOffset = tbGlassesTimeOffset.Value;
-            if (mStereoImageManager != null)
-            {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
-            }
-        }
-        private void tbGlassesTimeOffset_KeyUp(object sender, KeyEventArgs e)
-        {
-            Settings.GlassesTimeOffset = tbGlassesTimeOffset.Value;
-            if (mStereoImageManager != null)
-            {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
-            }
-        }
         private void tbGlassesTimeOffset_Scroll(object sender, EventArgs e)
         {
             lblGlassesTimeOffset.Text = tbGlassesTimeOffset.Value.ToString();
-        }
-        private void tbTransparentTimePercent_MouseUp(object sender, MouseEventArgs e)
-        {
-            Settings.TransparentTimePercent = tbTransparentTimePercent.Value;
+            Settings.GlassesTimeOffset = tbGlassesTimeOffset.Value;
             if (mStereoImageManager != null)
             {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
-            }
-        }
-        private void tbTransparentTimePercent_KeyUp(object sender, KeyEventArgs e)
-        {
-            Settings.TransparentTimePercent = tbTransparentTimePercent.Value;
-            if (mStereoImageManager != null)
-            {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
             }
         }
         private void tbTransparentTimePercent_Scroll(object sender, EventArgs e)
         {
             lblTransparentTimePercent.Text = tbTransparentTimePercent.Value.ToString();
+            Settings.TransparentTimePercent = tbTransparentTimePercent.Value;
+            if (mStereoImageManager != null)
+            {
+                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+            }
         }
         #endregion
 

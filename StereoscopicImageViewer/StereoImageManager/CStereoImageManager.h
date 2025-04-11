@@ -67,6 +67,7 @@ private:
 	bool mImageToPlayIsLeft;
 	bool mFirstFrameAlreadyArrived;
 	UINT32 mFrameCounter;
+	int mRefreshRate;
 	std::chrono::time_point<std::chrono::high_resolution_clock> mMeasureTimeFromFirstFrame;
 public:
 	CStereoImageManager(HWND hWnd, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath);

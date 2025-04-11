@@ -53,13 +53,13 @@ void CComPort::End()
         mHCom = NULL;
     }
 }
-void CComPort::Send(std::wstring comPortName, BYTE byteToSend)
+void CComPort::Send(std::wstring comPortName, BYTE* command)
 {
     if (mHCom == NULL) Begin(comPortName);
     if (mHCom != NULL)
     {
         DWORD bytesWritten;
-        if (!WriteFile(mHCom, &byteToSend, 1, &bytesWritten, NULL)) {
+        if (!WriteFile(mHCom, command, 5, &bytesWritten, NULL)) {
             std::cerr << "Error: Unable to write to COM port." << std::endl;
             End();
             return;
@@ -71,24 +71,27 @@ void CComPort::Send(std::wstring comPortName, BYTE byteToSend)
         }
     }
 }
-void CComPort::SendCommand(std::wstring comPortName, eTransparentLenses transparentLenses)
+void CComPort::SendFrequency(std::wstring comPortName, int frequency)
 {
-    BYTE byteToSend = 76; // 76 = L (Left).
-    if (transparentLenses == eTransparentLenses::Left)
-    {
-        byteToSend = 76; // 76 = L (Left).
-    }
-    else if (transparentLenses == eTransparentLenses::Right)
-    {
-        byteToSend = 82; // 82 = R (Right).
-    }
-    Send(comPortName, byteToSend);
+    BYTE command[] = { 0x54, 0xED, 0x00, 0x00, 0x00 };
+    command[2] = eCommandTypes::Frequency;
+    command[3] = frequency;
+    command[4] = command[0] + command[1] + command[2] + command[3];
+    Send(comPortName, command);
 }
 void CComPort::SendGlassesTimeOffset(std::wstring comPortName, int offset)
 {
-    Send(comPortName, (BYTE)(offset + 100));
+    BYTE command[] = { 0x54, 0xED, 0x00, 0x00, 0x00 };
+    command[2] = eCommandTypes::GlassesTimeOffset;
+    command[3] = offset;
+    command[4] = command[0] + command[1] + command[2] + command[3];
+    Send(comPortName, command);
 }
 void CComPort::SendTransparentTimePercent(std::wstring comPortName, int percent)
 {
-    Send(comPortName, (BYTE)(percent + 180));
+    BYTE command[] = { 0x54, 0xED, 0x00, 0x00, 0x00 };
+    command[2] = eCommandTypes::TransparentTimePercent;
+    command[3] = percent;
+    command[4] = command[0] + command[1] + command[2] + command[3];
+    Send(comPortName, command);
 }

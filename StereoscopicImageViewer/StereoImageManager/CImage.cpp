@@ -1,14 +1,30 @@
 #include "stdafx.h"
 #include "CImage.h"
 
+CImage::CImage()
+{
+    this->Width = 0;
+    this->Height = 0;
+    this->Channels = 0;
+    this->IsLeft = false;
+    this->RectangleHeight = 0;
+    this->RectanglesMustBeDrawn = false;
+}
+
+CImage::~CImage()
+{
+}
+
 //BGRA
 void CImage::LoadPNG(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft, int rectangleHeight, bool rectanglesMustBeDrawn)
 {
     // Initialize COM library
-    CoInitialize(NULL);
+    HRESULT hr = CoInitialize(NULL);
+    if (FAILED(hr)) return;
     // Create WIC factory
     IWICImagingFactory* pFactory = NULL;
-    CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&pFactory);
+    hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&pFactory);
+    if (FAILED(hr)) return;
     // Create a decoder to read the image
     IWICBitmapDecoder* pDecoder = NULL;
     pFactory->CreateDecoderFromFilename(filePath.c_str(), NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);

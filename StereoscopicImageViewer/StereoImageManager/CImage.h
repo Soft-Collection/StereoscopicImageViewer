@@ -20,6 +20,8 @@ public:
 	int RectangleHeight;
 	bool RectanglesMustBeDrawn;
 public:
+	CImage();
+	~CImage();
 	static void LoadPNG(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft, int rectangleHeight, bool rectanglesMustBeDrawn);
 	static void LoadPNG(CImage* img);
 };

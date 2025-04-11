@@ -9,19 +9,20 @@ class CComPort
 private:
 	HANDLE mHCom;
 public:
-	enum eTransparentLenses : int
+	enum eCommandTypes : int
 	{
-		Left = 0,
-		Right = 1
+		Frequency = 0,
+		GlassesTimeOffset = 1,
+		TransparentTimePercent = 2
 	};
 private:
 	void Begin(std::wstring comPortName);
 	void End();
-	void Send(std::wstring comPortName, BYTE byteToSend);
+	void Send(std::wstring comPortName, BYTE* command);
 public:
 	CComPort();
 	~CComPort();
-	void SendCommand(std::wstring comPortName, eTransparentLenses transparentLenses);
+	void SendFrequency(std::wstring comPortName, int frequency);
 	void SendGlassesTimeOffset(std::wstring comPortName, int offset);
 	void SendTransparentTimePercent(std::wstring comPortName, int percent);
 };
