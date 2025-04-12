@@ -21,7 +21,7 @@ def split_image(anaglyph_image_file_path, output_folder_path=None, red_cyan=Fals
         if not os.path.exists(output_folder_path):
             print(f"The folder: {output_folder_path} doesn't exist")
             return
-        elif os.path.isdir(output_folder_path):
+        elif not os.path.isdir(output_folder_path):
             print(f"Not a folder: {output_folder_path}")
             return
     else:
