@@ -266,6 +266,10 @@ namespace StereoscopicImageViewer
         {
             System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/blob/master/ArduinoProject/CableGlasses/CableGlasses.ino");
         }
+        private void createImagesFromAnaglyphImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/blob/master/StereoImageSplitter/stereo_image_splitter.py");
+        }
         private void stereoImagesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/tree/master/StereoImages");
@@ -276,7 +280,12 @@ namespace StereoscopicImageViewer
         private void tsbOpenFolder_Click(object sender, EventArgs e)
         {
             string temp = OpenFolder();
-            Settings.FolderPath = (temp == null) ? Settings.FolderPath : temp;
+            Settings.FolderPath = (temp == string.Empty) ? Settings.FolderPath : temp;
+            LoadStereoImages();
+        }
+        private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PerformStop();
             LoadStereoImages();
         }
         private void tscbFrequency_SelectedIndexChanged(object sender, EventArgs e)
@@ -514,11 +523,12 @@ namespace StereoscopicImageViewer
             {
                 return fbdOpenFolder.SelectedPath;
             }
-            return null;
+            return string.Empty;
         }
         private void LoadStereoImages()
         {
             if (Settings.FolderPath == null) return;
+            if (Settings.FolderPath == string.Empty) return;
             if (!Directory.Exists(Settings.FolderPath)) return;
             lvStereoImages.Items.Clear();
             string[] files = Directory.GetFiles(Settings.FolderPath);

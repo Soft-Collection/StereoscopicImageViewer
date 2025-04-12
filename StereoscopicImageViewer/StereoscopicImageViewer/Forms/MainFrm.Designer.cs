@@ -75,6 +75,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.timerSendSettings = new System.Windows.Forms.Timer(this.components);
+            this.cmsStereoImages = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createImagesFromAnaglyphImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
@@ -84,6 +87,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.tbTransparentTimePercent)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.cmsStereoImages.SuspendLayout();
             this.SuspendLayout();
             // 
             // popUpMenu
@@ -185,6 +189,7 @@
             this.visitWebSiteToolStripMenuItem,
             this.gitHubToolStripMenuItem,
             this.arduinoProjectToolStripMenuItem,
+            this.createImagesFromAnaglyphImageToolStripMenuItem,
             this.stereoImagesToolStripMenuItem,
             this.aboutToolStripMenuItem1});
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
@@ -380,6 +385,7 @@
             // 
             this.lvStereoImages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.lvStereoImages.ContextMenuStrip = this.cmsStereoImages;
             this.lvStereoImages.HideSelection = false;
             this.lvStereoImages.Location = new System.Drawing.Point(5, 57);
             this.lvStereoImages.MultiSelect = false;
@@ -467,6 +473,27 @@
             // 
             this.timerSendSettings.Tick += new System.EventHandler(this.timerSendSettings_Tick);
             // 
+            // cmsStereoImages
+            // 
+            this.cmsStereoImages.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshToolStripMenuItem});
+            this.cmsStereoImages.Name = "cmsStereoImages";
+            this.cmsStereoImages.Size = new System.Drawing.Size(114, 26);
+            // 
+            // refreshToolStripMenuItem
+            // 
+            this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.refreshToolStripMenuItem.Text = "Refresh";
+            this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
+            // 
+            // createImagesFromAnaglyphImageToolStripMenuItem
+            // 
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Name = "createImagesFromAnaglyphImageToolStripMenuItem";
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Size = new System.Drawing.Size(270, 22);
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Text = "Create Images From Anaglyph Image";
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Click += new System.EventHandler(this.createImagesFromAnaglyphImageToolStripMenuItem_Click);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -499,6 +526,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.tbTransparentTimePercent)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
+            this.cmsStereoImages.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -551,6 +579,9 @@
         private System.Windows.Forms.ToolStripMenuItem gitHubToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem arduinoProjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stereoImagesToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip cmsStereoImages;
+        private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createImagesFromAnaglyphImageToolStripMenuItem;
     }
 }
 

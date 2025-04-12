@@ -125,7 +125,7 @@ namespace StereoscopicImageViewer
             {
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
                 if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                FolderPathValue = (string)key.GetValue("FolderPath", null);
+                FolderPathValue = (string)key.GetValue("FolderPath", string.Empty);
                 return (FolderPathValue);
             }
             set
