@@ -213,7 +213,7 @@ int CStereoImageManager::GetRefreshRate(HWND hWnd)
 			ZeroMemory(&dm, sizeof(dm));
 			dm.dmSize = sizeof(dm);
 			// Retrieve the current display settings
-			if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm))
+			if (EnumDisplaySettings(monitorInfo.szDevice, ENUM_CURRENT_SETTINGS, &dm))
 			{
 				return dm.dmDisplayFrequency;
 			}
