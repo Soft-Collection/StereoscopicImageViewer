@@ -180,10 +180,18 @@ namespace StereoscopicImageViewer
         private void MainFrm_Move(object sender, EventArgs e)
         {
             Settings.Location = this.Location;
+            if (mStereoImageManager != null)
+            {
+                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.WindowSizeOrLocationChanged();
+            }
         }
         private void MainFrm_Resize(object sender, EventArgs e)
         {
             Settings.Size = this.Size;
+            if (mStereoImageManager != null)
+            {
+                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.WindowSizeOrLocationChanged();
+            }
         }
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)
         {

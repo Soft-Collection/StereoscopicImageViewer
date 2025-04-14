@@ -73,10 +73,11 @@ public:
 	CStereoImageManager(HWND hWnd, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath);
 	~CStereoImageManager();
 private:
-	int GetRefreshRate();
+	int GetRefreshRate(HWND hWnd);
 public:
 	eStereoImageManagerErrors VideoRender();
 	eStereoImageManagerErrors SetGlassesTimeOffset(int offset);
 	eStereoImageManagerErrors SetTransparentTimePercent(int percent);
+	eStereoImageManagerErrors WindowSizeOrLocationChanged();
 };
 #endif // __CSTEREOIMAGEMANAGER_H__

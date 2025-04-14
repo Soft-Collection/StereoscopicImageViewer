@@ -30,3 +30,9 @@ CStereoImageManager::eStereoImageManagerErrors StereoImageManagerSetTransparentT
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
 	return(cStereoImageManager->SetTransparentTimePercent(percent));
 }
+CStereoImageManager::eStereoImageManagerErrors StereoImageManagerWindowSizeOrLocationChanged(void* handle)
+{
+	if (handle == NULL) return(CStereoImageManager::eStereoImageManagerErrors::NullHandle);
+	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
+	return(cStereoImageManager->WindowSizeOrLocationChanged());
+}

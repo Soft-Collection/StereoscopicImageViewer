@@ -106,5 +106,26 @@ public class clsStereoImageManager
         }
         return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
     }
+    public clsStereoImageManagerWrap.eStereoImageManagerErrors WindowSizeOrLocationChanged()
+    {
+        try
+        {
+            if (mHandle != IntPtr.Zero)
+            {
+                lock (mLock)
+                {
+                    return clsStereoImageManagerWrap.StereoImageManagerWindowSizeOrLocationChanged(mHandle);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ExceptionManager.Publish(ex);
+        }
+        finally
+        {
+        }
+        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
+    }
     #endregion
 }

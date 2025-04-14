@@ -7,4 +7,5 @@ extern "C"
 	__declspec(dllexport) CStereoImageManager::eStereoImageManagerErrors StereoImageManagerVideoRender(void* handle);
 	__declspec(dllexport) CStereoImageManager::eStereoImageManagerErrors StereoImageManagerSetGlassesTimeOffset(void* handle, int offset);
 	__declspec(dllexport) CStereoImageManager::eStereoImageManagerErrors StereoImageManagerSetTransparentTimePercent(void* handle, int percent);
+	__declspec(dllexport) CStereoImageManager::eStereoImageManagerErrors StereoImageManagerWindowSizeOrLocationChanged(void* handle);
 }

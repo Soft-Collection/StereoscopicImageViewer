@@ -40,7 +40,7 @@ CStereoImageManager::CStereoImageManager(HWND hWnd, eFrequencies frequency, eSig
 	mImageToPlayIsLeft = true;
 	mFirstFrameAlreadyArrived = false;
 	mFrameCounter = 0;
-	mRefreshRate = GetRefreshRate();
+	mRefreshRate = GetRefreshRate(mHWnd);
 	mMeasureTimeFromFirstFrame = std::chrono::high_resolution_clock::now();
 	//----------------------------------------------------
 	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
@@ -147,7 +147,7 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetGlassesTi
 	}
 	catch (...)
 	{
-		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager VideoRender");
+		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager SetGlassesTimeOffset");
 		return eStereoImageManagerErrors::ExceptionInVideoRender;
 	}
 	return eStereoImageManagerErrors::NoError;
@@ -172,24 +172,51 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetTranspare
 	}
 	catch (...)
 	{
-		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager VideoRender");
+		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager SetTransparentTimePercent");
 		return eStereoImageManagerErrors::ExceptionInVideoRender;
 	}
 	return eStereoImageManagerErrors::NoError;
 }
-int CStereoImageManager::GetRefreshRate()
+CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::WindowSizeOrLocationChanged()
 {
-	// Structure to store display settings
-	DEVMODE dm;
-	// Initialize the memory block to zero
-	ZeroMemory(&dm, sizeof(dm));
-	dm.dmSize = sizeof(dm);
-	// Retrieve the current display settings
-	if (mFrequency == eFrequencies::Default)
+	try
 	{
-		if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm))
+		//----------------------------------------------
+		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+		mFirstFrameAlreadyArrived = false;
+		mFrameCounter = 0;
+		mRefreshRate = GetRefreshRate(mHWnd);
+		//----------------------------------------------
+		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
+		//----------------------------------------------
+	}
+	catch (...)
+	{
+		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager WindowSizeOrLocationChanged");
+		return eStereoImageManagerErrors::ExceptionInVideoRender;
+	}
+	return eStereoImageManagerErrors::NoError;
+}
+int CStereoImageManager::GetRefreshRate(HWND hWnd)
+{
+	HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	MONITORINFOEX monitorInfo;
+	monitorInfo.cbSize = sizeof(MONITORINFOEX);
+	if (GetMonitorInfo(hMonitor, &monitorInfo))
+	{
+		if (mFrequency == eFrequencies::Default)
 		{
-			return dm.dmDisplayFrequency;
+			// Structure to store display settings
+			DEVMODE dm;
+			// Initialize the memory block to zero
+			ZeroMemory(&dm, sizeof(dm));
+			dm.dmSize = sizeof(dm);
+			// Retrieve the current display settings
+			if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm))
+			{
+				return dm.dmDisplayFrequency;
+			}
 		}
 	}
 	return 1;

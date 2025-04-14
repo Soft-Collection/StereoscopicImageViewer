@@ -46,6 +46,7 @@
             this.visitWebSiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gitHubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.arduinoProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createImagesFromAnaglyphImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stereoImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
@@ -68,6 +69,8 @@
             this.fbdOpenFolder = new System.Windows.Forms.FolderBrowserDialog();
             this.pbVideoPanel = new System.Windows.Forms.PictureBox();
             this.lvStereoImages = new System.Windows.Forms.ListView();
+            this.cmsStereoImages = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tbGlassesTimeOffset = new System.Windows.Forms.TrackBar();
             this.lblGlassesTimeOffset = new System.Windows.Forms.Label();
             this.tbTransparentTimePercent = new System.Windows.Forms.TrackBar();
@@ -75,19 +78,16 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.timerSendSettings = new System.Windows.Forms.Timer(this.components);
-            this.cmsStereoImages = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createImagesFromAnaglyphImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbVideoPanel)).BeginInit();
+            this.cmsStereoImages.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbGlassesTimeOffset)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbTransparentTimePercent)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.cmsStereoImages.SuspendLayout();
             this.SuspendLayout();
             // 
             // popUpMenu
@@ -199,35 +199,42 @@
             // visitWebSiteToolStripMenuItem
             // 
             this.visitWebSiteToolStripMenuItem.Name = "visitWebSiteToolStripMenuItem";
-            this.visitWebSiteToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.visitWebSiteToolStripMenuItem.Size = new System.Drawing.Size(270, 22);
             this.visitWebSiteToolStripMenuItem.Text = "Visit Web Site";
             this.visitWebSiteToolStripMenuItem.Click += new System.EventHandler(this.visitWebSiteToolStripMenuItem_Click);
             // 
             // gitHubToolStripMenuItem
             // 
             this.gitHubToolStripMenuItem.Name = "gitHubToolStripMenuItem";
-            this.gitHubToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.gitHubToolStripMenuItem.Size = new System.Drawing.Size(270, 22);
             this.gitHubToolStripMenuItem.Text = "GitHub";
             this.gitHubToolStripMenuItem.Click += new System.EventHandler(this.gitHubToolStripMenuItem_Click);
             // 
             // arduinoProjectToolStripMenuItem
             // 
             this.arduinoProjectToolStripMenuItem.Name = "arduinoProjectToolStripMenuItem";
-            this.arduinoProjectToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.arduinoProjectToolStripMenuItem.Size = new System.Drawing.Size(270, 22);
             this.arduinoProjectToolStripMenuItem.Text = "Arduino Project";
             this.arduinoProjectToolStripMenuItem.Click += new System.EventHandler(this.arduinoProjectToolStripMenuItem_Click);
+            // 
+            // createImagesFromAnaglyphImageToolStripMenuItem
+            // 
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Name = "createImagesFromAnaglyphImageToolStripMenuItem";
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Size = new System.Drawing.Size(270, 22);
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Text = "Create Images From Anaglyph Image";
+            this.createImagesFromAnaglyphImageToolStripMenuItem.Click += new System.EventHandler(this.createImagesFromAnaglyphImageToolStripMenuItem_Click);
             // 
             // stereoImagesToolStripMenuItem
             // 
             this.stereoImagesToolStripMenuItem.Name = "stereoImagesToolStripMenuItem";
-            this.stereoImagesToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
+            this.stereoImagesToolStripMenuItem.Size = new System.Drawing.Size(270, 22);
             this.stereoImagesToolStripMenuItem.Text = "Stereo Images";
             this.stereoImagesToolStripMenuItem.Click += new System.EventHandler(this.stereoImagesToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem1
             // 
             this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(157, 22);
+            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(270, 22);
             this.aboutToolStripMenuItem1.Text = "About";
             this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -377,7 +384,7 @@
             this.pbVideoPanel.BackColor = System.Drawing.SystemColors.ControlDark;
             this.pbVideoPanel.Location = new System.Drawing.Point(198, 57);
             this.pbVideoPanel.Name = "pbVideoPanel";
-            this.pbVideoPanel.Size = new System.Drawing.Size(579, 433);
+            this.pbVideoPanel.Size = new System.Drawing.Size(579, 375);
             this.pbVideoPanel.TabIndex = 28;
             this.pbVideoPanel.TabStop = false;
             // 
@@ -390,11 +397,25 @@
             this.lvStereoImages.Location = new System.Drawing.Point(5, 57);
             this.lvStereoImages.MultiSelect = false;
             this.lvStereoImages.Name = "lvStereoImages";
-            this.lvStereoImages.Size = new System.Drawing.Size(187, 317);
+            this.lvStereoImages.Size = new System.Drawing.Size(187, 375);
             this.lvStereoImages.TabIndex = 0;
             this.lvStereoImages.UseCompatibleStateImageBehavior = false;
             this.lvStereoImages.View = System.Windows.Forms.View.List;
             this.lvStereoImages.SelectedIndexChanged += new System.EventHandler(this.lvStereoImages_SelectedIndexChanged);
+            // 
+            // cmsStereoImages
+            // 
+            this.cmsStereoImages.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshToolStripMenuItem});
+            this.cmsStereoImages.Name = "cmsStereoImages";
+            this.cmsStereoImages.Size = new System.Drawing.Size(114, 26);
+            // 
+            // refreshToolStripMenuItem
+            // 
+            this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.refreshToolStripMenuItem.Text = "Refresh";
+            this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // 
             // tbGlassesTimeOffset
             // 
@@ -404,16 +425,15 @@
             this.tbGlassesTimeOffset.Location = new System.Drawing.Point(6, 19);
             this.tbGlassesTimeOffset.Maximum = 100;
             this.tbGlassesTimeOffset.Name = "tbGlassesTimeOffset";
-            this.tbGlassesTimeOffset.Size = new System.Drawing.Size(125, 23);
+            this.tbGlassesTimeOffset.Size = new System.Drawing.Size(517, 23);
             this.tbGlassesTimeOffset.TabIndex = 30;
-            this.tbGlassesTimeOffset.TickFrequency = 5;
             this.tbGlassesTimeOffset.Scroll += new System.EventHandler(this.tbGlassesTimeOffset_Scroll);
             // 
             // lblGlassesTimeOffset
             // 
             this.lblGlassesTimeOffset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblGlassesTimeOffset.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGlassesTimeOffset.Location = new System.Drawing.Point(128, 16);
+            this.lblGlassesTimeOffset.Location = new System.Drawing.Point(520, 16);
             this.lblGlassesTimeOffset.Name = "lblGlassesTimeOffset";
             this.lblGlassesTimeOffset.Size = new System.Drawing.Size(53, 23);
             this.lblGlassesTimeOffset.TabIndex = 31;
@@ -447,12 +467,13 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.tbGlassesTimeOffset);
             this.groupBox1.Controls.Add(this.lblGlassesTimeOffset);
-            this.groupBox1.Location = new System.Drawing.Point(5, 380);
+            this.groupBox1.Location = new System.Drawing.Point(198, 438);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(187, 52);
+            this.groupBox1.Size = new System.Drawing.Size(579, 52);
             this.groupBox1.TabIndex = 34;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Glasses Time Offset";
@@ -472,27 +493,6 @@
             // timerSendSettings
             // 
             this.timerSendSettings.Tick += new System.EventHandler(this.timerSendSettings_Tick);
-            // 
-            // cmsStereoImages
-            // 
-            this.cmsStereoImages.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.refreshToolStripMenuItem});
-            this.cmsStereoImages.Name = "cmsStereoImages";
-            this.cmsStereoImages.Size = new System.Drawing.Size(114, 26);
-            // 
-            // refreshToolStripMenuItem
-            // 
-            this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.refreshToolStripMenuItem.Text = "Refresh";
-            this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
-            // 
-            // createImagesFromAnaglyphImageToolStripMenuItem
-            // 
-            this.createImagesFromAnaglyphImageToolStripMenuItem.Name = "createImagesFromAnaglyphImageToolStripMenuItem";
-            this.createImagesFromAnaglyphImageToolStripMenuItem.Size = new System.Drawing.Size(270, 22);
-            this.createImagesFromAnaglyphImageToolStripMenuItem.Text = "Create Images From Anaglyph Image";
-            this.createImagesFromAnaglyphImageToolStripMenuItem.Click += new System.EventHandler(this.createImagesFromAnaglyphImageToolStripMenuItem_Click);
             // 
             // MainFrm
             // 
@@ -522,11 +522,11 @@
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbVideoPanel)).EndInit();
+            this.cmsStereoImages.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tbGlassesTimeOffset)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbTransparentTimePercent)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
-            this.cmsStereoImages.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
