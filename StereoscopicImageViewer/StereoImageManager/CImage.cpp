@@ -8,7 +8,6 @@ CImage::CImage()
     this->Channels = 0;
     this->IsLeft = false;
     this->RectangleHeight = 0;
-    this->RectanglesMustBeDrawn = false;
 }
 
 CImage::~CImage()
@@ -16,7 +15,7 @@ CImage::~CImage()
 }
 
 //BGRA
-void CImage::LoadPNG(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft, int rectangleHeight, bool rectanglesMustBeDrawn)
+void CImage::LoadPNG(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft)
 {
     // Initialize COM library
     HRESULT hr = CoInitialize(NULL);
@@ -60,31 +59,9 @@ void CImage::LoadPNG(std::wstring filePath, int& width, int& height, int& channe
     pDecoder->Release();
     pFactory->Release();
     CoUninitialize();
-    // Draw Rectangles
-    if (!rectanglesMustBeDrawn) return;
-    if (height < rectangleHeight) return;
-    int middleWidth = width / 2;
-    int rectangleTop = height - rectangleHeight;
-    for (int y = rectangleTop; y < height; y++)
-    {
-        for (int x = 0; x < middleWidth; x++)
-        {
-            for (int i = 0; i < channels; i++)
-            {
-                pixelData[((y * width + x) * channels) + i] = isLeft ? 0 : 255;
-            }
-        }
-        for (int x = middleWidth; x < width; x++)
-        {
-            for (int i = 0; i < channels; i++)
-            {
-                pixelData[((y * width + x) * channels) + i] = isLeft ? 255 : 0;
-            }
-        }
-    }
 }
 
 void CImage::LoadPNG(CImage* img) 
 {
-    CImage::LoadPNG(img->FilePath, img->Width, img->Height, img->Channels, img->PixelData, img->IsLeft, img->RectangleHeight, img->RectanglesMustBeDrawn);
+    CImage::LoadPNG(img->FilePath, img->Width, img->Height, img->Channels, img->PixelData, img->IsLeft);
 }

@@ -52,11 +52,6 @@
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.tsbOpenFolder = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-            this.tscbFrequency = new System.Windows.Forms.ToolStripComboBox();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
-            this.tscbSignalSource = new System.Windows.Forms.ToolStripComboBox();
             this.tscbComPort = new System.Windows.Forms.ToolStripComboBox();
             this.tsbRefresh = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
@@ -245,11 +240,6 @@
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbOpenFolder,
             this.toolStripSeparator2,
-            this.toolStripLabel1,
-            this.tscbFrequency,
-            this.toolStripSeparator4,
-            this.toolStripLabel3,
-            this.tscbSignalSource,
             this.tscbComPort,
             this.tsbRefresh,
             this.toolStripSeparator5,
@@ -275,47 +265,11 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 30);
             // 
-            // toolStripLabel1
-            // 
-            this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(62, 27);
-            this.toolStripLabel1.Text = "Frequency";
-            // 
-            // tscbFrequency
-            // 
-            this.tscbFrequency.Items.AddRange(new object[] {
-            "Default",
-            "Test"});
-            this.tscbFrequency.Name = "tscbFrequency";
-            this.tscbFrequency.Size = new System.Drawing.Size(75, 30);
-            this.tscbFrequency.SelectedIndexChanged += new System.EventHandler(this.tscbFrequency_SelectedIndexChanged);
-            // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 30);
-            // 
-            // toolStripLabel3
-            // 
-            this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(78, 27);
-            this.toolStripLabel3.Text = "Signal Source";
-            // 
-            // tscbSignalSource
-            // 
-            this.tscbSignalSource.Items.AddRange(new object[] {
-            "Screen Sensor",
-            "COM Port"});
-            this.tscbSignalSource.Name = "tscbSignalSource";
-            this.tscbSignalSource.Size = new System.Drawing.Size(100, 30);
-            this.tscbSignalSource.SelectedIndexChanged += new System.EventHandler(this.tscbSignalSource_SelectedIndexChanged);
-            // 
             // tscbComPort
             // 
             this.tscbComPort.Name = "tscbComPort";
             this.tscbComPort.Size = new System.Drawing.Size(100, 30);
             this.tscbComPort.Sorted = true;
-            this.tscbComPort.Visible = false;
             this.tscbComPort.SelectedIndexChanged += new System.EventHandler(this.tscbComPort_SelectedIndexChanged);
             // 
             // tsbRefresh
@@ -556,12 +510,7 @@
         private System.Windows.Forms.ToolStripStatusLabel tsslFrequency;
         private System.Windows.Forms.Timer timerFrequency;
         private System.Windows.Forms.ToolStripButton tsbOpenFolder;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
-        private System.Windows.Forms.ToolStripComboBox tscbFrequency;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel3;
-        private System.Windows.Forms.ToolStripComboBox tscbSignalSource;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripComboBox tscbComPort;
         private System.Windows.Forms.Timer timerErrors;

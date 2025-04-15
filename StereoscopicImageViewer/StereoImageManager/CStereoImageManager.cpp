@@ -6,42 +6,31 @@
 #include <Windows.h>
 #include <iostream>
 
-CStereoImageManager::CStereoImageManager(HWND hWnd, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+CStereoImageManager::CStereoImageManager(HWND hWnd, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
 {
 	mCriticalSectionPool = new CCriticalSectionPool(eCriticalSections::Size);
 	mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 	//----------------------------------------------------
 	mHWnd = hWnd;
 	mStereoDirect3D = new CStereoDirect3D();
-	mFrequency = frequency;
-	mSignalSource = signalSource;
 	mComPortName = std::wstring(comPort);
 	mComPort = NULL;
-	if (mSignalSource == eSignalSources::COMPort)
-	{
-		mComPort = new CComPort();
-	}
+	mComPort = new CComPort();
 	//----------------------------------------------------
 	mLeftImage = new CImage();
 	mLeftImage->FilePath = std::wstring(leftImageFilePath);
 	mLeftImage->IsLeft = true;
 	mLeftImage->RectangleHeight = 30;
-	mLeftImage->RectanglesMustBeDrawn = (mSignalSource == eSignalSources::ScreenSensor);
 	CImage::LoadPNG(mLeftImage);
 	mRightImage = new CImage();
 	mRightImage->FilePath = std::wstring(rightImageFilePath);
 	mRightImage->IsLeft = false;
 	mRightImage->RectangleHeight = 30;
-	mRightImage->RectanglesMustBeDrawn = (mSignalSource == eSignalSources::ScreenSensor);
 	CImage::LoadPNG(mRightImage);
 	//----------------------------------------------------
 	mStereoDirect3D->DrawImage(mHWnd, mLeftImage->PixelData.data(), mRightImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
 	//----------------------------------------------------
 	mImageToPlayIsLeft = true;
-	mFirstFrameAlreadyArrived = false;
-	mFrameCounter = 0;
-	mRefreshRate = GetRefreshRate(mHWnd);
-	mMeasureTimeFromFirstFrame = std::chrono::high_resolution_clock::now();
 	//----------------------------------------------------
 	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
 }
@@ -86,25 +75,10 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 	try
 	{
 		if ((mLeftImage->Width != mRightImage->Width) || (mLeftImage->Height != mRightImage->Height)) return eStereoImageManagerErrors::DifferentLeftRightImageDimensions;
-		if (!mFirstFrameAlreadyArrived)
-		{
-			mMeasureTimeFromFirstFrame = std::chrono::high_resolution_clock::now();
-			mFirstFrameAlreadyArrived = true;
-		}
 		//----------------------------------------------
 		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
 		mImageToPlayIsLeft = !mImageToPlayIsLeft;
-		if (mImageToPlayIsLeft)
-		{
-			if (mSignalSource == eSignalSources::COMPort)
-			{
-				if (mComPort != NULL)
-				{
-					mComPort->SendFrequency(mComPortName, mRefreshRate);
-				}
-			}
-		}
 		if (mStereoDirect3D != NULL)
 		{
 			mStereoDirect3D->Blt(mImageToPlayIsLeft);
@@ -113,12 +87,16 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 		{
 			return eStereoImageManagerErrors::Direct3DIsNull;
 		}
-		mFrameCounter++;
+		if (mImageToPlayIsLeft)
+		{
+			if (mComPort != NULL)
+			{
+				mComPort->SendFrequency(mComPortName, 0); //No need to send frequency.
+			}
+		}
 		//----------------------------------------------
 		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
-		long long timeThreshold = (long long)((double)mFrameCounter * 1000000.0 / (double)mRefreshRate);
-		while (std::chrono::high_resolution_clock::now() - mMeasureTimeFromFirstFrame < std::chrono::microseconds(timeThreshold));
 	}
 	catch(...)
 	{ 
@@ -134,12 +112,9 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetGlassesTi
 		//----------------------------------------------
 		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
-		if (mSignalSource == eSignalSources::COMPort)
+		if (mComPort != NULL)
 		{
-			if (mComPort != NULL)
-			{
-				mComPort->SendGlassesTimeOffset(mComPortName, offset);
-			}
+			mComPort->SendGlassesTimeOffset(mComPortName, offset);
 		}
 		//----------------------------------------------
 		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
@@ -159,12 +134,9 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetTranspare
 		//----------------------------------------------
 		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
 		//----------------------------------------------
-		if (mSignalSource == eSignalSources::COMPort)
+		if (mComPort != NULL)
 		{
-			if (mComPort != NULL)
-			{
-				mComPort->SendTransparentTimePercent(mComPortName, percent);
-			}
+			mComPort->SendTransparentTimePercent(mComPortName, percent);
 		}
 		//----------------------------------------------
 		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
@@ -176,48 +148,4 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetTranspare
 		return eStereoImageManagerErrors::ExceptionInVideoRender;
 	}
 	return eStereoImageManagerErrors::NoError;
-}
-CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::WindowSizeOrLocationChanged()
-{
-	try
-	{
-		//----------------------------------------------
-		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
-		mFirstFrameAlreadyArrived = false;
-		mFrameCounter = 0;
-		mRefreshRate = GetRefreshRate(mHWnd);
-		//----------------------------------------------
-		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
-	}
-	catch (...)
-	{
-		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager WindowSizeOrLocationChanged");
-		return eStereoImageManagerErrors::ExceptionInVideoRender;
-	}
-	return eStereoImageManagerErrors::NoError;
-}
-int CStereoImageManager::GetRefreshRate(HWND hWnd)
-{
-	HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
-	MONITORINFOEX monitorInfo;
-	monitorInfo.cbSize = sizeof(MONITORINFOEX);
-	if (GetMonitorInfo(hMonitor, &monitorInfo))
-	{
-		if (mFrequency == eFrequencies::Default)
-		{
-			// Structure to store display settings
-			DEVMODE dm;
-			// Initialize the memory block to zero
-			ZeroMemory(&dm, sizeof(dm));
-			dm.dmSize = sizeof(dm);
-			// Retrieve the current display settings
-			if (EnumDisplaySettings(monitorInfo.szDevice, ENUM_CURRENT_SETTINGS, &dm))
-			{
-				return dm.dmDisplayFrequency;
-			}
-		}
-	}
-	return 1;
 }

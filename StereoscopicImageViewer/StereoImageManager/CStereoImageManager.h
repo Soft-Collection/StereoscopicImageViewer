@@ -35,16 +35,6 @@ public:
 		UUCoreIsNull = 19,
 		DifferentLeftRightImageDimensions = 20
 	};
-	enum eFrequencies : int
-	{
-		Default = 0,
-		Test = 1
-	};
-	enum eSignalSources : int
-	{
-		ScreenSensor = 0,
-		COMPort = 1
-	};
 private:
 	enum eCriticalSections : int
 	{
@@ -55,8 +45,6 @@ private:
 	CCriticalSectionPool* mCriticalSectionPool;
 	//----------------------------------------
 	HWND mHWnd;
-	eFrequencies mFrequency;
-	eSignalSources mSignalSource;
 	std::wstring mComPortName;
 	CComPort* mComPort;
 	CStereoDirect3D* mStereoDirect3D;
@@ -65,19 +53,12 @@ private:
 	CImage* mRightImage;
 	//----------------------------------------
 	bool mImageToPlayIsLeft;
-	bool mFirstFrameAlreadyArrived;
-	UINT32 mFrameCounter;
-	int mRefreshRate;
-	std::chrono::time_point<std::chrono::high_resolution_clock> mMeasureTimeFromFirstFrame;
 public:
-	CStereoImageManager(HWND hWnd, eFrequencies frequency, eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath);
+	CStereoImageManager(HWND hWnd, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath);
 	~CStereoImageManager();
-private:
-	int GetRefreshRate(HWND hWnd);
 public:
 	eStereoImageManagerErrors VideoRender();
 	eStereoImageManagerErrors SetGlassesTimeOffset(int offset);
 	eStereoImageManagerErrors SetTransparentTimePercent(int percent);
-	eStereoImageManagerErrors WindowSizeOrLocationChanged();
 };
 #endif // __CSTEREOIMAGEMANAGER_H__

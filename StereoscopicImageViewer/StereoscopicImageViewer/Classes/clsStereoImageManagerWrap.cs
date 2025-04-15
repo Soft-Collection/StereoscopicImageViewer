@@ -22,7 +22,7 @@ public class clsStereoImageManagerWrap
     #region External Functions
 
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr StereoImageManagerCreateNew(IntPtr hWnd, eFrequencies frequency, clsStereoImageManagerWrap.eSignalSources signalSource, [MarshalAs(UnmanagedType.LPWStr)] string comPort, [MarshalAs(UnmanagedType.LPWStr)] string leftImageFilePath, [MarshalAs(UnmanagedType.LPWStr)] string rightImageFilePath);
+    public static extern IntPtr StereoImageManagerCreateNew(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)] string comPort, [MarshalAs(UnmanagedType.LPWStr)] string leftImageFilePath, [MarshalAs(UnmanagedType.LPWStr)] string rightImageFilePath);
 
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void StereoImageManagerDispose(IntPtr StereoImageManagerHandle);
@@ -36,24 +36,9 @@ public class clsStereoImageManagerWrap
     [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
     public static extern eStereoImageManagerErrors StereoImageManagerSetTransparentTimePercent(IntPtr StereoImageManagerHandle, int percent);
 
-    [DllImport(DllFileName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern eStereoImageManagerErrors StereoImageManagerWindowSizeOrLocationChanged(IntPtr StereoImageManagerHandle);
-
     #endregion
 
     #region Enums
-
-    public enum eFrequencies : int
-    {
-        Default = 0,
-        Test = 1
-    }
-
-    public enum eSignalSources : int
-    {
-        ScreenSensor = 0,
-        COMPort = 1
-    }
 
     public enum eStereoImageManagerErrors : int
     {

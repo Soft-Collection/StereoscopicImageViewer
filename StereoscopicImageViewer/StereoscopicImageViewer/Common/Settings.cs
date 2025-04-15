@@ -13,8 +13,6 @@ namespace StereoscopicImageViewer
         private static bool AlwaysOnTopValue = true;
         private static bool RunAtStartupValue = false;
         private static string FolderPathValue = string.Empty;
-        private static clsStereoImageManagerWrap.eFrequencies FrequencyValue = clsStereoImageManagerWrap.eFrequencies.Default;
-        private static clsStereoImageManagerWrap.eSignalSources SignalSourceValue = clsStereoImageManagerWrap.eSignalSources.ScreenSensor;
         private static string ComPortValue = "COM1";
         private static int GlassesTimeOffsetValue = 0;
         private static int TransparentTimePercentValue = 70;
@@ -133,42 +131,6 @@ namespace StereoscopicImageViewer
                 FolderPathValue = value;
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
                 key.SetValue("FolderPath", FolderPathValue);
-            }
-        }
-
-        // Frequency
-        public static clsStereoImageManagerWrap.eFrequencies Frequency
-        {
-            get
-            {
-                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                FrequencyValue = (clsStereoImageManagerWrap.eFrequencies)key.GetValue("Frequency", (int)clsStereoImageManagerWrap.eFrequencies.Default);
-                return (FrequencyValue);
-            }
-            set
-            {
-                FrequencyValue = value;
-                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
-                key.SetValue("Frequency", (int)FrequencyValue);
-            }
-        }
-
-        // Signal Source
-        public static clsStereoImageManagerWrap.eSignalSources SignalSource
-        {
-            get
-            {
-                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                SignalSourceValue = (clsStereoImageManagerWrap.eSignalSources)key.GetValue("SignalSource", (int)clsStereoImageManagerWrap.eSignalSources.ScreenSensor);
-                return (SignalSourceValue);
-            }
-            set
-            {
-                SignalSourceValue = value;
-                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
-                key.SetValue("SignalSource", (int)SignalSourceValue);
             }
         }
 

@@ -4,18 +4,8 @@
 #include <windows.h>
 #include <d3d9.h>
 #include <tchar.h>
-#include <cassert>
-#include <cstring>
 
-// Link the Direct3D 9 library.
 #pragma comment(lib, "d3d9.lib")
-
-// Our custom vertex structure with pre-transformed coordinates.
-struct CUSTOMVERTEX {
-	float x, y, z, rhw; // screen/clip-space position (rhw = 1.0)
-	float tu, tv;       // texture coordinates
-};
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW | D3DFVF_TEX1)
 
 class CStereoDirect3D
 {
@@ -24,12 +14,13 @@ private:
 	INT         m_ImageWidth;
 	INT         m_ImageHeight;
 private:
-	LPDIRECT3D9             g_pD3D;
-	LPDIRECT3DDEVICE9       g_pd3dDevice;
-	LPDIRECT3DTEXTURE9      g_pLeftTexture;
-	LPDIRECT3DTEXTURE9      g_pRightTexture;
+	LPDIRECT3D9 mD3D = nullptr;
+	LPDIRECT3DDEVICE9 mDevice = nullptr;
+	LPDIRECT3DSURFACE9 mLeftSurface = nullptr;
+	LPDIRECT3DSURFACE9 mRightSurface = nullptr;
 private:
 	void ReInit(HWND hWnd, INT ImageWidth, INT ImageHeight);
+	LPDIRECT3DSURFACE9 CreateSurface(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight);
 public:
 	CStereoDirect3D();
 	~CStereoDirect3D();

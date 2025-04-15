@@ -42,19 +42,23 @@ namespace StereoscopicImageViewer
             this.Visible = Settings.Visible;
             this.TopMost = Settings.AlwaysOnTop;
             //-----------------------------------
-            tscbFrequency.SelectedIndex = (int)Settings.Frequency;
-            tscbSignalSource.SelectedIndex = (int)Settings.SignalSource;
-            if (tscbSignalSource.SelectedIndex == (int)clsStereoImageManagerWrap.eSignalSources.COMPort)
+            // Get a list of all available COM ports
+            string[] ports = SerialPort.GetPortNames();
+            tscbComPort.Items.Clear();
+            foreach (string port in ports)
             {
-                if (tscbComPort.Items.Contains(Settings.ComPort))
-                {
-                    tscbComPort.SelectedItem = Settings.ComPort;
-                }
-                else
-                {
-                    tscbComPort.SelectedIndex = 0;
-                }
+                tscbComPort.Items.Add(port);
             }
+            if (tscbComPort.Items.Contains(Settings.ComPort))
+            {
+                tscbComPort.SelectedItem = Settings.ComPort;
+            }
+            else
+            {
+                tscbComPort.SelectedIndex = 0;
+            }
+            tscbComPort.Visible = true;
+            tsbRefresh.Visible = true;
             //-----------------------------------
             tsbStartStop.Enabled = false;
             tbGlassesTimeOffset.Value = Settings.GlassesTimeOffset;
@@ -180,18 +184,10 @@ namespace StereoscopicImageViewer
         private void MainFrm_Move(object sender, EventArgs e)
         {
             Settings.Location = this.Location;
-            if (mStereoImageManager != null)
-            {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.WindowSizeOrLocationChanged();
-            }
         }
         private void MainFrm_Resize(object sender, EventArgs e)
         {
             Settings.Size = this.Size;
-            if (mStereoImageManager != null)
-            {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.WindowSizeOrLocationChanged();
-            }
         }
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -295,40 +291,6 @@ namespace StereoscopicImageViewer
         {
             PerformStop();
             LoadStereoImages();
-        }
-        private void tscbFrequency_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Settings.Frequency = (clsStereoImageManagerWrap.eFrequencies)tscbFrequency.SelectedIndex;
-        }
-        private void tscbSignalSource_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (tscbSignalSource.SelectedIndex == 0)
-            {
-                Settings.SignalSource = clsStereoImageManagerWrap.eSignalSources.ScreenSensor;
-                tscbComPort.Visible = false;
-                tsbRefresh.Visible = false;
-            }
-            else if (tscbSignalSource.SelectedIndex == 1)
-            {
-                Settings.SignalSource = clsStereoImageManagerWrap.eSignalSources.COMPort;
-                // Get a list of all available COM ports
-                string[] ports = SerialPort.GetPortNames();
-                tscbComPort.Items.Clear();
-                foreach (string port in ports)
-                {
-                    tscbComPort.Items.Add(port);
-                }
-                if (tscbComPort.Items.Contains(Settings.ComPort))
-                {
-                    tscbComPort.SelectedItem = Settings.ComPort;
-                }
-                else
-                {
-                    tscbComPort.SelectedIndex = 0;
-                }
-                tscbComPort.Visible = true;
-                tsbRefresh.Visible = true;
-            }
         }
         private void tscbComPort_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -436,8 +398,6 @@ namespace StereoscopicImageViewer
                 tsbStartStop.Text = "Stop";
                 tsbStartStop.ToolTipText = "Stop";
                 tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.stop;
-                tscbFrequency.Enabled = false;
-                tscbSignalSource.Enabled = false;
                 tscbComPort.Enabled = false;
                 tsbRefresh.Enabled = false;
                 tsbOpenFolder.Enabled = false;
@@ -459,8 +419,6 @@ namespace StereoscopicImageViewer
                 tsbStartStop.Text = "Start";
                 tsbStartStop.ToolTipText = "Start";
                 tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.play;
-                tscbFrequency.Enabled = true;
-                tscbSignalSource.Enabled = true;
                 tscbComPort.Enabled = true;
                 tsbRefresh.Enabled = true;
                 tsbOpenFolder.Enabled = true;
@@ -476,7 +434,7 @@ namespace StereoscopicImageViewer
         {
             pbVideoPanel.BackColor = System.Drawing.Color.DarkGray;
             //------------------------------------------------------
-            mStereoImageManager = new clsStereoImageManager(pbVideoPanel.Handle, Settings.Frequency, Settings.SignalSource, Settings.ComPort, mLeftImagePath, mRightImagePath);
+            mStereoImageManager = new clsStereoImageManager(pbVideoPanel.Handle, Settings.ComPort, mLeftImagePath, mRightImagePath);
             mFrequencyCounter = new clsFrequencyCounter();
             //------------------------------------------------------
             if (mTask == null)

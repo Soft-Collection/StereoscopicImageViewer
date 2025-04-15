@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "StereoImageManagerWrap.h"
 
-void* StereoImageManagerCreateNew(HWND hWnd, CStereoImageManager::eFrequencies frequency, CStereoImageManager::eSignalSources signalSource, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+void* StereoImageManagerCreateNew(HWND hWnd, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
 {
-	CStereoImageManager* cStereoImageManager = new CStereoImageManager(hWnd, frequency, signalSource, comPort, leftImageFilePath, rightImageFilePath);
+	CStereoImageManager* cStereoImageManager = new CStereoImageManager(hWnd, comPort, leftImageFilePath, rightImageFilePath);
 	return((void*)cStereoImageManager);
 }
 void StereoImageManagerDispose(void* handle)
@@ -29,10 +29,4 @@ CStereoImageManager::eStereoImageManagerErrors StereoImageManagerSetTransparentT
 	if (handle == NULL) return(CStereoImageManager::eStereoImageManagerErrors::NullHandle);
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
 	return(cStereoImageManager->SetTransparentTimePercent(percent));
-}
-CStereoImageManager::eStereoImageManagerErrors StereoImageManagerWindowSizeOrLocationChanged(void* handle)
-{
-	if (handle == NULL) return(CStereoImageManager::eStereoImageManagerErrors::NullHandle);
-	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	return(cStereoImageManager->WindowSizeOrLocationChanged());
 }

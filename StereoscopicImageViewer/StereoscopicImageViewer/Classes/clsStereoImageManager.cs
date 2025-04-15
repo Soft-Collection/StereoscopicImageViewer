@@ -11,11 +11,11 @@ public class clsStereoImageManager
     #endregion
 
     #region New / Dispose
-    public clsStereoImageManager(IntPtr hWnd, clsStereoImageManagerWrap.eFrequencies frequency, clsStereoImageManagerWrap.eSignalSources signalSource, string comPort, string leftImageFilePath, string rightImageFilePath)
+    public clsStereoImageManager(IntPtr hWnd, string comPort, string leftImageFilePath, string rightImageFilePath)
     {
         try
         {
-            mHandle = clsStereoImageManagerWrap.StereoImageManagerCreateNew(hWnd, frequency, signalSource, comPort, leftImageFilePath, rightImageFilePath);
+            mHandle = clsStereoImageManagerWrap.StereoImageManagerCreateNew(hWnd, comPort, leftImageFilePath, rightImageFilePath);
         }
         catch (Exception ex)
         {
@@ -94,27 +94,6 @@ public class clsStereoImageManager
                 lock (mLock)
                 {
                     return clsStereoImageManagerWrap.StereoImageManagerSetTransparentTimePercent(mHandle, percent);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ExceptionManager.Publish(ex);
-        }
-        finally
-        {
-        }
-        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
-    }
-    public clsStereoImageManagerWrap.eStereoImageManagerErrors WindowSizeOrLocationChanged()
-    {
-        try
-        {
-            if (mHandle != IntPtr.Zero)
-            {
-                lock (mLock)
-                {
-                    return clsStereoImageManagerWrap.StereoImageManagerWindowSizeOrLocationChanged(mHandle);
                 }
             }
         }
