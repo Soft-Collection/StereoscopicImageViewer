@@ -35,7 +35,7 @@ void CComPort::Begin(std::wstring comPortName)
         End();
         return;
     }
-    dcb.BaudRate = CBR_115200; // Set baud rate to 115200
+    dcb.BaudRate = 250000;     // Set baud rate to 250000
     dcb.ByteSize = 8;          // 8 data bits
     dcb.Parity = NOPARITY;     // No parity
     dcb.StopBits = ONESTOPBIT; // 1 stop bit

@@ -123,20 +123,23 @@ uint8_t GetTransparencyTime(Transparency transparency, uint8_t common) {
   if (transparency.Begin <= transparency.End) {
     if ((transparency.Begin < insideTwoEyeCycleInUS) && (insideTwoEyeCycleInUS < transparency.End)) {
       return common;
-    } else {
+    } 
+    else {
       return !common;
     }
-  } else {
+  } 
+  else {
     if ((transparency.Begin < insideTwoEyeCycleInUS) || (insideTwoEyeCycleInUS < transparency.End)) {
       return common;
-    } else {
+    } 
+    else {
       return !common;
     }
   }
 }
 
 void SetupSerial() {
-  Serial.begin(115200);
+  Serial.begin(250000);
   Serial.flush();
 }
 
@@ -173,7 +176,7 @@ ISR(TIMER1_COMPA_vect) {
   //----------------------------------------------------------------
   output.Left = GetTransparencyTime(shutters.Left, output.Common);
   output.Right = GetTransparencyTime(shutters.Right, output.Common);
-  if (insideTwoEyeCycleInUS > twoEyePeriodInUS * 2){
+  if (insideTwoEyeCycleInUS > twoEyePeriodInUS * 2) {
     output.Left = output.Common;
     output.Right = output.Common;
   }
