@@ -45,7 +45,7 @@ void CStereoDirect3D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 		d3dpp.Windowed = TRUE;
 		d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
-		d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE; // Enable vsync
+		d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE; //Enable vsync
 		mD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &mDevice);
 		//--------------------------------------------------------
 		m_HWnd = hWnd;
@@ -105,7 +105,7 @@ BOOL CStereoDirect3D::Blt(bool isLeft)
 			LPDIRECT3DSURFACE9 srcSurface = isLeft ? mLeftSurface : mRightSurface;
 			mDevice->StretchRect(srcSurface, nullptr, backBuffer, nullptr, D3DTEXF_NONE);
 			mDevice->EndScene();
-			mDevice->Present(nullptr, nullptr, nullptr, nullptr);
+			mDevice->Present(nullptr, nullptr, nullptr, nullptr); //Blocks until new vsync.
 			backBuffer->Release();
 		}
 	}

@@ -5,7 +5,7 @@
 #define COMMON_SHUTTER_PIN 7
 #define RIGHT_SHUTTER_PIN 8
 
-#define COMMAND_TYPE_FREQUENCY 0
+#define COMMAND_TYPE_SYNC 0
 #define COMMAND_TYPE_GLASSES_TIME_OFFSET 1
 #define COMMAND_TYPE_TRANSPARENT_TIME_PERCENT 2
 
@@ -71,19 +71,32 @@ void loop() {
   inByte = (uint8_t)Serial.read();
   if (inByte != 0xED) return;
   //-------------------------------
-  while (Serial.available() < 3);
+  while (!Serial.available());
   uint8_t command_type = (uint8_t)Serial.read();
-  uint8_t value = (uint8_t)Serial.read();
-  uint8_t checkSum = (uint8_t)Serial.read();
-  if (checkSum != (uint8_t)(0x54 + 0xED + command_type + value)) return;
-  //-------------------------------
-  if (command_type == COMMAND_TYPE_FREQUENCY) {
+  if (command_type == COMMAND_TYPE_SYNC) 
+  {
+    while (!Serial.available());
+    uint8_t checkSum = (uint8_t)Serial.read();
+    if (checkSum != (uint8_t)(0x54 + 0xED + command_type)) return;
+    //-------------------------------------------------------------
     uint32_t timeInUS = micros();
     twoEyePeriodInUS = timeInUS - lastSyncTimeInUS;
     lastSyncTimeInUS = timeInUS;
-  } else if (command_type == COMMAND_TYPE_GLASSES_TIME_OFFSET) {
+  } 
+  else if (command_type == COMMAND_TYPE_GLASSES_TIME_OFFSET) 
+  {
+    while (Serial.available() < 2);
+    uint8_t value = (uint8_t)Serial.read();
+    uint8_t checkSum = (uint8_t)Serial.read();
+    if (checkSum != (uint8_t)(0x54 + 0xED + command_type + value)) return;
     glassesTimeOffset = value;
-  } else if (command_type == COMMAND_TYPE_TRANSPARENT_TIME_PERCENT) {
+  } 
+  else if (command_type == COMMAND_TYPE_TRANSPARENT_TIME_PERCENT) 
+  {
+    while (Serial.available() < 2);
+    uint8_t value = (uint8_t)Serial.read();
+    uint8_t checkSum = (uint8_t)Serial.read();
+    if (checkSum != (uint8_t)(0x54 + 0xED + command_type + value)) return;
     transparentTimePercent = value;
   }
   //-------------------------------

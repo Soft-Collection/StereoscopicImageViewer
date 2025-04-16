@@ -91,7 +91,7 @@ CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender(
 		{
 			if (mComPort != NULL)
 			{
-				mComPort->SendFrequency(mComPortName, 0); //No need to send frequency.
+				mComPort->SendSync(mComPortName);
 			}
 		}
 		//----------------------------------------------

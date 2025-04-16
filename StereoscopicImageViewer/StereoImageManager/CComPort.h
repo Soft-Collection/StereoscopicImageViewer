@@ -18,11 +18,11 @@ public:
 private:
 	void Begin(std::wstring comPortName);
 	void End();
-	void Send(std::wstring comPortName, BYTE* command);
+	void Send(std::wstring comPortName, BYTE* command, int length);
 public:
 	CComPort();
 	~CComPort();
-	void SendFrequency(std::wstring comPortName, int frequency);
+	void SendSync(std::wstring comPortName);
 	void SendGlassesTimeOffset(std::wstring comPortName, int offset);
 	void SendTransparentTimePercent(std::wstring comPortName, int percent);
 };

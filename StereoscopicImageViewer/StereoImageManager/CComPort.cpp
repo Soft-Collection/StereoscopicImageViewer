@@ -53,13 +53,13 @@ void CComPort::End()
         mHCom = NULL;
     }
 }
-void CComPort::Send(std::wstring comPortName, BYTE* command)
+void CComPort::Send(std::wstring comPortName, BYTE* command, int length)
 {
     if (mHCom == NULL) Begin(comPortName);
     if (mHCom != NULL)
     {
         DWORD bytesWritten;
-        if (!WriteFile(mHCom, command, 5, &bytesWritten, NULL)) {
+        if (!WriteFile(mHCom, command, length, &bytesWritten, NULL)) {
             std::cerr << "Error: Unable to write to COM port." << std::endl;
             End();
             return;
@@ -71,27 +71,23 @@ void CComPort::Send(std::wstring comPortName, BYTE* command)
         }
     }
 }
-void CComPort::SendFrequency(std::wstring comPortName, int frequency)
+void CComPort::SendSync(std::wstring comPortName)
 {
-    BYTE command[] = { 0x54, 0xED, 0x00, 0x00, 0x00 };
-    command[2] = eCommandTypes::Frequency;
-    command[3] = frequency;
-    command[4] = command[0] + command[1] + command[2] + command[3];
-    Send(comPortName, command);
+    BYTE command[] = { 0x54, 0xED, eCommandTypes::Frequency, 0x00 };
+    command[3] = command[0] + command[1] + command[2];
+    Send(comPortName, command, 4);
 }
 void CComPort::SendGlassesTimeOffset(std::wstring comPortName, int offset)
 {
-    BYTE command[] = { 0x54, 0xED, 0x00, 0x00, 0x00 };
-    command[2] = eCommandTypes::GlassesTimeOffset;
+    BYTE command[] = { 0x54, 0xED, eCommandTypes::GlassesTimeOffset, 0x00, 0x00 };
     command[3] = offset;
     command[4] = command[0] + command[1] + command[2] + command[3];
-    Send(comPortName, command);
+    Send(comPortName, command, 5);
 }
 void CComPort::SendTransparentTimePercent(std::wstring comPortName, int percent)
 {
-    BYTE command[] = { 0x54, 0xED, 0x00, 0x00, 0x00 };
-    command[2] = eCommandTypes::TransparentTimePercent;
+    BYTE command[] = { 0x54, 0xED, eCommandTypes::TransparentTimePercent, 0x00, 0x00 };
     command[3] = percent;
     command[4] = command[0] + command[1] + command[2] + command[3];
-    Send(comPortName, command);
+    Send(comPortName, command, 5);
 }
