@@ -20,15 +20,13 @@ CStereoImageManager::CStereoImageManager(HWND hWnd, LPCWSTR comPort, LPCWSTR lef
 	mLeftImage = new CImage();
 	mLeftImage->FilePath = std::wstring(leftImageFilePath);
 	mLeftImage->IsLeft = true;
-	mLeftImage->RectangleHeight = 30;
-	CImage::LoadPNG(mLeftImage);
+	CImage::LoadImage(mLeftImage);
 	mRightImage = new CImage();
 	mRightImage->FilePath = std::wstring(rightImageFilePath);
 	mRightImage->IsLeft = false;
-	mRightImage->RectangleHeight = 30;
-	CImage::LoadPNG(mRightImage);
+	CImage::LoadImage(mRightImage);
 	//----------------------------------------------------
-	mStereoDirect3D->DrawImage(mHWnd, mLeftImage->PixelData.data(), mRightImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height);
+	mStereoDirect3D->DrawImage(mHWnd, mLeftImage->PixelData.data(), mRightImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height, mLeftImage->Channels);
 	//----------------------------------------------------
 	mImageToPlayIsLeft = true;
 	//----------------------------------------------------

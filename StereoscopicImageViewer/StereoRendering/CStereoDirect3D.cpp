@@ -57,7 +57,7 @@ void CStereoDirect3D::ReInit(HWND hWnd, int ImageWidth, int ImageHeight)
 		CExceptionReport::WriteExceptionReportToFile("CStereoDirect3D::ReInit", "Exception in CStereoDirect3D ReInit");
 	}		
 }
-LPDIRECT3DSURFACE9 CStereoDirect3D::CreateSurface(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight)
+LPDIRECT3DSURFACE9 CStereoDirect3D::CreateSurface(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight, int Channels)
 {
 	try
 	{
@@ -67,7 +67,27 @@ LPDIRECT3DSURFACE9 CStereoDirect3D::CreateSurface(BYTE* ImageDataPtr, int ImageW
 		D3DLOCKED_RECT rect;
 		if (SUCCEEDED(sysMemSurface->LockRect(&rect, nullptr, 0))) {
 			DWORD* pixels = (DWORD*)rect.pBits;
-			memcpy(pixels, ImageDataPtr, ImageWidth * ImageHeight * 4);
+			if (Channels == 3)
+			{
+				for (int y = 0; y < ImageHeight; y++) {
+					for (int x = 0; x < ImageWidth; x++) {
+						DWORD pixel = 0;
+						DWORD alpha = 255;
+						DWORD r = ImageDataPtr[(y * ImageWidth + x) * 3 + 0];
+						DWORD g = ImageDataPtr[(y * ImageWidth + x) * 3 + 1];
+						DWORD b = ImageDataPtr[(y * ImageWidth + x) * 3 + 2];
+						pixel |= (alpha << 24);
+						pixel |= (r << 16);
+						pixel |= (g << 8);
+						pixel |= (b << 0);
+						pixels[y * ImageWidth + x] = pixel;
+					}
+				}
+			}
+			else if (Channels == 4)
+			{
+				memcpy(pixels, ImageDataPtr, ImageWidth * ImageHeight * Channels);
+			}
 			sysMemSurface->UnlockRect();
 		}
 		mDevice->CreateOffscreenPlainSurface(ImageWidth, ImageHeight, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &videoSurface, nullptr);
@@ -80,13 +100,13 @@ LPDIRECT3DSURFACE9 CStereoDirect3D::CreateSurface(BYTE* ImageDataPtr, int ImageW
 		CExceptionReport::WriteExceptionReportToFile("CStereoDirect3D::ReInit", "Exception in CStereoDirect3D CreateSurface");
 	}
 }
-BOOL CStereoDirect3D::DrawImageRGB32(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, int ImageWidth, int ImageHeight)
+BOOL CStereoDirect3D::DrawImageRGB(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, int ImageWidth, int ImageHeight, INT Channels)
 {
 	try
 	{
 		ReInit(hWnd, ImageWidth, ImageHeight);
-		mLeftSurface = CreateSurface(LeftImageDataPtr, ImageWidth, ImageHeight);
-		mRightSurface = CreateSurface(RightImageDataPtr, ImageWidth, ImageHeight);
+		mLeftSurface = CreateSurface(LeftImageDataPtr, ImageWidth, ImageHeight, Channels);
+		mRightSurface = CreateSurface(RightImageDataPtr, ImageWidth, ImageHeight, Channels);
 	}
 	catch(...)
 	{ 

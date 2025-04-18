@@ -6,6 +6,8 @@ using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
 namespace StereoscopicImageViewer
 {
@@ -363,8 +365,8 @@ namespace StereoscopicImageViewer
             if (lvStereoImages.SelectedItems.Count > 0)
             {
                 if (mIsStarted) PerformStop();
-                mLeftImagePath = Settings.FolderPath + "\\" + lvStereoImages.SelectedItems[0].Text + ".left.png";
-                mRightImagePath = Settings.FolderPath + "\\" + lvStereoImages.SelectedItems[0].Text + ".right.png";
+                mLeftImagePath = Settings.FolderPath + "\\" + ((Tuple<string, string>)lvStereoImages.SelectedItems[0].Tag).Item1;
+                mRightImagePath = Settings.FolderPath + "\\" + ((Tuple<string, string>)lvStereoImages.SelectedItems[0].Tag).Item2;
                 if (!mIsStarted) PerformStart();
             }
         }
@@ -500,13 +502,21 @@ namespace StereoscopicImageViewer
             string[] files = Directory.GetFiles(Settings.FolderPath);
             foreach (string file in files)
             {
+                List<string> supportedExtensions = new List<string> { ".PNG",".png",".JPEG",".jpeg",".JPG",".jpg",".BMP",".bmp",".TIFF",".tiff",".GIF",".gif" };
                 string fileNameWithExtension = Path.GetFileName(file);
-                if (fileNameWithExtension.EndsWith(".left.png"))
+                string fileExtension = Path.GetExtension(file);
+                if (supportedExtensions.Contains(fileExtension))
                 {
-                    string fileName = fileNameWithExtension.Replace(".left.png", "");
-                    if (File.Exists(Settings.FolderPath + '\\' + fileName + ".right.png"))
+                    if (fileNameWithExtension.Contains(".left"))
                     {
-                        lvStereoImages.Items.Add(fileName);
+                        string fileName = fileNameWithExtension.Replace(".left" + fileExtension, "");
+                        if (File.Exists(Settings.FolderPath + '\\' + fileName + ".right" + fileExtension))
+                        {
+                            ListViewItem lvi = new ListViewItem();
+                            lvi.Text = fileName;
+                            lvi.Tag = new Tuple<string, string>(fileName + ".left" + fileExtension, fileName + ".right" + fileExtension);
+                            lvStereoImages.Items.Add(lvi);
+                        }
                     }
                 }
             }

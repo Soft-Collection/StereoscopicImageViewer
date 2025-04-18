@@ -17,12 +17,11 @@ public:
 	int Channels;
 	std::vector<BYTE> PixelData;
 	bool IsLeft;
-	int RectangleHeight;
 public:
 	CImage();
 	~CImage();
-	static void LoadPNG(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft);
-	static void LoadPNG(CImage* img);
+	static void LoadImage(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft);
+	static void LoadImage(CImage* img);
 };
 
 #endif // __CIMAGE_H__

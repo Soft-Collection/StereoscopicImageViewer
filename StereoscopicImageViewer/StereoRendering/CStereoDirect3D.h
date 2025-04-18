@@ -20,12 +20,12 @@ private:
 	LPDIRECT3DSURFACE9 mRightSurface = nullptr;
 private:
 	void ReInit(HWND hWnd, INT ImageWidth, INT ImageHeight);
-	LPDIRECT3DSURFACE9 CreateSurface(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight);
+	LPDIRECT3DSURFACE9 CreateSurface(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight, int Channels);
 public:
 	CStereoDirect3D();
 	~CStereoDirect3D();
-	BOOL DrawImageRGB32(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight);
-	BOOL DrawImage(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight){ return(DrawImageRGB32(hWnd, LeftImageDataPtr, RightImageDataPtr, ImageWidth, ImageHeight)); }
+	BOOL DrawImageRGB(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight, INT Channels);
+	BOOL DrawImage(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight, INT Channels){ return(DrawImageRGB(hWnd, LeftImageDataPtr, RightImageDataPtr, ImageWidth, ImageHeight, Channels)); }
 	BOOL Blt(bool isLeft);
 };
 #endif // __CSTEREODIRECT3D_H__

@@ -7,7 +7,6 @@ CImage::CImage()
     this->Height = 0;
     this->Channels = 0;
     this->IsLeft = false;
-    this->RectangleHeight = 0;
 }
 
 CImage::~CImage()
@@ -15,7 +14,7 @@ CImage::~CImage()
 }
 
 //BGRA
-void CImage::LoadPNG(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft)
+void CImage::LoadImage(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft)
 {
     // Initialize COM library
     HRESULT hr = CoInitialize(NULL);
@@ -61,7 +60,7 @@ void CImage::LoadPNG(std::wstring filePath, int& width, int& height, int& channe
     CoUninitialize();
 }
 
-void CImage::LoadPNG(CImage* img) 
+void CImage::LoadImage(CImage* img)
 {
-    CImage::LoadPNG(img->FilePath, img->Width, img->Height, img->Channels, img->PixelData, img->IsLeft);
+    CImage::LoadImage(img->FilePath, img->Width, img->Height, img->Channels, img->PixelData, img->IsLeft);
 }
