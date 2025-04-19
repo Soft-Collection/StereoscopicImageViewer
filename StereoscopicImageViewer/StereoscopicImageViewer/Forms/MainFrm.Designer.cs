@@ -73,6 +73,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.timerSendSettings = new System.Windows.Forms.Timer(this.components);
+            this.openSelectedFolderInExplorerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.toolStrip.SuspendLayout();
@@ -360,9 +361,10 @@
             // cmsStereoImages
             // 
             this.cmsStereoImages.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openSelectedFolderInExplorerToolStripMenuItem,
             this.refreshToolStripMenuItem});
             this.cmsStereoImages.Name = "cmsStereoImages";
-            this.cmsStereoImages.Size = new System.Drawing.Size(114, 26);
+            this.cmsStereoImages.Size = new System.Drawing.Size(245, 70);
             // 
             // refreshToolStripMenuItem
             // 
@@ -448,6 +450,13 @@
             // 
             this.timerSendSettings.Tick += new System.EventHandler(this.timerSendSettings_Tick);
             // 
+            // openSelectedFolderInExplorerToolStripMenuItem
+            // 
+            this.openSelectedFolderInExplorerToolStripMenuItem.Name = "openSelectedFolderInExplorerToolStripMenuItem";
+            this.openSelectedFolderInExplorerToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
+            this.openSelectedFolderInExplorerToolStripMenuItem.Text = "Open Selected Folder In Explorer";
+            this.openSelectedFolderInExplorerToolStripMenuItem.Click += new System.EventHandler(this.openSelectedFolderInExplorerToolStripMenuItem_Click);
+            // 
             // MainFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -531,6 +540,7 @@
         private System.Windows.Forms.ContextMenuStrip cmsStereoImages;
         private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createImagesFromAnaglyphImageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openSelectedFolderInExplorerToolStripMenuItem;
     }
 }
 

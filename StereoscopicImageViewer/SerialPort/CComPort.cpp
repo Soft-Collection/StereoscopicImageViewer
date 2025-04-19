@@ -1,18 +1,11 @@
 #include "stdafx.h"
 #include "CComPort.h"
+#include "CTools.h"
 
-#include "../Common/CTools.h"
-
-CComPort::CComPort()
+CComPort::CComPort(std::wstring comPortName)
 {
-    mHCom = NULL;
-}
-CComPort::~CComPort()
-{
-    End();
-}
-void CComPort::Begin(std::wstring comPortName)
-{
+    mHComMutex = new std::mutex();
+    std::unique_lock<std::mutex> lock1(*mHComMutex); // Lock the mutex
     std::wstring portNameW = std::wstring(L"\\\\.\\") + comPortName;
     std::string portNameA = CTools::ConvertUnicodeToMultibyte(portNameW);
     // Open the COM port
@@ -32,62 +25,88 @@ void CComPort::Begin(std::wstring comPortName)
     dcb.DCBlength = sizeof(DCB);
     if (!GetCommState(mHCom, &dcb)) {
         std::cerr << "Error: Unable to get COM port state." << std::endl;
-        End();
+        if (mHCom != INVALID_HANDLE_VALUE)
+        {
+            CloseHandle(mHCom);
+            mHCom = INVALID_HANDLE_VALUE;
+        }
         return;
     }
     dcb.BaudRate = 250000;     // Set baud rate to 250000
+    //dcb.BaudRate = 115200;   // Set baud rate to 115200
     dcb.ByteSize = 8;          // 8 data bits
     dcb.Parity = NOPARITY;     // No parity
     dcb.StopBits = ONESTOPBIT; // 1 stop bit
     if (!SetCommState(mHCom, &dcb)) {
         std::cerr << "Error: Unable to configure COM port." << std::endl;
-        End();
+        if (mHCom != INVALID_HANDLE_VALUE)
+        {
+            CloseHandle(mHCom);
+            mHCom = INVALID_HANDLE_VALUE;
+        }
         return;
     }
+    lock1.unlock();
 }
-void CComPort::End()
+CComPort::~CComPort()
 {
-    if (mHCom != NULL)
+    std::unique_lock<std::mutex> lock1(*mHComMutex); // Lock the mutex
+    if (mHCom != INVALID_HANDLE_VALUE)
     {
         CloseHandle(mHCom);
-        mHCom = NULL;
+        mHCom = INVALID_HANDLE_VALUE;
+    }
+    lock1.unlock();
+    if (mHComMutex != nullptr)
+    {
+        delete mHComMutex;
+        mHComMutex = nullptr;
     }
 }
-void CComPort::Send(std::wstring comPortName, BYTE* command, int length)
+void CComPort::Send(BYTE* command, int length)
 {
-    if (mHCom == NULL) Begin(comPortName);
-    if (mHCom != NULL)
+    std::unique_lock<std::mutex> lock1(*mHComMutex); // Lock the mutex
+    if (mHCom != INVALID_HANDLE_VALUE)
     {
         DWORD bytesWritten;
         if (!WriteFile(mHCom, command, length, &bytesWritten, NULL)) {
             std::cerr << "Error: Unable to write to COM port." << std::endl;
-            End();
+            if (mHCom != INVALID_HANDLE_VALUE)
+            {
+                CloseHandle(mHCom);
+                mHCom = INVALID_HANDLE_VALUE;
+            }
             return;
         }
         if (!FlushFileBuffers(mHCom)) {
             std::cerr << "Error: Unable to flush COM port." << std::endl;
-            End();
+            if (mHCom != INVALID_HANDLE_VALUE)
+            {
+                CloseHandle(mHCom);
+                mHCom = INVALID_HANDLE_VALUE;
+            }
             return;
         }
     }
+    lock1.unlock();
 }
-void CComPort::SendSync(std::wstring comPortName)
+void CComPort::SendSync()
 {
     BYTE command[] = { 0x54, 0xED, eCommandTypes::Frequency, 0x00 };
     command[3] = command[0] + command[1] + command[2];
-    Send(comPortName, command, 4);
+    Send(command, 4);
 }
-void CComPort::SendGlassesTimeOffset(std::wstring comPortName, int offset)
+void CComPort::SendGlassesTimeOffset(int offset)
 {
     BYTE command[] = { 0x54, 0xED, eCommandTypes::GlassesTimeOffset, 0x00, 0x00 };
     command[3] = offset;
     command[4] = command[0] + command[1] + command[2] + command[3];
-    Send(comPortName, command, 5);
+    Send(command, 5);
 }
-void CComPort::SendTransparentTimePercent(std::wstring comPortName, int percent)
+void CComPort::SendTransparentTimePercent(int percent)
 {
     BYTE command[] = { 0x54, 0xED, eCommandTypes::TransparentTimePercent, 0x00, 0x00 };
     command[3] = percent;
     command[4] = command[0] + command[1] + command[2] + command[3];
-    Send(comPortName, command, 5);
+    Send(command, 5);
 }

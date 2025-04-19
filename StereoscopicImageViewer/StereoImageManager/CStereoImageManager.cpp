@@ -1,41 +1,27 @@
 #include "stdafx.h"
 #include "CStereoImageManager.h"
-#include "../Common/CExceptionReport.h"
-#include "../Common/CCriticalSectionPool.h"
 #include <thread>
 #include <Windows.h>
 #include <iostream>
 
-CStereoImageManager::CStereoImageManager(HWND hWnd, LPCWSTR comPort, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+CStereoImageManager::CStereoImageManager(HWND hWnd)
 {
-	mCriticalSectionPool = new CCriticalSectionPool(eCriticalSections::Size);
-	mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-	//----------------------------------------------------
 	mHWnd = hWnd;
-	mStereoDirect3D = new CStereoDirect3D();
-	mComPortName = std::wstring(comPort);
+	mStereoDirect3D = new CStereoDirect3D(hWnd);
+	mComPortName = std::wstring(L"");
 	mComPort = NULL;
-	mComPort = new CComPort();
 	//----------------------------------------------------
-	mLeftImage = new CImage();
-	mLeftImage->FilePath = std::wstring(leftImageFilePath);
-	mLeftImage->IsLeft = true;
-	CImage::LoadImage(mLeftImage);
-	mRightImage = new CImage();
-	mRightImage->FilePath = std::wstring(rightImageFilePath);
-	mRightImage->IsLeft = false;
-	CImage::LoadImage(mRightImage);
+	mLeftImage = NULL;
+	mRightImage = NULL;
 	//----------------------------------------------------
-	mStereoDirect3D->DrawImage(mHWnd, mLeftImage->PixelData.data(), mRightImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height, mLeftImage->Channels);
+	m_ThreadRunning.store(false);
+	m_Thread;
 	//----------------------------------------------------
 	mImageToPlayIsLeft = true;
 	//----------------------------------------------------
-	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
 }
 CStereoImageManager::~CStereoImageManager()
 {
-	mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-	//----------------------------------------------------
 	if (mRightImage != NULL)
 	{
 		delete mRightImage;
@@ -59,91 +45,93 @@ CStereoImageManager::~CStereoImageManager()
 		delete mStereoDirect3D;
 		mStereoDirect3D = NULL;
 	}
-	//----------------------------------------------------
-	mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
-	//----------------------------------------------------
-	if (mCriticalSectionPool != NULL) 
-	{ 
-		delete mCriticalSectionPool;
-		mCriticalSectionPool = NULL;
-	}
 }
-CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::VideoRender()
+void CStereoImageManager::DrawImage(LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
 {
-	try
-	{
-		if ((mLeftImage->Width != mRightImage->Width) || (mLeftImage->Height != mRightImage->Height)) return eStereoImageManagerErrors::DifferentLeftRightImageDimensions;
-		//----------------------------------------------
-		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
-		mImageToPlayIsLeft = !mImageToPlayIsLeft;
-		if (mStereoDirect3D != NULL)
-		{
-			mStereoDirect3D->Blt(mImageToPlayIsLeft);
-		}
-		else
-		{
-			return eStereoImageManagerErrors::Direct3DIsNull;
-		}
-		if (mImageToPlayIsLeft)
-		{
-			if (mComPort != NULL)
-			{
-				mComPort->SendSync(mComPortName);
-			}
-		}
-		//----------------------------------------------
-		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
-	}
-	catch(...)
-	{ 
-		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager VideoRender");
-		return eStereoImageManagerErrors::ExceptionInVideoRender;
-	}
-	return eStereoImageManagerErrors::NoError;
+	mLeftImage = CImage::LoadImage(std::wstring(leftImageFilePath), true);
+	mRightImage = CImage::LoadImage(std::wstring(rightImageFilePath), false);
+	//----------------------------------------------
+	CStereoDirect3D::ImageData left = { mLeftImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height, mLeftImage->Channels, nullptr, nullptr };
+	CStereoDirect3D::ImageData right = { mRightImage->PixelData.data(), mRightImage->Width, mRightImage->Height, mRightImage->Channels, nullptr, nullptr };
+	mStereoDirect3D->DrawImage(left, right);
+	//----------------------------------------------
+	mImageToPlayIsLeft = true;
 }
-CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetGlassesTimeOffset(int offset)
+void CStereoImageManager::VideoRender()
 {
-	try
+	mImageToPlayIsLeft = !mImageToPlayIsLeft;
+	if (mStereoDirect3D != NULL)
 	{
-		//----------------------------------------------
-		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
+		mStereoDirect3D->Blt(mImageToPlayIsLeft);
+	}
+	if (mImageToPlayIsLeft)
+	{
 		if (mComPort != NULL)
 		{
-			mComPort->SendGlassesTimeOffset(mComPortName, offset);
+			mComPort->SendSync();
 		}
-		//----------------------------------------------
-		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
 	}
-	catch (...)
-	{
-		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager SetGlassesTimeOffset");
-		return eStereoImageManagerErrors::ExceptionInVideoRender;
-	}
-	return eStereoImageManagerErrors::NoError;
 }
-CStereoImageManager::eStereoImageManagerErrors CStereoImageManager::SetTransparentTimePercent(int percent)
+void CStereoImageManager::Start()
 {
-	try
+	if (!m_ThreadRunning.load()) 
 	{
-		//----------------------------------------------
-		mCriticalSectionPool->Enter(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
+		m_ThreadRunning = true;
+		m_Thread = std::thread(&CStereoImageManager::ThreadFunction, this);
+	}
+}
+void CStereoImageManager::Stop()
+{
+	if (m_ThreadRunning.load())
+	{
+		m_ThreadRunning = false;
+		if (m_Thread.joinable()) 
+		{
+			m_Thread.join();  // Wait for thread to finish
+		}
+	}
+}
+BOOL CStereoImageManager::IsStarted()
+{
+	return m_ThreadRunning.load();
+}
+int CStereoImageManager::GetFrequency()
+{
+	if (mStereoDirect3D != NULL)
+	{
+		return mStereoDirect3D->GetFrequency();
+	}
+}
+void CStereoImageManager::SetCOMPort(LPCWSTR comPort)
+{
+	if (mComPortName != std::wstring(comPort))
+	{
 		if (mComPort != NULL)
 		{
-			mComPort->SendTransparentTimePercent(mComPortName, percent);
+			delete mComPort;
+			mComPort = NULL;
 		}
-		//----------------------------------------------
-		mCriticalSectionPool->Leave(eCriticalSections::DecodedFrameCS);
-		//----------------------------------------------
+		mComPort = new CComPort(std::wstring(comPort));
+		mComPortName = std::wstring(comPort);
 	}
-	catch (...)
+}
+void CStereoImageManager::SetGlassesTimeOffset(int offset)
+{
+	if (mComPort != NULL)
 	{
-		CExceptionReport::WriteExceptionReportToFile("CStereoImageManager::VideoRender", "Exception in CStereoImageManager SetTransparentTimePercent");
-		return eStereoImageManagerErrors::ExceptionInVideoRender;
+		mComPort->SendGlassesTimeOffset(offset);
 	}
-	return eStereoImageManagerErrors::NoError;
+}
+void CStereoImageManager::SetTransparentTimePercent(int percent)
+{
+	if (mComPort != NULL)
+	{
+		mComPort->SendTransparentTimePercent(percent);
+	}
+}
+void CStereoImageManager::ThreadFunction() {
+	while (m_ThreadRunning.load()) 
+	{
+		VideoRender();
+	}
 }

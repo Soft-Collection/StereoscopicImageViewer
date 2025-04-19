@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 
 namespace StereoscopicImageViewer
 {
@@ -62,6 +61,8 @@ namespace StereoscopicImageViewer
             tscbComPort.Visible = true;
             tsbRefresh.Visible = true;
             //-----------------------------------
+            pbVideoPanel.BackColor = System.Drawing.Color.DarkGray;
+            //------------------------------------------------------
             tsbStartStop.Enabled = false;
             tbGlassesTimeOffset.Value = Settings.GlassesTimeOffset;
             lblGlassesTimeOffset.Text = Settings.GlassesTimeOffset.ToString();
@@ -78,6 +79,11 @@ namespace StereoscopicImageViewer
             SetRunAtStartup();
             //-----------------------------------
             LoadStereoImages();
+            //-----------------------------------
+            if (mStereoImageManager == null)
+            {
+                mStereoImageManager = new clsStereoImageManager(pbVideoPanel.Handle);
+            }
         }
         #endregion
 
@@ -99,6 +105,12 @@ namespace StereoscopicImageViewer
         }
         private void ExitProg()
         {
+            PerformStop();
+            if (mStereoImageManager != null)
+            {
+                mStereoImageManager.Dispose();
+                mStereoImageManager = null;
+            }
             Application.Exit();
         }
         //When clicked on About.
@@ -125,14 +137,24 @@ namespace StereoscopicImageViewer
         {
             if (this.Visible)
             {
-                mWasStartedWhenMinimized = mIsStarted;
-                if (mIsStarted) PerformStop();
+                bool isStarted = false;
+                if (mStereoImageManager != null)
+                {
+                    isStarted = mStereoImageManager.IsStarted();
+                }
+                mWasStartedWhenMinimized = isStarted;
+                if (isStarted) PerformStop();
             }
             else
             {
                 if (mWasStartedWhenMinimized)
                 {
-                    if (!mIsStarted) PerformStart();
+                    bool isStarted = false;
+                    if (mStereoImageManager != null)
+                    {
+                        isStarted = mStereoImageManager.IsStarted();
+                    }
+                    if (!isStarted) PerformStart();
                 }
             }
             this.Visible = !this.Visible;
@@ -193,14 +215,6 @@ namespace StereoscopicImageViewer
         }
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            mTaskQuit = true;
-            if (mTask != null)
-            {
-                mTask.Wait();
-                mTask.Dispose();
-                mTask = null;
-            }
-            //------------------------
             ExitProg();
         }
         #endregion
@@ -236,14 +250,8 @@ namespace StereoscopicImageViewer
         #region StereoscopicImageViewer
 
         #region Variables
-        private bool mIsStarted = false;
         private bool mWasStartedWhenMinimized = false;
         private clsStereoImageManager mStereoImageManager = null;
-        private clsFrequencyCounter mFrequencyCounter = null;
-        private Task mTask = null;
-        private bool mTaskQuit = false;
-        private int mFrequencyInHz = 0;
-        private int mLastError = (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError;
         private string mLeftImagePath = null;
         private string mRightImagePath = null;
         private bool mAlreadySent = true;
@@ -289,6 +297,34 @@ namespace StereoscopicImageViewer
             Settings.FolderPath = (temp == string.Empty) ? Settings.FolderPath : temp;
             LoadStereoImages();
         }
+        private void openSelectedFolderInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Settings.FolderPath != string.Empty)
+            {
+                if (Directory.Exists(Settings.FolderPath))
+                {
+                    Process.Start("explorer.exe", Settings.FolderPath);
+                }
+                else
+                {
+                    MessageBox.Show(
+                                       "Folder not found!", // Message
+                                       "Warning", // Title
+                                       MessageBoxButtons.OK, // OK button
+                                       MessageBoxIcon.Information // Icon
+                                   );
+                }
+            }
+            else
+            {
+                MessageBox.Show(
+                                   "Folder not selected!", // Message
+                                   "Warning", // Title
+                                    MessageBoxButtons.OK, // OK button
+                                    MessageBoxIcon.Information // Icon
+                               );
+            }
+        }
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PerformStop();
@@ -318,31 +354,30 @@ namespace StereoscopicImageViewer
         }
         private void tsbStartStop_Click(object sender, EventArgs e)
         {
-            if (mIsStarted) PerformStop(); else PerformStart();
+            bool isStarted = false;
+            if (mStereoImageManager != null)
+            {
+                isStarted = mStereoImageManager.IsStarted();
+                if (isStarted) PerformStop(); else PerformStart();
+            }
         }
         private void timerFrequency_Tick(object sender, EventArgs e)
         {
-            tsslFrequency.Text = mFrequencyInHz.ToString() + "Hz";
+            int frequencyInHz = 0;
+            if (mStereoImageManager != null)
+            {
+                frequencyInHz = mStereoImageManager.GetFrequency();
+            }
+            tsslFrequency.Text = frequencyInHz.ToString() + "Hz";
         }
         private void timerErrors_Tick(object sender, EventArgs e)
         {
-            int tempLastError = (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError;
-            if (mLastError != (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError)
-            {
-                PerformStop();
-                Interlocked.Exchange(ref tempLastError, mLastError);
-                Interlocked.Exchange(ref mLastError, (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError);
-            }
-            if (tempLastError == (int)clsStereoImageManagerWrap.eStereoImageManagerErrors.DifferentLeftRightImageDimensions)
-            {
-                MessageBox.Show(
-                    "Left and Right Images have different dimensions.", // Message
-                    "Warning", // Title
-                    MessageBoxButtons.OK, // OK button
-                    MessageBoxIcon.Information // Icon
-                );
-            }
-            tsbStartStop.Enabled = ((mLeftImagePath != null) && (mLeftImagePath != string.Empty) && (File.Exists(mLeftImagePath)) && (mRightImagePath != null) && (mRightImagePath != string.Empty) && (File.Exists(mRightImagePath)));
+            tsbStartStop.Enabled = ((mLeftImagePath != null) && 
+                                    (mLeftImagePath != string.Empty) && 
+                                    (File.Exists(mLeftImagePath)) && 
+                                    (mRightImagePath != null) && 
+                                    (mRightImagePath != string.Empty) && 
+                                    (File.Exists(mRightImagePath)));
         }
         private void timerSendSettings_Tick(object sender, EventArgs e)
         {
@@ -352,8 +387,8 @@ namespace StereoscopicImageViewer
                 {
                     if (mStereoImageManager != null)
                     {
-                        clsStereoImageManagerWrap.eStereoImageManagerErrors res1 = mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
-                        clsStereoImageManagerWrap.eStereoImageManagerErrors res2 = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                        mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
+                        mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
                     }
                     mAlreadySent = true;
                 }
@@ -364,10 +399,12 @@ namespace StereoscopicImageViewer
         {
             if (lvStereoImages.SelectedItems.Count > 0)
             {
-                if (mIsStarted) PerformStop();
                 mLeftImagePath = Settings.FolderPath + "\\" + ((Tuple<string, string>)lvStereoImages.SelectedItems[0].Tag).Item1;
                 mRightImagePath = Settings.FolderPath + "\\" + ((Tuple<string, string>)lvStereoImages.SelectedItems[0].Tag).Item2;
-                if (!mIsStarted) PerformStart();
+                if (mStereoImageManager != null)
+                {
+                    mStereoImageManager.DrawImage(mLeftImagePath, mRightImagePath);
+                }
             }
         }
         private void tbGlassesTimeOffset_Scroll(object sender, EventArgs e)
@@ -376,7 +413,7 @@ namespace StereoscopicImageViewer
             Settings.GlassesTimeOffset = tbGlassesTimeOffset.Value;
             if (mStereoImageManager != null)
             {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
+                mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
             }
         }
         private void tbTransparentTimePercent_Scroll(object sender, EventArgs e)
@@ -385,7 +422,7 @@ namespace StereoscopicImageViewer
             Settings.TransparentTimePercent = tbTransparentTimePercent.Value;
             if (mStereoImageManager != null)
             {
-                clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
             }
         }
         #endregion
@@ -393,94 +430,67 @@ namespace StereoscopicImageViewer
         #region Methods
         private void PerformStart()
         {
-            //To Be Started here.
-            if (!mIsStarted)
+            bool isStarted = false;
+            if (mStereoImageManager != null)
             {
-                mIsStarted = true;
-                tsbStartStop.Text = "Stop";
-                tsbStartStop.ToolTipText = "Stop";
-                tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.stop;
-                tscbComPort.Enabled = false;
-                tsbRefresh.Enabled = false;
-                tsbOpenFolder.Enabled = false;
-                tbGlassesTimeOffset.Enabled = true;
-                tbTransparentTimePercent.Enabled = true;
-                tsslFrequencyLabel.Visible = true;
-                tsslFrequency.Visible = true;
-                Start();
-                mAlreadySent = false;
-                mAlreadySentCounter = 0;
+                isStarted = mStereoImageManager.IsStarted();
+                //To Be Started here.
+                if (!isStarted)
+                {
+                    tsbStartStop.Text = "Stop";
+                    tsbStartStop.ToolTipText = "Stop";
+                    tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.stop;
+                    tscbComPort.Enabled = false;
+                    tsbRefresh.Enabled = false;
+                    tsbOpenFolder.Enabled = false;
+                    tbGlassesTimeOffset.Enabled = true;
+                    tbTransparentTimePercent.Enabled = true;
+                    tsslFrequencyLabel.Visible = true;
+                    tsslFrequency.Visible = true;
+                    Start();
+                    mAlreadySent = false;
+                    mAlreadySentCounter = 0;
+                }
             }
         }
         private void PerformStop()
         {
-            //To Be Stopped here.
-            if (mIsStarted)
+            bool isStarted = false;
+            if (mStereoImageManager != null)
             {
-                Stop();
-                tsbStartStop.Text = "Start";
-                tsbStartStop.ToolTipText = "Start";
-                tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.play;
-                tscbComPort.Enabled = true;
-                tsbRefresh.Enabled = true;
-                tsbOpenFolder.Enabled = true;
-                tbGlassesTimeOffset.Enabled = false;
-                tbTransparentTimePercent.Enabled = false;
-                tsslFrequencyLabel.Visible = false;
-                tsslFrequency.Visible = false;
-                pbVideoPanel.Refresh();
-                mIsStarted = false;
+                isStarted = mStereoImageManager.IsStarted();
+                //To Be Stopped here.
+                if (isStarted)
+                {
+                    Stop();
+                    tsbStartStop.Text = "Start";
+                    tsbStartStop.ToolTipText = "Start";
+                    tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.play;
+                    tscbComPort.Enabled = true;
+                    tsbRefresh.Enabled = true;
+                    tsbOpenFolder.Enabled = true;
+                    tbGlassesTimeOffset.Enabled = false;
+                    tbTransparentTimePercent.Enabled = false;
+                    tsslFrequencyLabel.Visible = false;
+                    tsslFrequency.Visible = false;
+                    pbVideoPanel.Refresh();
+                }
             }
         }
         private void Start()
         {
-            pbVideoPanel.BackColor = System.Drawing.Color.DarkGray;
-            //------------------------------------------------------
-            mStereoImageManager = new clsStereoImageManager(pbVideoPanel.Handle, Settings.ComPort, mLeftImagePath, mRightImagePath);
-            mFrequencyCounter = new clsFrequencyCounter();
-            //------------------------------------------------------
-            if (mTask == null)
+            if (mStereoImageManager != null)
             {
-                mTaskQuit = false;
-                mTask = new Task(() =>
-                {
-                    while (!mTaskQuit)
-                    {
-                        int frequencyInHz = 0;
-                        clsStereoImageManagerWrap.eStereoImageManagerErrors res = mStereoImageManager.VideoRender();
-                        if (res == clsStereoImageManagerWrap.eStereoImageManagerErrors.NoError)
-                        {
-                            frequencyInHz += mFrequencyCounter.GetFrequencyInHzValue();
-                            mFrequencyCounter.Increment();
-                            Interlocked.Exchange(ref mFrequencyInHz, frequencyInHz);
-                        }
-                        else
-                        {
-                            Interlocked.Exchange(ref mLastError, (int)res);
-                            mTaskQuit = true;
-                        }
-                    }
-                });
-                mTask.Start();
+                mStereoImageManager.SetCOMPort(Settings.ComPort);
+                mStereoImageManager.Start();
             }
         }
         private void Stop()
         {
-            mTaskQuit = true;
-            if (mTask != null)
-            {
-                mTask.Wait();
-                mTask.Dispose();
-                mTask = null;
-            }
-            //------------------------------------------------------
             if (mStereoImageManager != null)
             {
-                mStereoImageManager.Dispose();
-                mStereoImageManager = null;
+                mStereoImageManager.Stop();
             }
-            mFrequencyCounter = null;
-            mStereoImageManager = null;
         }
         private string OpenFolder()
         {
@@ -497,7 +507,11 @@ namespace StereoscopicImageViewer
         {
             if (Settings.FolderPath == null) return;
             if (Settings.FolderPath == string.Empty) return;
-            if (!Directory.Exists(Settings.FolderPath)) return;
+            if (!Directory.Exists(Settings.FolderPath))
+            {
+                Settings.FolderPath = string.Empty;
+                return;
+            }
             lvStereoImages.Items.Clear();
             string[] files = Directory.GetFiles(Settings.FolderPath);
             foreach (string file in files)

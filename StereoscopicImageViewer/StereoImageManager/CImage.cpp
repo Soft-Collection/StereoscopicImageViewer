@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "CImage.h"
 
-CImage::CImage()
+CImage::CImage(std::wstring FilePath, int Width, int Height, int Channels, std::vector<BYTE> PixelData, bool IsLeft)
 {
-    this->Width = 0;
-    this->Height = 0;
-    this->Channels = 0;
-    this->IsLeft = false;
+    this->FilePath = FilePath;
+    this->Width = Width;
+    this->Height = Height;
+    this->Channels = Channels;
+    this->PixelData = PixelData;
+    this->IsLeft = IsLeft;
 }
 
 CImage::~CImage()
@@ -14,15 +16,19 @@ CImage::~CImage()
 }
 
 //BGRA
-void CImage::LoadImage(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft)
+CImage* CImage::LoadImage(std::wstring filePath, bool isLeft)
 {
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    std::vector<BYTE> pixelData;
     // Initialize COM library
     HRESULT hr = CoInitialize(NULL);
-    if (FAILED(hr)) return;
+    if (FAILED(hr)) return NULL;
     // Create WIC factory
     IWICImagingFactory* pFactory = NULL;
     hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&pFactory);
-    if (FAILED(hr)) return;
+    if (FAILED(hr)) return NULL;
     // Create a decoder to read the image
     IWICBitmapDecoder* pDecoder = NULL;
     pFactory->CreateDecoderFromFilename(filePath.c_str(), NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
@@ -47,7 +53,7 @@ void CImage::LoadImage(std::wstring filePath, int& width, int& height, int& chan
         pDecoder->Release();
         pFactory->Release();
         CoUninitialize();
-        return;
+        return NULL;
     }
     // Allocate memory for image data
     pixelData.resize(width * height * channels);
@@ -58,9 +64,5 @@ void CImage::LoadImage(std::wstring filePath, int& width, int& height, int& chan
     pDecoder->Release();
     pFactory->Release();
     CoUninitialize();
-}
-
-void CImage::LoadImage(CImage* img)
-{
-    CImage::LoadImage(img->FilePath, img->Width, img->Height, img->Channels, img->PixelData, img->IsLeft);
+    return new CImage(filePath, width, height, channels, pixelData, isLeft);
 }

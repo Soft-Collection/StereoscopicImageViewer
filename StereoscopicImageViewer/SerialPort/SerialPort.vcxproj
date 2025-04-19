@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9E19B7D1-1100-4A0C-8C42-A3316E123060}</ProjectGuid>
+    <ProjectGuid>{1F8F9238-8EE7-4EED-B8D9-36D572B070D6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Common</RootNamespace>
+    <RootNamespace>SerialPort</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -72,15 +72,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CCriticalSectionPool.h" />
-    <ClInclude Include="CExceptionReport.h" />
+    <ClInclude Include="CComPort.h" />
     <ClInclude Include="CTools.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CCriticalSectionPool.cpp" />
-    <ClCompile Include="CExceptionReport.cpp" />
+    <ClCompile Include="CComPort.cpp" />
     <ClCompile Include="CTools.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>

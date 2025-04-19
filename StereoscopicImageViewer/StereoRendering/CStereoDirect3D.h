@@ -4,28 +4,43 @@
 #include <windows.h>
 #include <d3d9.h>
 #include <tchar.h>
+#include <mutex>
+#include <chrono>
+#include <atomic>
 
 #pragma comment(lib, "d3d9.lib")
 
 class CStereoDirect3D
 {
+public:
+	typedef struct {
+		BYTE* DataPtr;
+		INT Width;
+		INT Height;
+		INT Channels;
+		LPDIRECT3DSURFACE9 Surface;
+		std::mutex* Mutex;
+	} ImageData;
 private:
 	HWND        m_HWnd;
-	INT         m_ImageWidth;
-	INT         m_ImageHeight;
+	ImageData   m_Left;
+	ImageData   m_Right;
+	std::chrono::high_resolution_clock::time_point m_LastTimeMeasuring;
+	std::atomic<int> m_FrequencyInHz;
 private:
-	LPDIRECT3D9 mD3D = nullptr;
-	LPDIRECT3DDEVICE9 mDevice = nullptr;
-	LPDIRECT3DSURFACE9 mLeftSurface = nullptr;
-	LPDIRECT3DSURFACE9 mRightSurface = nullptr;
+	LPDIRECT3D9 m_D3D;
+	std::mutex* m_D3DMutex;
+	LPDIRECT3DDEVICE9 m_Device;
+	std::mutex* m_DeviceMutex;
 private:
-	void ReInit(HWND hWnd, INT ImageWidth, INT ImageHeight);
-	LPDIRECT3DSURFACE9 CreateSurface(BYTE* ImageDataPtr, int ImageWidth, int ImageHeight, int Channels);
+	void ReInit(ImageData Left, ImageData Right);
+	LPDIRECT3DSURFACE9 CreateSurface(ImageData idat);
 public:
-	CStereoDirect3D();
+	CStereoDirect3D(HWND hWnd);
 	~CStereoDirect3D();
-	BOOL DrawImageRGB(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight, INT Channels);
-	BOOL DrawImage(HWND hWnd, BYTE* LeftImageDataPtr, BYTE* RightImageDataPtr, INT ImageWidth, INT ImageHeight, INT Channels){ return(DrawImageRGB(hWnd, LeftImageDataPtr, RightImageDataPtr, ImageWidth, ImageHeight, Channels)); }
+	BOOL DrawImageRGB(ImageData Left, ImageData Right);
+	BOOL DrawImage(ImageData Left, ImageData Right){ return(DrawImageRGB(Left, Right)); }
 	BOOL Blt(bool isLeft);
+	INT GetFrequency();
 };
 #endif // __CSTEREODIRECT3D_H__

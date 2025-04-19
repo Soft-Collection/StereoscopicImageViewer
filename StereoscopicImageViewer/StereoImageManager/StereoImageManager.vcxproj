@@ -62,7 +62,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d2d1.lib;dwrite.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCD.lib;libcid.lib</IgnoreSpecificDefaultLibraries>
-      <OutputFile>..\StereoscopicImageViewer\Bin\Debug\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,12 +82,11 @@
       <AdditionalDependencies>d2d1.lib;dwrite.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBC.lib;libci.lib</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <OutputFile>..\StereoscopicImageViewer\Bin\Release\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CStereoImageManager.h" />
-    <ClInclude Include="CComPort.h" />
     <ClInclude Include="CImage.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="StereoImageManagerWrap.h" />
@@ -96,7 +95,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CStereoImageManager.cpp" />
-    <ClCompile Include="CComPort.cpp" />
     <ClCompile Include="CImage.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -116,8 +114,8 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.vcxproj">
-      <Project>{9e19b7d1-1100-4a0c-8c42-a3316e123060}</Project>
+    <ProjectReference Include="..\SerialPort\SerialPort.vcxproj">
+      <Project>{1f8f9238-8ee7-4eed-b8d9-36d572b070d6}</Project>
     </ProjectReference>
     <ProjectReference Include="..\StereoRendering\StereoRendering.vcxproj">
       <Project>{71cd25e8-7a58-47d9-9da9-5330c7135e52}</Project>

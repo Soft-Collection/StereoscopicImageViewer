@@ -2,40 +2,20 @@ using System;
 
 public class clsStereoImageManager
 {
-    #region External Functions
-    #endregion
-
     #region Variables
-    private readonly object mLock = new object();
     private IntPtr mHandle = IntPtr.Zero;
     #endregion
 
     #region New / Dispose
-    public clsStereoImageManager(IntPtr hWnd, string comPort, string leftImageFilePath, string rightImageFilePath)
+    public clsStereoImageManager(IntPtr hWnd)
     {
-        try
-        {
-            mHandle = clsStereoImageManagerWrap.StereoImageManagerCreateNew(hWnd, comPort, leftImageFilePath, rightImageFilePath);
-        }
-        catch (Exception ex)
-        {
-            ExceptionManager.Publish(ex);
-        }
+        mHandle = clsStereoImageManagerWrap.StereoImageManagerCreateNew(hWnd);
     }
-
     public void Dispose()
     {
-        try
-        {
-            GC.SuppressFinalize(this);
-            clsStereoImageManagerWrap.StereoImageManagerDispose(mHandle);
-        }
-        catch (Exception ex)
-        {
-            ExceptionManager.Publish(ex);
-        }
+        GC.SuppressFinalize(this);
+        clsStereoImageManagerWrap.StereoImageManagerDispose(mHandle);
     }
-
     ~clsStereoImageManager()
     {
         Dispose();
@@ -43,68 +23,63 @@ public class clsStereoImageManager
     #endregion
 
     #region Methods
-    public clsStereoImageManagerWrap.eStereoImageManagerErrors VideoRender()
+    public void DrawImage(string leftImageFilePath, string rightImageFilePath)
     {
-        try
+        if (mHandle != IntPtr.Zero)
         {
-            if (mHandle != IntPtr.Zero)
-            {
-                lock (mLock)
-                {
-                    return clsStereoImageManagerWrap.StereoImageManagerVideoRender(mHandle);
-                }
-            }
+            clsStereoImageManagerWrap.StereoImageManagerDrawImage(mHandle, leftImageFilePath, rightImageFilePath);
         }
-        catch (Exception ex)
-        {
-            ExceptionManager.Publish(ex);
-        }
-        finally
-        {
-        }
-        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
     }
-    public clsStereoImageManagerWrap.eStereoImageManagerErrors SetGlassesTimeOffset(int offset)
+    public void Start()
     {
-        try
+        if (mHandle != IntPtr.Zero)
         {
-            if (mHandle != IntPtr.Zero)
-            {
-                lock (mLock)
-                {
-                    return clsStereoImageManagerWrap.StereoImageManagerSetGlassesTimeOffset(mHandle, offset);
-                }
-            }
+            clsStereoImageManagerWrap.StereoImageManagerStart(mHandle);
         }
-        catch (Exception ex)
-        {
-            ExceptionManager.Publish(ex);
-        }
-        finally
-        {
-        }
-        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
     }
-    public clsStereoImageManagerWrap.eStereoImageManagerErrors SetTransparentTimePercent(int percent)
+    public void Stop()
     {
-        try
+        if (mHandle != IntPtr.Zero)
         {
-            if (mHandle != IntPtr.Zero)
-            {
-                lock (mLock)
-                {
-                    return clsStereoImageManagerWrap.StereoImageManagerSetTransparentTimePercent(mHandle, percent);
-                }
-            }
+            clsStereoImageManagerWrap.StereoImageManagerStop(mHandle);
         }
-        catch (Exception ex)
+    }
+    public bool IsStarted()
+    {
+        if (mHandle != IntPtr.Zero)
         {
-            ExceptionManager.Publish(ex);
+            return clsStereoImageManagerWrap.StereoImageManagerIsStarted(mHandle);
         }
-        finally
+        return false;
+    }
+    public int GetFrequency()
+    {
+        if (mHandle != IntPtr.Zero)
         {
+            return clsStereoImageManagerWrap.StereoImageManagerGetFrequency(mHandle);
         }
-        return clsStereoImageManagerWrap.eStereoImageManagerErrors.NullHandle;
+        return 0;
+    }
+    public void SetCOMPort(string comPort)
+    {
+        if (mHandle != IntPtr.Zero)
+        {
+            clsStereoImageManagerWrap.StereoImageManagerSetCOMPort(mHandle, comPort);
+        }
+    }
+    public void SetGlassesTimeOffset(int offset)
+    {
+        if (mHandle != IntPtr.Zero)
+        {
+            clsStereoImageManagerWrap.StereoImageManagerSetGlassesTimeOffset(mHandle, offset);
+        }
+    }
+    public void SetTransparentTimePercent(int percent)
+    {
+        if (mHandle != IntPtr.Zero)
+        {
+            clsStereoImageManagerWrap.StereoImageManagerSetTransparentTimePercent(mHandle, percent);
+        }
     }
     #endregion
 }

@@ -18,10 +18,9 @@ public:
 	std::vector<BYTE> PixelData;
 	bool IsLeft;
 public:
-	CImage();
+	CImage(std::wstring FilePath, int Width, int Height, int Channels, std::vector<BYTE> PixelData, bool IsLeft);
 	~CImage();
-	static void LoadImage(std::wstring filePath, int& width, int& height, int& channels, std::vector<BYTE>& pixelData, bool isLeft);
-	static void LoadImage(CImage* img);
+	static CImage* LoadImage(std::wstring filePath, bool isLeft);
 };
 
 #endif // __CIMAGE_H__
