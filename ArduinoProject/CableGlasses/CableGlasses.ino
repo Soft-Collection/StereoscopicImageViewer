@@ -139,7 +139,7 @@ uint8_t GetTransparencyTime(Transparency transparency, uint8_t common) {
 }
 
 void SetupSerial() {
-  Serial.begin(250000);
+  Serial.begin(115200);
   Serial.flush();
 }
 
