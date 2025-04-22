@@ -19,7 +19,7 @@ private:
 	CImage* mRightImage;
 	//----------------------------------------
 	std::atomic<bool> m_ThreadRunning;
-	std::thread m_Thread;
+	std::thread* m_Thread;
 	//----------------------------------------
 	bool mImageToPlayIsLeft;
 private:

@@ -15,13 +15,15 @@ CStereoImageManager::CStereoImageManager(HWND hWnd)
 	mRightImage = NULL;
 	//----------------------------------------------------
 	m_ThreadRunning.store(false);
-	m_Thread;
+	m_Thread = nullptr;
 	//----------------------------------------------------
 	mImageToPlayIsLeft = true;
 	//----------------------------------------------------
 }
 CStereoImageManager::~CStereoImageManager()
 {
+	Stop();
+	//----------------------------------------------------
 	if (mRightImage != NULL)
 	{
 		delete mRightImage;
@@ -74,10 +76,10 @@ void CStereoImageManager::VideoRender()
 }
 void CStereoImageManager::Start()
 {
-	if (!m_ThreadRunning.load()) 
+	if (!m_ThreadRunning.load())
 	{
 		m_ThreadRunning = true;
-		m_Thread = std::thread(&CStereoImageManager::ThreadFunction, this);
+		m_Thread = new std::thread(&CStereoImageManager::ThreadFunction, this);
 	}
 }
 void CStereoImageManager::Stop()
@@ -85,10 +87,13 @@ void CStereoImageManager::Stop()
 	if (m_ThreadRunning.load())
 	{
 		m_ThreadRunning = false;
-		if (m_Thread.joinable()) 
+
+		if (m_Thread && m_Thread->joinable())
 		{
-			m_Thread.join();  // Wait for thread to finish
+			m_Thread->join();
 		}
+		delete m_Thread;
+		m_Thread = nullptr;
 	}
 }
 BOOL CStereoImageManager::IsStarted()
