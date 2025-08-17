@@ -210,6 +210,16 @@ void CStereoDirect2D::DrawImageRGB(CImage* leftImage, CImage* rightImage)
 	std::unique_lock<std::mutex> lock1(*mMutexDrawBlt); // Lock the mutex
 	if (!m_ImageDataUpdated.load())
 	{
+		if (m_LeftImage != NULL)
+		{
+			delete m_LeftImage;
+			m_LeftImage = NULL;
+		}
+		if (m_RightImage != NULL)
+		{
+			delete m_RightImage;
+			m_RightImage = NULL;
+		}
 		m_LeftImage = leftImage;
 		m_RightImage = rightImage;
 		m_ImageDataUpdated.store(TRUE);

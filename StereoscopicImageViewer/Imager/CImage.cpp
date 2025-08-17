@@ -18,6 +18,8 @@ CImage::~CImage()
 //BGRA
 CImage* CImage::LoadImage(std::wstring filePath, bool isLeft)
 {
+    CImage* receivedImage = NULL;
+    CImage* convertedImage = NULL;
     int width = 0;
     int height = 0;
     int channels = 0;
@@ -64,5 +66,67 @@ CImage* CImage::LoadImage(std::wstring filePath, bool isLeft)
     pDecoder->Release();
     pFactory->Release();
     CoUninitialize();
-    return new CImage(filePath, width, height, channels, pixelData, isLeft);
+    receivedImage = new CImage(filePath, width, height, channels, pixelData, isLeft);
+    if (receivedImage->Channels == 3)
+    {
+        convertedImage = ConvertBGR24ToBGRA32(receivedImage);
+        if (receivedImage)
+        {
+            delete receivedImage;
+            receivedImage = NULL;
+            return convertedImage;
+        }
+    }
+    return receivedImage;
+}
+
+CImage* CImage::ConvertRGB24ToBGRA32(CImage* srcImage)
+{
+    int srcPitch = srcImage->Width * 3;
+    int dstPitch = srcImage->Width * 4;
+    std::vector<BYTE> dst;
+    // Allocate memory for image data
+    dst.resize(srcImage->Width * srcImage->Height * 4);
+    for (int y = 0; y < srcImage->Height; y++)
+    {
+        const uint8_t* s = srcImage->PixelData.data() + y * srcPitch;
+        uint8_t* d = dst.data() + y * dstPitch;
+        for (int x = 0; x < srcImage->Width; x++)
+        {
+            uint8_t r = s[0];
+            uint8_t g = s[1];
+            uint8_t b = s[2];
+            d[0] = b;     // B
+            d[1] = g;     // G
+            d[2] = r;     // R
+            d[3] = 255;   // A = opaque
+            s += 3;
+            d += 4;
+        }
+    }
+    return new CImage(L"", srcImage->Width, srcImage->Height, 4, dst, true);
+}
+
+CImage* CImage::ConvertBGR24ToBGRA32(CImage* srcImage)
+{
+    int srcPitch = srcImage->Width * 3; // 3 bytes per pixel
+    int dstPitch = srcImage->Width * 4; // 4 bytes per pixel
+    std::vector<BYTE> dst;
+    // Allocate memory for image data
+    dst.resize(srcImage->Width * srcImage->Height * 4);
+    for (int y = 0; y < srcImage->Height; y++)
+    {
+        const BYTE* s = srcImage->PixelData.data() + y * srcPitch;
+        BYTE* d = dst.data() + y * dstPitch;
+        for (int x = 0; x < srcImage->Width; x++)
+        {
+            d[0] = s[0]; // B
+            d[1] = s[1]; // G
+            d[2] = s[2]; // R
+            d[3] = 255;  // A = opaque
+            s += 3;
+            d += 4;
+        }
+    }
+    return new CImage(L"", srcImage->Width, srcImage->Height, 4, dst, true);
 }

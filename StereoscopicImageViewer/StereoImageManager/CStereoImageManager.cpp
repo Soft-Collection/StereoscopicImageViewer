@@ -170,12 +170,12 @@ void CStereoImageManager::ImagerProvideImages(LPCWSTR leftImageFilePath, LPCWSTR
 	mLeftImage = CImage::LoadImage(std::wstring(leftImageFilePath), true);
 	mRightImage = CImage::LoadImage(std::wstring(rightImageFilePath), false);
 	//----------------------------------------------
-	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
+	std::unique_lock<std::mutex> lock2(*mMutexRender2); // Lock the mutex
 	if (mStereoDirect2D != NULL)
 	{
 		mStereoDirect2D->DrawImage(mLeftImage, mRightImage);
 	}
-	lock1.unlock();
+	lock2.unlock();
 	//----------------------------------------------
 	mImageToPlayIsLeft = true;
 }
@@ -207,18 +207,3 @@ void CStereoImageManager::SendSync(int syncType)
 	}
 	lock1.unlock();
 }
-
-
-//if (mThreadRenderRunning.load())
-//{
-//	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
-//	if (mStereoDirect2D != NULL)
-//	{
-//		mStereoDirect2D->DrawImage(frame);
-//	}
-//	lock1.unlock();
-//}
-//else
-//{
-//	av_frame_free(&frame);
-//}
