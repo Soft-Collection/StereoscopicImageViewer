@@ -73,14 +73,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CComPort.h" />
-    <ClInclude Include="CTools.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CComPort.cpp" />
-    <ClCompile Include="CTools.cpp" />
     <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.vcxproj">
+      <Project>{9e19b7d1-1100-4a0c-8c42-a3316e123060}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

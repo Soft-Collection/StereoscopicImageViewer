@@ -1,10 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
-using System.IO.Ports;
 using System.Security.Permissions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections.Generic;
 
@@ -18,6 +15,7 @@ namespace StereoscopicImageViewer
             InitializeComponent();
             Initialize();
             Init();
+            InitStereoPlayer();
         }
         #endregion
 
@@ -43,33 +41,8 @@ namespace StereoscopicImageViewer
             this.Visible = Settings.Visible;
             this.TopMost = Settings.AlwaysOnTop;
             //-----------------------------------
-            // Get a list of all available COM ports
-            string[] ports = SerialPort.GetPortNames();
-            tscbComPort.Items.Clear();
-            foreach (string port in ports)
-            {
-                tscbComPort.Items.Add(port);
-            }
-            if (tscbComPort.Items.Contains(Settings.ComPort))
-            {
-                tscbComPort.SelectedItem = Settings.ComPort;
-            }
-            else
-            {
-                tscbComPort.SelectedIndex = 0;
-            }
-            tscbComPort.Visible = true;
-            tsbRefresh.Visible = true;
-            //-----------------------------------
             pbVideoPanel.BackColor = System.Drawing.Color.DarkGray;
             //------------------------------------------------------
-            tsbStartStop.Enabled = false;
-            tbGlassesTimeOffset.Value = Settings.GlassesTimeOffset;
-            lblGlassesTimeOffset.Text = Settings.GlassesTimeOffset.ToString();
-            tbGlassesTimeOffset.Enabled = false;
-            tbTransparentTimePercent.Value = Settings.TransparentTimePercent;
-            lblTransparentTimePercent.Text = Settings.TransparentTimePercent.ToString();
-            tbTransparentTimePercent.Enabled = false;
             tsslFrequencyLabel.Visible = false;
             tsslFrequency.Visible = false;
             //-----------------------------------
@@ -77,8 +50,6 @@ namespace StereoscopicImageViewer
             SetVisible();
             SetAlwaysOnTop();
             SetRunAtStartup();
-            //-----------------------------------
-            LoadStereoImages();
             //-----------------------------------
             if (mStereoImageManager == null)
             {
@@ -105,7 +76,7 @@ namespace StereoscopicImageViewer
         }
         private void ExitProg()
         {
-            PerformStop();
+            PerformStereoStop();
             if (mStereoImageManager != null)
             {
                 mStereoImageManager.Dispose();
@@ -140,10 +111,10 @@ namespace StereoscopicImageViewer
                 bool isStarted = false;
                 if (mStereoImageManager != null)
                 {
-                    isStarted = mStereoImageManager.IsStarted();
+                    isStarted = mStereoImageManager.StereoIsStarted();
                 }
                 mWasStartedWhenMinimized = isStarted;
-                if (isStarted) PerformStop();
+                if (isStarted) PerformStereoStop();
             }
             else
             {
@@ -152,9 +123,9 @@ namespace StereoscopicImageViewer
                     bool isStarted = false;
                     if (mStereoImageManager != null)
                     {
-                        isStarted = mStereoImageManager.IsStarted();
+                        isStarted = mStereoImageManager.StereoIsStarted();
                     }
-                    if (!isStarted) PerformStart();
+                    if (!isStarted) PerformStereoStart();
                 }
             }
             this.Visible = !this.Visible;
@@ -168,7 +139,6 @@ namespace StereoscopicImageViewer
             {
                 hideOrShowToolStripMenuItem.Text = "Hide";
                 trayNotifyIcon.Text = "Hide " + GetAssemblyInfo.AssemblyProduct;
-
                 this.Opacity = 1;
             }
             else
@@ -249,21 +219,17 @@ namespace StereoscopicImageViewer
 
         #region StereoscopicImageViewer
 
+        #region Enums
+        #endregion
+
         #region Variables
         private bool mWasStartedWhenMinimized = false;
         private clsStereoImageManager mStereoImageManager = null;
-        private string mLeftImagePath = null;
-        private string mRightImagePath = null;
-        private bool mAlreadySent = true;
-        private int mAlreadySentCounter = 0;
         #endregion
 
         #region Initialize
         private void Init()
         {
-            timerFrequency.Start();
-            timerErrors.Start();
-            timerSendSettings.Start();
         }
         #endregion
 
@@ -278,87 +244,134 @@ namespace StereoscopicImageViewer
         }
         private void arduinoProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/blob/master/ArduinoProject/CableGlasses/CableGlasses.ino");
-        }
-        private void createImagesFromAnaglyphImageToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/blob/master/StereoImageSplitter/stereo_image_splitter.py");
-        }
-        private void stereoImagesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/tree/master/StereoImages");
+            System.Diagnostics.Process.Start("https://github.com/Soft-Collection/StereoscopicImageViewer/tree/master/ArduinoProject/CableGlasses");
         }
         #endregion
 
         #region Main Form Events
-        private void tsbOpenFolder_Click(object sender, EventArgs e)
+        #endregion
+
+        #region Methods
+        #endregion
+
+        #endregion
+
+        #region Stereo Imager
+
+        #region Enums
+        private enum eMainStates
         {
-            string temp = OpenFolder();
-            Settings.FolderPath = (temp == string.Empty) ? Settings.FolderPath : temp;
-            LoadStereoImages();
+            ImagesFolderNotOpened = 0,
+            COMPortNotSelected = 1,
+            Stopped = 2,
+            Playing = 3
         }
-        private void openSelectedFolderInExplorerToolStripMenuItem_Click(object sender, EventArgs e)
+        #endregion
+
+        #region Variables
+        private bool mAlreadySent = true;
+        private int mAlreadySentCounter = 0;
+        private long mLastWindowResizeTime = 0;
+        private bool mResizeAlreadyApplied = true;
+        private bool mLastIsDirectoryExists = false;
+        private bool mLastIsCOMPortSelected = false;
+        private string mLeftImagePath = null;
+        private string mRightImagePath = null;
+        #endregion
+
+        #region Initialize
+        private void InitStereoPlayer()
         {
-            if (Settings.FolderPath != string.Empty)
+            timerFrequency.Start();
+            timerSendSettings.Start();
+            timerGUIStereoPlayer.Start();
+            SetMainState(eMainStates.ImagesFolderNotOpened);
+            LoadSettingsToControls();
+        }
+        #endregion
+
+        #region Menu Events
+        #endregion
+
+        #region Main Form Events
+        private void MainFrm_DragEnter(object sender, DragEventArgs e)
+        {
+            Array data = ((IDataObject)e.Data).GetData("FileDrop") as Array;
+            if (data != null)
             {
-                if (Directory.Exists(Settings.FolderPath))
+                if ((data.Length == 1) && (data.GetValue(0) is String))
                 {
-                    Process.Start("explorer.exe", Settings.FolderPath);
+                    string folderpath = ((string[])data)[0];
+                    if (Directory.Exists(folderpath))
+                    {
+                        e.Effect = DragDropEffects.Copy; //Will show small plus (+)
+                    }
+                    else
+                    {
+                        e.Effect = DragDropEffects.None; //Will show small prohibition symbol.
+                    }
                 }
                 else
                 {
-                    MessageBox.Show(
-                                       "Folder not found!", // Message
-                                       "Warning", // Title
-                                       MessageBoxButtons.OK, // OK button
-                                       MessageBoxIcon.Information // Icon
-                                   );
+                    e.Effect = DragDropEffects.None; //Will show small prohibition symbol.
                 }
             }
-            else
+        }
+        private void MainFrm_DragDrop(object sender, DragEventArgs e)
+        {
+            Array data = ((IDataObject)e.Data).GetData("FileDrop") as Array;
+            if (data != null)
             {
-                MessageBox.Show(
-                                   "Folder not selected!", // Message
-                                   "Warning", // Title
-                                    MessageBoxButtons.OK, // OK button
-                                    MessageBoxIcon.Information // Icon
-                               );
+                if ((data.Length == 1) && (data.GetValue(0) is String))
+                {
+                    string folderpath = ((string[])data)[0];
+                    if (Directory.Exists(folderpath))
+                    {
+                        if (Settings.FolderPath != folderpath)
+                        {
+                            Settings.FolderPath = folderpath;
+                            LoadStereoImages();
+                            SetMainState((cppComPortPanel.IsCOMPortSelected) ? eMainStates.Stopped : eMainStates.COMPortNotSelected);
+                        }
+                    }
+                }
             }
         }
-        private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
+        private void timerGUIStereoPlayer_Tick(object sender, EventArgs e)
         {
-            PerformStop();
-            LoadStereoImages();
-        }
-        private void tscbComPort_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Settings.ComPort = (string)tscbComPort.SelectedItem;
-        }
-        private void tsbRefresh_Click(object sender, EventArgs e)
-        {
-            // Get a list of all available COM ports
-            string[] ports = SerialPort.GetPortNames();
-            tscbComPort.Items.Clear();
-            foreach (string port in ports)
+            bool isDirectoryExists = Directory.Exists(Settings.FolderPath);
+            if (mLastIsDirectoryExists != isDirectoryExists)
             {
-                tscbComPort.Items.Add(port);
+                if (isDirectoryExists)
+                {
+                    SetMainState((cppComPortPanel.IsCOMPortSelected) ? eMainStates.Stopped : eMainStates.COMPortNotSelected);
+                }
+                else
+                {
+                    SetMainState(eMainStates.ImagesFolderNotOpened);
+                }
+                mLastIsDirectoryExists = isDirectoryExists;
             }
-            if (tscbComPort.Items.Contains(Settings.ComPort))
+            //-----------------------------------------------------
+            if (mLastIsCOMPortSelected != cppComPortPanel.IsCOMPortSelected)
             {
-                tscbComPort.SelectedItem = Settings.ComPort;
+                if (!cppComPortPanel.IsCOMPortSelected)
+                {
+                    SetMainState(eMainStates.COMPortNotSelected);
+                }
+                mLastIsCOMPortSelected = cppComPortPanel.IsCOMPortSelected;
             }
-            else
+            //-----------------------------------------------------
+            if (((double)(Stopwatch.GetTimestamp() - mLastWindowResizeTime)) / ((double)Stopwatch.Frequency / 1000.0) > 200)
             {
-                tscbComPort.SelectedIndex = 0;
-            }
-        }
-        private void tsbStartStop_Click(object sender, EventArgs e)
-        {
-            bool isStarted = false;
-            if (mStereoImageManager != null)
-            {
-                isStarted = mStereoImageManager.IsStarted();
-                if (isStarted) PerformStop(); else PerformStart();
+                if (!mResizeAlreadyApplied)
+                {
+                    if (mStereoImageManager != null)
+                    {
+                        mStereoImageManager.StereoWindowSizeChanged();
+                    }
+                    mResizeAlreadyApplied = true;
+                }
             }
         }
         private void timerFrequency_Tick(object sender, EventArgs e)
@@ -366,18 +379,9 @@ namespace StereoscopicImageViewer
             int frequencyInHz = 0;
             if (mStereoImageManager != null)
             {
-                frequencyInHz = mStereoImageManager.GetFrequency();
+                frequencyInHz = mStereoImageManager.StereoGetFrequency();
             }
             tsslFrequency.Text = frequencyInHz.ToString() + "Hz";
-        }
-        private void timerErrors_Tick(object sender, EventArgs e)
-        {
-            tsbStartStop.Enabled = ((mLeftImagePath != null) && 
-                                    (mLeftImagePath != string.Empty) && 
-                                    (File.Exists(mLeftImagePath)) && 
-                                    (mRightImagePath != null) && 
-                                    (mRightImagePath != string.Empty) && 
-                                    (File.Exists(mRightImagePath)));
         }
         private void timerSendSettings_Tick(object sender, EventArgs e)
         {
@@ -387,13 +391,33 @@ namespace StereoscopicImageViewer
                 {
                     if (mStereoImageManager != null)
                     {
-                        mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
-                        mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                        mStereoImageManager.StereoLRBoth(Settings.LRBoth);
+                        mStereoImageManager.StereoSwapLR(Settings.SwapLR);
+                        mStereoImageManager.StereoSetGlassesTimeOffset(Settings.GlassesTimeOffset);
                     }
                     mAlreadySent = true;
                 }
                 mAlreadySentCounter++;
             }
+        }
+        private void bOpen_Click(object sender, EventArgs e)
+        {
+            string temp = OpenFolder();
+            Settings.FolderPath = (temp == string.Empty) ? Settings.FolderPath : temp;
+            LoadStereoImages();
+            if (Directory.Exists(Settings.FolderPath))
+            {
+                SetMainState((cppComPortPanel.IsCOMPortSelected) ? eMainStates.Stopped : eMainStates.COMPortNotSelected);
+            }
+            else
+            {
+                SetMainState(eMainStates.ImagesFolderNotOpened);
+            }
+        }
+        private void pbVideoPanel_SizeChanged(object sender, EventArgs e)
+        {
+            mLastWindowResizeTime = Stopwatch.GetTimestamp();
+            mResizeAlreadyApplied = false;
         }
         private void lvStereoImages_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -403,93 +427,189 @@ namespace StereoscopicImageViewer
                 mRightImagePath = Settings.FolderPath + "\\" + ((Tuple<string, string>)lvStereoImages.SelectedItems[0].Tag).Item2;
                 if (mStereoImageManager != null)
                 {
-                    mStereoImageManager.DrawImage(mLeftImagePath, mRightImagePath);
+                    mStereoImageManager.ImagerProvideImages(mLeftImagePath, mRightImagePath);
                 }
             }
         }
-        private void tbGlassesTimeOffset_Scroll(object sender, EventArgs e)
+        private void ppPlayerPanel_OnPlay(object sender, EventArgs e)
         {
-            lblGlassesTimeOffset.Text = tbGlassesTimeOffset.Value.ToString();
-            Settings.GlassesTimeOffset = tbGlassesTimeOffset.Value;
+            SetMainState(eMainStates.Playing);
+            PerformStereoStart();
+        }
+        private void ppPlayerPanel_OnStop(object sender, EventArgs e)
+        {
+            PerformStereoStop();
+            SetMainState(eMainStates.Stopped);
+        }
+        private void cppComPortPanel_OnCOMPortSelected(object sender, COMPortPanel.COMPortEventArgs e)
+        {
+            Settings.ComPort = e.COMPort;
+            SetMainState(eMainStates.Stopped);
+        }
+        private void sbpStereoButtonsPanel_OnBoth(object sender, EventArgs e)
+        {
             if (mStereoImageManager != null)
             {
-                mStereoImageManager.SetGlassesTimeOffset(Settings.GlassesTimeOffset);
+                mStereoImageManager.StereoLRBoth(0);
+                Settings.LRBoth = 0;
             }
         }
-        private void tbTransparentTimePercent_Scroll(object sender, EventArgs e)
+        private void sbpStereoButtonsPanel_OnLeftOnly(object sender, EventArgs e)
         {
-            lblTransparentTimePercent.Text = tbTransparentTimePercent.Value.ToString();
-            Settings.TransparentTimePercent = tbTransparentTimePercent.Value;
             if (mStereoImageManager != null)
             {
-                mStereoImageManager.SetTransparentTimePercent(Settings.TransparentTimePercent);
+                mStereoImageManager.StereoLRBoth(1);
+                Settings.LRBoth = 1;
             }
+        }
+        private void sbpStereoButtonsPanel_OnRightOnly(object sender, EventArgs e)
+        {
+            if (mStereoImageManager != null)
+            {
+                mStereoImageManager.StereoLRBoth(2);
+                Settings.LRBoth = 2;
+            }
+        }
+        private void sbpStereoButtonsPanel_OnNoSwap(object sender, EventArgs e)
+        {
+            if (mStereoImageManager != null)
+            {
+                mStereoImageManager.StereoSwapLR(false);
+                Settings.SwapLR = false;
+            }
+        }
+        private void sbpStereoButtonsPanel_OnSwap(object sender, EventArgs e)
+        {
+            if (mStereoImageManager != null)
+            {
+                mStereoImageManager.StereoSwapLR(true);
+                Settings.SwapLR = true;
+            }
+        }
+        private void gtopGlassesTimeOffsetPanel_OnTimeOffset(object sender, GlassesTimeOffsetPanel.TimeOffsetEventArgs e)
+        {
+            if (mStereoImageManager != null)
+            {
+                mStereoImageManager.StereoSetGlassesTimeOffset(e.TimeOffset);
+                Settings.GlassesTimeOffset = e.TimeOffset;
+            }
+        }
+        private void bOpen_MouseEnter(object sender, EventArgs e)
+        {
+            ttControls.Show("Open video file", (IWin32Window)sender, 5000);
         }
         #endregion
 
         #region Methods
-        private void PerformStart()
+        private void SetMainState(eMainStates mainState)
         {
-            bool isStarted = false;
-            if (mStereoImageManager != null)
+            switch (mainState)
             {
-                isStarted = mStereoImageManager.IsStarted();
-                //To Be Started here.
-                if (!isStarted)
-                {
-                    tsbStartStop.Text = "Stop";
-                    tsbStartStop.ToolTipText = "Stop";
-                    tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.stop;
-                    tscbComPort.Enabled = false;
-                    tsbRefresh.Enabled = false;
-                    tsbOpenFolder.Enabled = false;
-                    tbGlassesTimeOffset.Enabled = true;
-                    tbTransparentTimePercent.Enabled = true;
+                case eMainStates.ImagesFolderNotOpened:
+                    bOpen.Enabled = true;
+                    lvStereoImages.Enabled = false;
+                    ppPlayerPanel.Enabled = false;
+                    cppComPortPanel.Enabled = false;
+                    sbpStereoButtonsPanel.Enabled = false;
+                    gtopGlassesTimeOffsetPanel.Enabled = false;
+                    tsslFrequencyLabel.Visible = false;
+                    tsslFrequency.Visible = false;
+                    break;
+                case eMainStates.COMPortNotSelected:
+                    bOpen.Enabled = true;
+                    lvStereoImages.Enabled = false;
+                    ppPlayerPanel.Enabled = false;
+                    cppComPortPanel.Enabled = true;
+                    sbpStereoButtonsPanel.Enabled = false;
+                    gtopGlassesTimeOffsetPanel.Enabled = false;
+                    tsslFrequencyLabel.Visible = false;
+                    tsslFrequency.Visible = false;
+                    break;
+                case eMainStates.Stopped:
+                    bOpen.Enabled = true;
+                    lvStereoImages.Enabled = false;
+                    ppPlayerPanel.Enabled = true;
+                    cppComPortPanel.Enabled = true;
+                    sbpStereoButtonsPanel.Enabled = false;
+                    gtopGlassesTimeOffsetPanel.Enabled = false;
+                    tsslFrequencyLabel.Visible = false;
+                    tsslFrequency.Visible = false;
+                    break;
+                case eMainStates.Playing:
+                    bOpen.Enabled = true;
+                    lvStereoImages.Enabled = true;
+                    ppPlayerPanel.Enabled = true;
+                    cppComPortPanel.Enabled = false;
+                    sbpStereoButtonsPanel.Enabled = true;
+                    gtopGlassesTimeOffsetPanel.Enabled = true;
                     tsslFrequencyLabel.Visible = true;
                     tsslFrequency.Visible = true;
-                    Start();
+                    break;
+            }
+
+        }
+        private void LoadSettingsToControls()
+        {
+            cppComPortPanel.SelectedCOMPort = Settings.ComPort;
+            cppComPortPanel.LoadPorts();
+            switch (Settings.LRBoth)
+            {
+                case 0:
+                    sbpStereoButtonsPanel.LRBothButtonsState = StereoButtonsPanel.eLRBothButtonsStates.Both;
+                    break;
+                case 1:
+                    sbpStereoButtonsPanel.LRBothButtonsState = StereoButtonsPanel.eLRBothButtonsStates.LeftOnly;
+                    break;
+                case 2:
+                    sbpStereoButtonsPanel.LRBothButtonsState = StereoButtonsPanel.eLRBothButtonsStates.RightOnly;
+                    break;
+            }
+            sbpStereoButtonsPanel.SwapButtonState = (Settings.SwapLR) ? StereoButtonsPanel.eSwapButtonStates.SwapOn : StereoButtonsPanel.eSwapButtonStates.SwapOff;
+            gtopGlassesTimeOffsetPanel.TimeOffset = Settings.GlassesTimeOffset;
+            LoadStereoImages();
+        }
+        private void PerformStereoStart()
+        {
+            if (mStereoImageManager != null)
+            {
+                bool isStereoStarted = false;
+                isStereoStarted = mStereoImageManager.StereoIsStarted();
+                //To Be Started here.
+                if (!isStereoStarted)
+                {
+                    StereoStart();
                     mAlreadySent = false;
                     mAlreadySentCounter = 0;
                 }
             }
         }
-        private void PerformStop()
+        private void PerformStereoStop()
         {
-            bool isStarted = false;
             if (mStereoImageManager != null)
             {
-                isStarted = mStereoImageManager.IsStarted();
+                bool isStarted = false;
+                isStarted = mStereoImageManager.StereoIsStarted();
                 //To Be Stopped here.
                 if (isStarted)
                 {
-                    Stop();
-                    tsbStartStop.Text = "Start";
-                    tsbStartStop.ToolTipText = "Start";
-                    tsbStartStop.Image = global::StereoscopicImageViewer.Properties.Resources.play;
-                    tscbComPort.Enabled = true;
-                    tsbRefresh.Enabled = true;
-                    tsbOpenFolder.Enabled = true;
-                    tbGlassesTimeOffset.Enabled = false;
-                    tbTransparentTimePercent.Enabled = false;
-                    tsslFrequencyLabel.Visible = false;
-                    tsslFrequency.Visible = false;
+                    StereoStop();
                     pbVideoPanel.Refresh();
                 }
             }
         }
-        private void Start()
+        private void StereoStart()
         {
             if (mStereoImageManager != null)
             {
-                mStereoImageManager.SetCOMPort(Settings.ComPort);
-                mStereoImageManager.Start();
+                mStereoImageManager.StereoSetCOMPort(Settings.ComPort);
+                mStereoImageManager.StereoStart();
             }
         }
-        private void Stop()
+        private void StereoStop()
         {
             if (mStereoImageManager != null)
             {
-                mStereoImageManager.Stop();
+                mStereoImageManager.StereoStop();
             }
         }
         private string OpenFolder()
@@ -516,7 +636,7 @@ namespace StereoscopicImageViewer
             string[] files = Directory.GetFiles(Settings.FolderPath);
             foreach (string file in files)
             {
-                List<string> supportedExtensions = new List<string> { ".PNG",".png",".JPEG",".jpeg",".JPG",".jpg",".BMP",".bmp",".TIFF",".tiff",".GIF",".gif" };
+                List<string> supportedExtensions = new List<string> { ".PNG", ".png", ".JPEG", ".jpeg", ".JPG", ".jpg", ".BMP", ".bmp", ".TIFF", ".tiff", ".GIF", ".gif" };
                 string fileNameWithExtension = Path.GetFileName(file);
                 string fileExtension = Path.GetExtension(file);
                 if (supportedExtensions.Contains(fileExtension))

@@ -81,16 +81,6 @@ namespace StereoscopicImageViewer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap play {
-            get {
-                object obj = ResourceManager.GetObject("play", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon program_icon {
@@ -103,21 +93,161 @@ namespace StereoscopicImageViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap stop {
-            get {
-                object obj = ResourceManager.GetObject("stop", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap refresh {
             get {
                 object obj = ResourceManager.GetObject("refresh", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+		
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap aplay {
+            get {
+                object obj = ResourceManager.GetObject("aplay", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap astop {
+            get {
+                object obj = ResourceManager.GetObject("astop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap apause {
+            get {
+                object obj = ResourceManager.GetObject("apause", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap left_only_selected {
+            get {
+                object obj = ResourceManager.GetObject("left_only_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap right_only_selected {
+            get {
+                object obj = ResourceManager.GetObject("right_only_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap both_selected {
+            get {
+                object obj = ResourceManager.GetObject("both_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap swap_selected {
+            get {
+                object obj = ResourceManager.GetObject("swap_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap left_only_unselected {
+            get {
+                object obj = ResourceManager.GetObject("left_only_unselected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap right_only_unselected {
+            get {
+                object obj = ResourceManager.GetObject("right_only_unselected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap both_unselected {
+            get {
+                object obj = ResourceManager.GetObject("both_unselected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap swap_unselected {
+            get {
+                object obj = ResourceManager.GetObject("swap_unselected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }	
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sound {
+            get {
+                object obj = ResourceManager.GetObject("sound", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap no_sound {
+            get {
+                object obj = ResourceManager.GetObject("no_sound", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap horizontal {
+            get {
+                object obj = ResourceManager.GetObject("horizontal", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap vertical {
+            get {
+                object obj = ResourceManager.GetObject("vertical", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }		
     }
 }

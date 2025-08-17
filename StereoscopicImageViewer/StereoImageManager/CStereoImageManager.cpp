@@ -7,110 +7,118 @@
 CStereoImageManager::CStereoImageManager(HWND hWnd)
 {
 	mHWnd = hWnd;
-	mStereoDirect3D = new CStereoDirect3D(hWnd);
+	mStereoDirect2D = new CStereoDirect2D(hWnd);
 	mComPortName = std::wstring(L"");
 	mComPort = NULL;
 	//----------------------------------------------------
 	mLeftImage = NULL;
 	mRightImage = NULL;
 	//----------------------------------------------------
-	m_ThreadRunning.store(false);
-	m_Thread = nullptr;
+	mMutexRender1 = new std::mutex();
+	mMutexRender2 = new std::mutex();
+	mThreadRenderRunning.store(false);
+	mThreadRender = nullptr;
+	mMutexCOMPort = new std::mutex();
 	//----------------------------------------------------
 	mImageToPlayIsLeft = true;
 	//----------------------------------------------------
 }
 CStereoImageManager::~CStereoImageManager()
 {
-	Stop();
+	StereoStop();
 	//----------------------------------------------------
-	if (mRightImage != NULL)
-	{
-		delete mRightImage;
-		mRightImage = NULL;
-	}
-	//----------------------------------------------------
-	if (mLeftImage != NULL)
-	{
-		delete mLeftImage;
-		mLeftImage = NULL;
-	}
-	//----------------------------------------------------
+	std::unique_lock<std::mutex> lock1(*mMutexCOMPort); // Lock the mutex
 	if (mComPort != NULL)
 	{
 		delete mComPort;
 		mComPort = NULL;
 	}
+	lock1.unlock();
 	//----------------------------------------------------
-	if (mStereoDirect3D != NULL)
+	std::unique_lock<std::mutex> lock2(*mMutexRender1); // Lock the mutex
+	std::unique_lock<std::mutex> lock5(*mMutexRender2); // Lock the mutex
+	if (mStereoDirect2D != NULL)
 	{
-		delete mStereoDirect3D;
-		mStereoDirect3D = NULL;
+		delete mStereoDirect2D;
+		mStereoDirect2D = NULL;
+	}
+	if (mRightImage != NULL)
+	{
+		delete mRightImage;
+		mRightImage = NULL;
+	}
+	if (mLeftImage != NULL)
+	{
+		delete mLeftImage;
+		mLeftImage = NULL;
+	}
+	lock5.unlock();
+	lock2.unlock();
+	//----------------------------------------------------
+	if (mMutexCOMPort != nullptr)
+	{
+		delete mMutexCOMPort;
+		mMutexCOMPort = nullptr;
+	}
+	//----------------------------------------------------
+	if (mMutexRender2 != nullptr)
+	{
+		delete mMutexRender2;
+		mMutexRender2 = nullptr;
+	}
+	//----------------------------------------------------
+	if (mMutexRender1 != nullptr)
+	{
+		delete mMutexRender1;
+		mMutexRender1 = nullptr;
 	}
 }
-void CStereoImageManager::DrawImage(LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+void CStereoImageManager::StereoStart()
 {
-	mLeftImage = CImage::LoadImage(std::wstring(leftImageFilePath), true);
-	mRightImage = CImage::LoadImage(std::wstring(rightImageFilePath), false);
-	//----------------------------------------------
-	CStereoDirect3D::ImageData left = { mLeftImage->PixelData.data(), mLeftImage->Width, mLeftImage->Height, mLeftImage->Channels, nullptr, nullptr };
-	CStereoDirect3D::ImageData right = { mRightImage->PixelData.data(), mRightImage->Width, mRightImage->Height, mRightImage->Channels, nullptr, nullptr };
-	mStereoDirect3D->DrawImage(left, right);
-	//----------------------------------------------
-	mImageToPlayIsLeft = true;
-}
-void CStereoImageManager::VideoRender()
-{
-	mImageToPlayIsLeft = !mImageToPlayIsLeft;
-	if (mStereoDirect3D != NULL)
+	if (!mThreadRenderRunning.load())
 	{
-		mStereoDirect3D->Blt(mImageToPlayIsLeft);
+		mThreadRenderRunning = true;
+		mThreadRender = new std::thread(&CStereoImageManager::ThreadRenderFunction, this);
 	}
-	if (mImageToPlayIsLeft)
+}
+void CStereoImageManager::StereoStop()
+{
+	if (mThreadRenderRunning.load())
 	{
-		if (mComPort != NULL)
+		mThreadRenderRunning.store(false);
+		if (mThreadRender && mThreadRender->joinable())
 		{
-			mComPort->SendSync();
+			mThreadRender->join();
 		}
+		delete mThreadRender;
+		mThreadRender = nullptr;
 	}
-}
-void CStereoImageManager::Start()
-{
-	if (!m_ThreadRunning.load())
+	std::unique_lock<std::mutex> lock1(*mMutexRender1); // Lock the mutex
+	if (mStereoDirect2D != NULL)
 	{
-		m_ThreadRunning = true;
-		m_Thread = new std::thread(&CStereoImageManager::ThreadFunction, this);
+		mStereoDirect2D->Blt(TRUE, this, nullptr);
 	}
+	lock1.unlock();
 }
-void CStereoImageManager::Stop()
+BOOL CStereoImageManager::StereoIsStarted()
 {
-	if (m_ThreadRunning.load())
+	return mThreadRenderRunning.load();
+}
+int CStereoImageManager::StereoGetFrequency()
+{
+	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
+	if (mStereoDirect2D != NULL)
 	{
-		m_ThreadRunning = false;
-
-		if (m_Thread && m_Thread->joinable())
-		{
-			m_Thread->join();
-		}
-		delete m_Thread;
-		m_Thread = nullptr;
+		return mStereoDirect2D->GetFrequency();
 	}
+	lock1.unlock();
+	return 0;
 }
-BOOL CStereoImageManager::IsStarted()
-{
-	return m_ThreadRunning.load();
-}
-int CStereoImageManager::GetFrequency()
-{
-	if (mStereoDirect3D != NULL)
-	{
-		return mStereoDirect3D->GetFrequency();
-	}
-}
-void CStereoImageManager::SetCOMPort(LPCWSTR comPort)
+void CStereoImageManager::StereoSetCOMPort(LPCWSTR comPort)
 {
 	if (mComPortName != std::wstring(comPort))
 	{
+		std::unique_lock<std::mutex> lock1(*mMutexCOMPort); // Lock the mutex
 		if (mComPort != NULL)
 		{
 			delete mComPort;
@@ -118,25 +126,99 @@ void CStereoImageManager::SetCOMPort(LPCWSTR comPort)
 		}
 		mComPort = new CComPort(std::wstring(comPort));
 		mComPortName = std::wstring(comPort);
+		lock1.unlock();
 	}
 }
-void CStereoImageManager::SetGlassesTimeOffset(int offset)
+void CStereoImageManager::StereoSetGlassesTimeOffset(int offset)
 {
+	std::unique_lock<std::mutex> lock1(*mMutexCOMPort); // Lock the mutex
 	if (mComPort != NULL)
 	{
 		mComPort->SendGlassesTimeOffset(offset);
 	}
+	lock1.unlock();
 }
-void CStereoImageManager::SetTransparentTimePercent(int percent)
+void CStereoImageManager::StereoLRBoth(int lrboth)
 {
+	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
+	if (mStereoDirect2D != NULL)
+	{
+		mStereoDirect2D->StereoLRBoth(lrboth);
+	}
+	lock1.unlock();
+}
+void CStereoImageManager::StereoSwapLR(BOOL swaplr)
+{
+	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
+	if (mStereoDirect2D != NULL)
+	{
+		mStereoDirect2D->StereoSwapLR(swaplr);
+	}
+	lock1.unlock();
+}
+void CStereoImageManager::StereoWindowSizeChanged()
+{
+	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
+	if (mStereoDirect2D != NULL)
+	{
+		mStereoDirect2D->StereoWindowSizeChanged();
+	}
+	lock1.unlock();
+}
+void CStereoImageManager::ImagerProvideImages(LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+{
+	mLeftImage = CImage::LoadImage(std::wstring(leftImageFilePath), true);
+	mRightImage = CImage::LoadImage(std::wstring(rightImageFilePath), false);
+	//----------------------------------------------
+	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
+	if (mStereoDirect2D != NULL)
+	{
+		mStereoDirect2D->DrawImage(mLeftImage, mRightImage);
+	}
+	lock1.unlock();
+	//----------------------------------------------
+	mImageToPlayIsLeft = true;
+}
+void CStereoImageManager::ThreadRenderFunction()
+{
+	while (mThreadRenderRunning.load())
+	{
+		std::unique_lock<std::mutex> lock1(*mMutexRender1); // Lock the mutex
+		mImageToPlayIsLeft = !mImageToPlayIsLeft;
+		if (mStereoDirect2D != NULL)
+		{
+			mStereoDirect2D->Blt(mImageToPlayIsLeft, this, SendSyncStatic);
+		}
+		lock1.unlock();
+	}
+}
+void CStereoImageManager::SendSyncStatic(void* user, int syncType)
+{
+	if (user == NULL) return;
+	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)user;
+	cStereoImageManager->SendSync(syncType);
+}
+void CStereoImageManager::SendSync(int syncType)
+{
+	std::unique_lock<std::mutex> lock1(*mMutexCOMPort); // Lock the mutex
 	if (mComPort != NULL)
 	{
-		mComPort->SendTransparentTimePercent(percent);
+		mComPort->SendSync(syncType);
 	}
+	lock1.unlock();
 }
-void CStereoImageManager::ThreadFunction() {
-	while (m_ThreadRunning.load()) 
-	{
-		VideoRender();
-	}
-}
+
+
+//if (mThreadRenderRunning.load())
+//{
+//	std::unique_lock<std::mutex> lock1(*mMutexRender2); // Lock the mutex
+//	if (mStereoDirect2D != NULL)
+//	{
+//		mStereoDirect2D->DrawImage(frame);
+//	}
+//	lock1.unlock();
+//}
+//else
+//{
+//	av_frame_free(&frame);
+//}

@@ -24,18 +24,12 @@
     <ClInclude Include="CComPort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CTools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CComPort.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

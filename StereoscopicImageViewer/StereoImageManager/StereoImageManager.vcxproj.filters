@@ -27,9 +27,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StereoImageManagerWrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CStereoImageManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StereoImageManagerWrap.cpp">

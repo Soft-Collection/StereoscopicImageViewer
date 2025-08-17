@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "CComPort.h"
-#include "CTools.h"
+#include "../Common/CTools.h"
 
 CComPort::CComPort(std::wstring comPortName)
 {
-    mHComMutex = new std::mutex();
-    std::unique_lock<std::mutex> lock1(*mHComMutex); // Lock the mutex
+    mMutexSend = new std::mutex();
+    //-------------------------------------------------------------------
     std::wstring portNameW = std::wstring(L"\\\\.\\") + comPortName;
     std::string portNameA = CTools::ConvertUnicodeToMultibyte(portNameW);
     // Open the COM port
@@ -32,7 +32,7 @@ CComPort::CComPort(std::wstring comPortName)
         }
         return;
     }
-    dcb.BaudRate = CBR_115200; // Set baud rate to 115200
+    dcb.BaudRate = CBR_9600; // Set baud rate to 115200
     dcb.ByteSize = 8;          // 8 data bits
     dcb.Parity = NOPARITY;     // No parity
     dcb.StopBits = ONESTOPBIT; // 1 stop bit
@@ -45,26 +45,23 @@ CComPort::CComPort(std::wstring comPortName)
         }
         return;
     }
-    lock1.unlock();
 }
 CComPort::~CComPort()
 {
-    std::unique_lock<std::mutex> lock1(*mHComMutex); // Lock the mutex
     if (mHCom != INVALID_HANDLE_VALUE)
     {
         CloseHandle(mHCom);
         mHCom = INVALID_HANDLE_VALUE;
     }
-    lock1.unlock();
-    if (mHComMutex != nullptr)
+    if (mMutexSend != nullptr)
     {
-        delete mHComMutex;
-        mHComMutex = nullptr;
+        delete mMutexSend;
+        mMutexSend = nullptr;
     }
 }
 void CComPort::Send(BYTE* command, int length)
 {
-    std::unique_lock<std::mutex> lock1(*mHComMutex); // Lock the mutex
+    std::unique_lock<std::mutex> lock1(*mMutexSend); // Lock the mutex
     if (mHCom != INVALID_HANDLE_VALUE)
     {
         DWORD bytesWritten;
@@ -89,23 +86,15 @@ void CComPort::Send(BYTE* command, int length)
     }
     lock1.unlock();
 }
-void CComPort::SendSync()
+void CComPort::SendSync(int syncType)
 {
-    BYTE command[] = { 0x54, 0xED, eCommandTypes::Frequency, 0x00 };
-    command[3] = command[0] + command[1] + command[2];
-    Send(command, 4);
+    BYTE command[1];
+    command[0] = syncType + 105;
+    Send(command, 1);
 }
 void CComPort::SendGlassesTimeOffset(int offset)
 {
-    BYTE command[] = { 0x54, 0xED, eCommandTypes::GlassesTimeOffset, 0x00, 0x00 };
-    command[3] = offset;
-    command[4] = command[0] + command[1] + command[2] + command[3];
-    Send(command, 5);
-}
-void CComPort::SendTransparentTimePercent(int percent)
-{
-    BYTE command[] = { 0x54, 0xED, eCommandTypes::TransparentTimePercent, 0x00, 0x00 };
-    command[3] = percent;
-    command[4] = command[0] + command[1] + command[2] + command[3];
-    Send(command, 5);
+    BYTE command[1];
+    command[0] = offset;
+    Send(command, 1);
 }

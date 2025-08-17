@@ -21,7 +21,7 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CStereoDirect3D.h">
+    <ClInclude Include="CStereoDirect2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CStereoDirect3D.cpp">
+    <ClCompile Include="CStereoDirect2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

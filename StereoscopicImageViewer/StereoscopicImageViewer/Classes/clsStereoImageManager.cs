@@ -23,63 +23,77 @@ public class clsStereoImageManager
     #endregion
 
     #region Methods
-    public void DrawImage(string leftImageFilePath, string rightImageFilePath)
+    public void StereoStart()
     {
         if (mHandle != IntPtr.Zero)
         {
-            clsStereoImageManagerWrap.StereoImageManagerDrawImage(mHandle, leftImageFilePath, rightImageFilePath);
+            clsStereoImageManagerWrap.StereoImageManagerStereoStart(mHandle);
         }
     }
-    public void Start()
+    public void StereoStop()
     {
         if (mHandle != IntPtr.Zero)
         {
-            clsStereoImageManagerWrap.StereoImageManagerStart(mHandle);
+            clsStereoImageManagerWrap.StereoImageManagerStereoStop(mHandle);
         }
     }
-    public void Stop()
+    public bool StereoIsStarted()
     {
         if (mHandle != IntPtr.Zero)
         {
-            clsStereoImageManagerWrap.StereoImageManagerStop(mHandle);
-        }
-    }
-    public bool IsStarted()
-    {
-        if (mHandle != IntPtr.Zero)
-        {
-            return clsStereoImageManagerWrap.StereoImageManagerIsStarted(mHandle);
+            return clsStereoImageManagerWrap.StereoImageManagerStereoIsStarted(mHandle);
         }
         return false;
     }
-    public int GetFrequency()
+    public int StereoGetFrequency()
     {
         if (mHandle != IntPtr.Zero)
         {
-            return clsStereoImageManagerWrap.StereoImageManagerGetFrequency(mHandle);
+            return clsStereoImageManagerWrap.StereoImageManagerStereoGetFrequency(mHandle);
         }
         return 0;
     }
-    public void SetCOMPort(string comPort)
+    public void StereoSetCOMPort(string comPort)
     {
         if (mHandle != IntPtr.Zero)
         {
-            clsStereoImageManagerWrap.StereoImageManagerSetCOMPort(mHandle, comPort);
+            clsStereoImageManagerWrap.StereoImageManagerStereoSetCOMPort(mHandle, comPort);
         }
     }
-    public void SetGlassesTimeOffset(int offset)
+    public void StereoSetGlassesTimeOffset(int offset)
     {
         if (mHandle != IntPtr.Zero)
         {
-            clsStereoImageManagerWrap.StereoImageManagerSetGlassesTimeOffset(mHandle, offset);
+            clsStereoImageManagerWrap.StereoImageManagerStereoSetGlassesTimeOffset(mHandle, offset);
         }
     }
-    public void SetTransparentTimePercent(int percent)
+    public void StereoLRBoth(int lrboth)
     {
         if (mHandle != IntPtr.Zero)
         {
-            clsStereoImageManagerWrap.StereoImageManagerSetTransparentTimePercent(mHandle, percent);
+            clsStereoImageManagerWrap.StereoImageManagerStereoLRBoth(mHandle, lrboth);
         }
     }
+    public void StereoSwapLR(bool swaplr)
+    {
+        if (mHandle != IntPtr.Zero)
+        {
+            clsStereoImageManagerWrap.StereoImageManagerStereoSwapLR(mHandle, swaplr);
+        }
+    }
+    public void StereoWindowSizeChanged()
+    {
+        if (mHandle != IntPtr.Zero)
+        {
+            clsStereoImageManagerWrap.StereoImageManagerStereoWindowSizeChanged(mHandle);
+        }
+    }
+    public void ImagerProvideImages(string leftImageFilePath, string rightImageFilePath)
+    {
+        if (mHandle != IntPtr.Zero)
+        {
+            clsStereoImageManagerWrap.StereoImageManagerImagerProvideImages(mHandle, leftImageFilePath, rightImageFilePath);
+        }
+    }    
     #endregion
 }

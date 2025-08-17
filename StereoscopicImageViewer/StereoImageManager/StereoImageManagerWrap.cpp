@@ -12,51 +12,63 @@ void StereoImageManagerDispose(void* handle)
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
 	delete cStereoImageManager;
 }
-void StereoImageManagerDrawImage(void* handle, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+void StereoImageManagerStereoStart(void* handle)
 {
 	if (handle == NULL) return;
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	cStereoImageManager->DrawImage(leftImageFilePath, rightImageFilePath);
+	cStereoImageManager->StereoStart();
 }
-void StereoImageManagerStart(void* handle)
+void StereoImageManagerStereoStop(void* handle)
 {
 	if (handle == NULL) return;
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	cStereoImageManager->Start();
+	cStereoImageManager->StereoStop();
 }
-void StereoImageManagerStop(void* handle)
-{
-	if (handle == NULL) return;
-	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	cStereoImageManager->Stop();
-}
-BOOL StereoImageManagerIsStarted(void* handle)
+BOOL StereoImageManagerStereoIsStarted(void* handle)
 {
 	if (handle == NULL) return false;
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	return(cStereoImageManager->IsStarted());
+	return(cStereoImageManager->StereoIsStarted());
 }
-int StereoImageManagerGetFrequency(void* handle)
+int StereoImageManagerStereoGetFrequency(void* handle)
 {
 	if (handle == NULL) return 0;
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	return(cStereoImageManager->GetFrequency());
+	return(cStereoImageManager->StereoGetFrequency());
 }
-void StereoImageManagerSetCOMPort(void* handle, LPCWSTR comPort)
+void StereoImageManagerStereoSetCOMPort(void* handle, LPCWSTR comPort)
 {
 	if (handle == NULL) return;
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	cStereoImageManager->SetCOMPort(comPort);
+	cStereoImageManager->StereoSetCOMPort(comPort);
 }
-void StereoImageManagerSetGlassesTimeOffset(void* handle, int offset)
+void StereoImageManagerStereoSetGlassesTimeOffset(void* handle, int offset)
 {
 	if (handle == NULL) return;
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	cStereoImageManager->SetGlassesTimeOffset(offset);
+	cStereoImageManager->StereoSetGlassesTimeOffset(offset);
 }
-void StereoImageManagerSetTransparentTimePercent(void* handle, int percent)
+void StereoImageManagerStereoLRBoth(void* handle, int lrboth)
 {
 	if (handle == NULL) return;
 	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
-	cStereoImageManager->SetTransparentTimePercent(percent);
+	cStereoImageManager->StereoLRBoth(lrboth);
+}
+void StereoImageManagerStereoSwapLR(void* handle, BOOL swaplr)
+{
+	if (handle == NULL) return;
+	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
+	cStereoImageManager->StereoSwapLR(swaplr);
+}
+void StereoImageManagerStereoWindowSizeChanged(void* handle)
+{
+	if (handle == NULL) return;
+	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
+	cStereoImageManager->StereoWindowSizeChanged();
+}
+void StereoImageManagerImagerProvideImages(void* handle, LPCWSTR leftImageFilePath, LPCWSTR rightImageFilePath)
+{
+	if (handle == NULL) return;
+	CStereoImageManager* cStereoImageManager = (CStereoImageManager*)handle;
+	cStereoImageManager->ImagerProvideImages(leftImageFilePath, rightImageFilePath);
 }

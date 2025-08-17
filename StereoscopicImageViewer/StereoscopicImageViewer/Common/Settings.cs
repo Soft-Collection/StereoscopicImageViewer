@@ -15,7 +15,8 @@ namespace StereoscopicImageViewer
         private static string FolderPathValue = string.Empty;
         private static string ComPortValue = "COM1";
         private static int GlassesTimeOffsetValue = 0;
-        private static int TransparentTimePercentValue = 70;
+        private static bool SwapLRValue = false;
+        private static int LRBothValue = 0;
 
         //Location Property.
         public static Point Location
@@ -170,21 +171,39 @@ namespace StereoscopicImageViewer
             }
         }
 
-        //Transparent Time Percent
-        public static int TransparentTimePercent
+        //SwapLR Property.
+        public static bool SwapLR
         {
             get
             {
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
                 if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
-                TransparentTimePercentValue = (int)key.GetValue("TransparentTimePercent", 70);
-                return (TransparentTimePercentValue);
+                SwapLRValue = Boolean.Parse((string)key.GetValue("SwapLR", "False"));
+                return (SwapLRValue);
             }
             set
             {
-                TransparentTimePercentValue = value;
+                SwapLRValue = value;
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
-                key.SetValue("TransparentTimePercent", TransparentTimePercentValue);
+                key.SetValue("SwapLR", SwapLRValue.ToString());
+            }
+        }
+
+        //LRBoth Property.
+        public static int LRBoth
+        {
+            get
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                LRBothValue = (int)key.GetValue("LRBoth", 0);
+                return (LRBothValue);
+            }
+            set
+            {
+                LRBothValue = value;
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
+                key.SetValue("LRBoth", LRBothValue);
             }
         }
     }
