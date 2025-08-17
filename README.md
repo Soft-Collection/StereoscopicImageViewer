@@ -14,7 +14,8 @@ It consists of two projects:
 
 **Please note:** In the folder with stereo images, image for left eye must have extension **.left.png** and image for right eye must have extension **.right.png**
 For example: **my_photo.left.png** and **my_photo.right.png**.
-Left and Right images must be the same size.
+Left and Right images must be the same size.  
+**Please be aware that 3D Glasses may be incompatible with specific Monitor!**
 
 ![Connection Diagram](Images/StereoscopicImageViewer.png)
 
