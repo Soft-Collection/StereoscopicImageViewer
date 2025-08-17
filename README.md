@@ -19,8 +19,19 @@ Left and Right images must be the same size.
 
 ![Connection Diagram](Images/StereoscopicImageViewer.png)
 
-![Connection Diagram](Images/Connection%20Diagram.png)
+**5V Version**  
+![Connection Diagram](Images/5V/Connection%20Diagram.png)
 
-![Connection Diagram](Images/AssembledDevice.png)
+![Connection Diagram](Images/5V/AssembledDevice.png)
 
-![Connection Diagram](Images/DeviceInBox.png)
+![Connection Diagram](Images/5V/DeviceInBox.png)
+
+**10V Version**  
+![Connection Diagram](Images/10V/Connection%20Diagram.png)
+
+![Connection Diagram](Images/10V/AssembledDevice.png)
+
+**3D Glasses**  
+![Connection Diagram](Images/10V/3DGlassesFront.png)
+
+![Connection Diagram](Images/10V/3DGlassesBack.png)
