@@ -257,9 +257,8 @@ void CStereoDirect2D::Blt(BOOL isLeft, void* user, dSendSync sendSync)
 		m_D2DContext->Clear(D2D1::ColorF(D2D1::ColorF::Gray));
 	}
 	m_D2DContext->EndDraw();
-	if (sendSync) sendSync(user, isLeft ? SYNC_LEFT_TRANSPARENT : SYNC_RIGHT_TRANSPARENT);
 	m_SwapChain->Present(1, 0);
-	if (sendSync) sendSync(user, isLeft ? SYNC_LEFT_OPAQUE : SYNC_RIGHT_OPAQUE);
+	if (sendSync) sendSync(user, isLeft);
 	MeasureFrequencyInHz();
 }
 INT CStereoDirect2D::GetFrequency()

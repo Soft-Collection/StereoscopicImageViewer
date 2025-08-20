@@ -20,7 +20,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-typedef void(*dSendSync)(void* user, int syncType);
+typedef void(*dSendSync)(void* user, bool isLeft);
 
 class CStereoDirect2D
 {

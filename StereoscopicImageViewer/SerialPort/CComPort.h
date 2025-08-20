@@ -15,12 +15,14 @@ class CComPort
 private:
 	HANDLE mHCom;
 	std::mutex* mMutexSend;
+	INT mRefreshmentRateOfMainMonitorInHz;
+	INT mSyncMessageLength;
 private:
 	void Send(BYTE* command, int length);
 public:
 	CComPort(std::wstring comPortName);
 	~CComPort();
-	void SendSync(int syncType);
+	void SendSync(bool isLeft);
 	void SendGlassesTimeOffset(int offset);
 };
 

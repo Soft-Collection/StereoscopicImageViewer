@@ -29,8 +29,8 @@ private:
 	//----------------------------------------
 private:
 	void ThreadRenderFunction();
-	static void SendSyncStatic(void* user, int syncType);
-	void SendSync(int syncType);
+	static void SendSyncStatic(void* user, bool isLeft);
+	void SendSync(bool isLeft);
 public:
 	CStereoImageManager(HWND hWnd);
 	~CStereoImageManager();

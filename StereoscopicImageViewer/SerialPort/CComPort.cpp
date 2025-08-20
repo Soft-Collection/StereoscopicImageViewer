@@ -2,6 +2,8 @@
 #include "CComPort.h"
 #include "../Common/CTools.h"
 
+#define BAUD_RATE CBR_9600
+
 CComPort::CComPort(std::wstring comPortName)
 {
     mMutexSend = new std::mutex();
@@ -32,7 +34,7 @@ CComPort::CComPort(std::wstring comPortName)
         }
         return;
     }
-    dcb.BaudRate = CBR_9600; // Set baud rate to 115200
+    dcb.BaudRate = BAUD_RATE;  // Set baud rate
     dcb.ByteSize = 8;          // 8 data bits
     dcb.Parity = NOPARITY;     // No parity
     dcb.StopBits = ONESTOPBIT; // 1 stop bit
@@ -45,6 +47,9 @@ CComPort::CComPort(std::wstring comPortName)
         }
         return;
     }
+    //-------------------------------------------------------------------
+    mRefreshmentRateOfMainMonitorInHz = CTools::GetRefreshmentRateOfMainMonitorInHz();
+    mSyncMessageLength = BAUD_RATE / mRefreshmentRateOfMainMonitorInHz / 8 / 2;
 }
 CComPort::~CComPort()
 {
@@ -86,11 +91,13 @@ void CComPort::Send(BYTE* command, int length)
     }
     lock1.unlock();
 }
-void CComPort::SendSync(int syncType)
+void CComPort::SendSync(bool isLeft)
 {
-    BYTE command[1];
-    command[0] = syncType + 105;
-    Send(command, 1);
+    BYTE command[64] = { 0, };
+    for (int i = 0; i < sizeof(command); i++) command[i] = 255;
+    command[0] = isLeft ? 105 + SYNC_LEFT_TRANSPARENT : 105 + SYNC_RIGHT_TRANSPARENT;
+    command[mSyncMessageLength - 1] = isLeft ? 105 + SYNC_LEFT_OPAQUE : 105 + SYNC_RIGHT_OPAQUE;
+    Send(command, mSyncMessageLength);
 }
 void CComPort::SendGlassesTimeOffset(int offset)
 {

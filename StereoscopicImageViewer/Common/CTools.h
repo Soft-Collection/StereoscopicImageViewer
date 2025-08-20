@@ -9,6 +9,7 @@ class CTools
 {
 public:
 	static std::string ConvertUnicodeToMultibyte(const std::wstring& wstr);
+	static INT CTools::GetRefreshmentRateOfMainMonitorInHz();
 };
 
 #endif // __CTOOLS_H__
