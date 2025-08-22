@@ -275,6 +275,8 @@ namespace StereoscopicImageViewer
         private bool mResizeAlreadyApplied = true;
         private bool mLastIsDirectoryExists = false;
         private bool mLastIsCOMPortSelected = false;
+        private eMainStates mMainState = eMainStates.ImagesFolderNotOpened;
+        private eMainStates mLastMainState = eMainStates.ImagesFolderNotOpened;
         private string mLeftImagePath = null;
         private string mRightImagePath = null;
         #endregion
@@ -341,7 +343,11 @@ namespace StereoscopicImageViewer
             bool isDirectoryExists = Directory.Exists(Settings.FolderPath);
             if (mLastIsDirectoryExists != isDirectoryExists)
             {
-                if (!isDirectoryExists)
+                if (isDirectoryExists)
+                {
+                    SetMainState((cppComPortPanel.IsCOMPortSelected) ? mLastMainState : eMainStates.COMPortNotSelected);
+                }
+                else
                 {
                     SetMainState(eMainStates.ImagesFolderNotOpened);
                 }
@@ -494,6 +500,8 @@ namespace StereoscopicImageViewer
         #region Methods
         private void SetMainState(eMainStates mainState)
         {
+            mLastMainState = mMainState;
+            mMainState = mainState;
             switch (mainState)
             {
                 case eMainStates.ImagesFolderNotOpened:
