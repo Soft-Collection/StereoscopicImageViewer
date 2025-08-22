@@ -52,24 +52,29 @@
             this.tsslFrequency = new System.Windows.Forms.ToolStripStatusLabel();
             this.timerFrequency = new System.Windows.Forms.Timer(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.gtopGlassesTimeOffsetPanel = new StereoscopicImageViewer.GlassesTimeOffsetPanel();
             this.timerSendSettings = new System.Windows.Forms.Timer(this.components);
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.ppPlayerPanel = new StereoscopicImageViewer.ImagerPanel();
-            this.cppComPortPanel = new StereoscopicImageViewer.COMPortPanel();
-            this.sbpStereoButtonsPanel = new StereoscopicImageViewer.StereoButtonsPanel();
             this.bOpen = new System.Windows.Forms.Button();
             this.timerGUIStereoPlayer = new System.Windows.Forms.Timer(this.components);
             this.ttControls = new System.Windows.Forms.ToolTip(this.components);
             this.lvStereoImages = new System.Windows.Forms.ListView();
             this.pbVideoPanel = new System.Windows.Forms.PictureBox();
             this.fbdOpenFolder = new System.Windows.Forms.FolderBrowserDialog();
+            this.spSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.ppPlayerPanel = new StereoscopicImageViewer.ImagerPanel();
+            this.cppComPortPanel = new StereoscopicImageViewer.COMPortPanel();
+            this.sbpStereoButtonsPanel = new StereoscopicImageViewer.StereoButtonsPanel();
+            this.gtopGlassesTimeOffsetPanel = new StereoscopicImageViewer.GlassesTimeOffsetPanel();
             this.popUpMenu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbVideoPanel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.spSplitContainer)).BeginInit();
+            this.spSplitContainer.Panel1.SuspendLayout();
+            this.spSplitContainer.Panel2.SuspendLayout();
+            this.spSplitContainer.SuspendLayout();
             this.SuspendLayout();
             // 
             // popUpMenu
@@ -245,17 +250,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Glasses Time Offset";
             // 
-            // gtopGlassesTimeOffsetPanel
-            // 
-            this.gtopGlassesTimeOffsetPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gtopGlassesTimeOffsetPanel.Location = new System.Drawing.Point(7, 20);
-            this.gtopGlassesTimeOffsetPanel.Name = "gtopGlassesTimeOffsetPanel";
-            this.gtopGlassesTimeOffsetPanel.Size = new System.Drawing.Size(580, 24);
-            this.gtopGlassesTimeOffsetPanel.TabIndex = 0;
-            this.gtopGlassesTimeOffsetPanel.TimeOffset = 0;
-            this.gtopGlassesTimeOffsetPanel.OnTimeOffset += new System.EventHandler<StereoscopicImageViewer.GlassesTimeOffsetPanel.TimeOffsetEventArgs>(this.gtopGlassesTimeOffsetPanel_OnTimeOffset);
-            // 
             // timerSendSettings
             // 
             this.timerSendSettings.Tick += new System.EventHandler(this.timerSendSettings_Tick);
@@ -276,6 +270,78 @@
             this.groupBox3.TabIndex = 35;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Player Controls";
+            // 
+            // bOpen
+            // 
+            this.bOpen.BackgroundImage = global::StereoscopicImageViewer.Properties.Resources.open;
+            this.bOpen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.bOpen.FlatAppearance.BorderSize = 0;
+            this.bOpen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bOpen.Location = new System.Drawing.Point(7, 13);
+            this.bOpen.Name = "bOpen";
+            this.bOpen.Size = new System.Drawing.Size(26, 26);
+            this.bOpen.TabIndex = 35;
+            this.bOpen.UseVisualStyleBackColor = true;
+            this.bOpen.Click += new System.EventHandler(this.bOpen_Click);
+            this.bOpen.MouseEnter += new System.EventHandler(this.bOpen_MouseEnter);
+            // 
+            // timerGUIStereoPlayer
+            // 
+            this.timerGUIStereoPlayer.Tick += new System.EventHandler(this.timerGUIStereoPlayer_Tick);
+            // 
+            // ttControls
+            // 
+            this.ttControls.AutoPopDelay = 5000;
+            this.ttControls.InitialDelay = 500;
+            this.ttControls.ReshowDelay = 100;
+            // 
+            // lvStereoImages
+            // 
+            this.lvStereoImages.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.lvStereoImages.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvStereoImages.HideSelection = false;
+            this.lvStereoImages.Location = new System.Drawing.Point(0, 0);
+            this.lvStereoImages.MultiSelect = false;
+            this.lvStereoImages.Name = "lvStereoImages";
+            this.lvStereoImages.Size = new System.Drawing.Size(200, 340);
+            this.lvStereoImages.TabIndex = 38;
+            this.lvStereoImages.UseCompatibleStateImageBehavior = false;
+            this.lvStereoImages.View = System.Windows.Forms.View.List;
+            this.lvStereoImages.SelectedIndexChanged += new System.EventHandler(this.lvStereoImages_SelectedIndexChanged);
+            // 
+            // pbVideoPanel
+            // 
+            this.pbVideoPanel.BackColor = System.Drawing.Color.Gray;
+            this.pbVideoPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pbVideoPanel.Location = new System.Drawing.Point(0, 0);
+            this.pbVideoPanel.Name = "pbVideoPanel";
+            this.pbVideoPanel.Size = new System.Drawing.Size(400, 340);
+            this.pbVideoPanel.TabIndex = 37;
+            this.pbVideoPanel.TabStop = false;
+            this.pbVideoPanel.SizeChanged += new System.EventHandler(this.pbVideoPanel_SizeChanged);
+            // 
+            // spSplitContainer
+            // 
+            this.spSplitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.spSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.spSplitContainer.Location = new System.Drawing.Point(0, 24);
+            this.spSplitContainer.Name = "spSplitContainer";
+            // 
+            // spSplitContainer.Panel1
+            // 
+            this.spSplitContainer.Panel1.Controls.Add(this.lvStereoImages);
+            this.spSplitContainer.Panel1MinSize = 0;
+            // 
+            // spSplitContainer.Panel2
+            // 
+            this.spSplitContainer.Panel2.Controls.Add(this.pbVideoPanel);
+            this.spSplitContainer.Panel2MinSize = 200;
+            this.spSplitContainer.Size = new System.Drawing.Size(604, 340);
+            this.spSplitContainer.SplitterDistance = 200;
+            this.spSplitContainer.TabIndex = 39;
+            this.spSplitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.spSplitContainer_SplitterMoved);
             // 
             // ppPlayerPanel
             // 
@@ -310,57 +376,16 @@
             this.sbpStereoButtonsPanel.OnNoSwap += new System.EventHandler(this.sbpStereoButtonsPanel_OnNoSwap);
             this.sbpStereoButtonsPanel.OnSwap += new System.EventHandler(this.sbpStereoButtonsPanel_OnSwap);
             // 
-            // bOpen
+            // gtopGlassesTimeOffsetPanel
             // 
-            this.bOpen.BackgroundImage = global::StereoscopicImageViewer.Properties.Resources.open;
-            this.bOpen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.bOpen.FlatAppearance.BorderSize = 0;
-            this.bOpen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bOpen.Location = new System.Drawing.Point(7, 13);
-            this.bOpen.Name = "bOpen";
-            this.bOpen.Size = new System.Drawing.Size(26, 26);
-            this.bOpen.TabIndex = 35;
-            this.bOpen.UseVisualStyleBackColor = true;
-            this.bOpen.Click += new System.EventHandler(this.bOpen_Click);
-            this.bOpen.MouseEnter += new System.EventHandler(this.bOpen_MouseEnter);
-            // 
-            // timerGUIStereoPlayer
-            // 
-            this.timerGUIStereoPlayer.Tick += new System.EventHandler(this.timerGUIStereoPlayer_Tick);
-            // 
-            // ttControls
-            // 
-            this.ttControls.AutoPopDelay = 5000;
-            this.ttControls.InitialDelay = 500;
-            this.ttControls.ReshowDelay = 100;
-            // 
-            // lvStereoImages
-            // 
-            this.lvStereoImages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lvStereoImages.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.lvStereoImages.HideSelection = false;
-            this.lvStereoImages.Location = new System.Drawing.Point(0, 25);
-            this.lvStereoImages.MultiSelect = false;
-            this.lvStereoImages.Name = "lvStereoImages";
-            this.lvStereoImages.Size = new System.Drawing.Size(187, 339);
-            this.lvStereoImages.TabIndex = 38;
-            this.lvStereoImages.UseCompatibleStateImageBehavior = false;
-            this.lvStereoImages.View = System.Windows.Forms.View.List;
-            this.lvStereoImages.SelectedIndexChanged += new System.EventHandler(this.lvStereoImages_SelectedIndexChanged);
-            // 
-            // pbVideoPanel
-            // 
-            this.pbVideoPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.gtopGlassesTimeOffsetPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbVideoPanel.BackColor = System.Drawing.Color.Gray;
-            this.pbVideoPanel.Location = new System.Drawing.Point(193, 25);
-            this.pbVideoPanel.Name = "pbVideoPanel";
-            this.pbVideoPanel.Size = new System.Drawing.Size(411, 339);
-            this.pbVideoPanel.TabIndex = 37;
-            this.pbVideoPanel.TabStop = false;
-            this.pbVideoPanel.SizeChanged += new System.EventHandler(this.pbVideoPanel_SizeChanged);
+            this.gtopGlassesTimeOffsetPanel.Location = new System.Drawing.Point(7, 20);
+            this.gtopGlassesTimeOffsetPanel.Name = "gtopGlassesTimeOffsetPanel";
+            this.gtopGlassesTimeOffsetPanel.Size = new System.Drawing.Size(580, 24);
+            this.gtopGlassesTimeOffsetPanel.TabIndex = 0;
+            this.gtopGlassesTimeOffsetPanel.TimeOffset = 0;
+            this.gtopGlassesTimeOffsetPanel.OnTimeOffset += new System.EventHandler<StereoscopicImageViewer.GlassesTimeOffsetPanel.TimeOffsetEventArgs>(this.gtopGlassesTimeOffsetPanel_OnTimeOffset);
             // 
             // MainFrm
             // 
@@ -368,8 +393,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(604, 495);
-            this.Controls.Add(this.lvStereoImages);
-            this.Controls.Add(this.pbVideoPanel);
+            this.Controls.Add(this.spSplitContainer);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.statusStrip);
@@ -392,6 +416,10 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbVideoPanel)).EndInit();
+            this.spSplitContainer.Panel1.ResumeLayout(false);
+            this.spSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.spSplitContainer)).EndInit();
+            this.spSplitContainer.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -433,6 +461,7 @@
         private System.Windows.Forms.ListView lvStereoImages;
         private System.Windows.Forms.PictureBox pbVideoPanel;
         private System.Windows.Forms.FolderBrowserDialog fbdOpenFolder;
+        private System.Windows.Forms.SplitContainer spSplitContainer;
     }
 }
 

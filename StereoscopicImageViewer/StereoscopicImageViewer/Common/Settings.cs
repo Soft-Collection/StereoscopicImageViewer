@@ -12,6 +12,7 @@ namespace StereoscopicImageViewer
         private static bool VisibleValue = true;
         private static bool AlwaysOnTopValue = true;
         private static bool RunAtStartupValue = false;
+        private static int SplitterValue = 0;
         private static string FolderPathValue = string.Empty;
         private static string ComPortValue = "COM1";
         private static int GlassesTimeOffsetValue = 0;
@@ -114,6 +115,24 @@ namespace StereoscopicImageViewer
                 RegistryKey runKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
                 if (RunAtStartupValue) runKey.SetValue(GetAssemblyInfo.AssemblyProduct, Application.ExecutablePath.ToString());
                 else runKey.DeleteValue(GetAssemblyInfo.AssemblyProduct, false);
+            }
+        }
+
+        //Splitter Property.
+        public static int Splitter
+        {
+            get
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                if (key == null) key = Registry.CurrentUser.CreateSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct);
+                SplitterValue = (int)key.GetValue("Splitter", 100);
+                return (SplitterValue);
+            }
+            set
+            {
+                SplitterValue = value;
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + GetAssemblyInfo.AssemblyCompany + "\\" + GetAssemblyInfo.AssemblyProduct, true);
+                key.SetValue("Splitter", SplitterValue);
             }
         }
 

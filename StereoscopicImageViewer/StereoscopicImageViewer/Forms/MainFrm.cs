@@ -494,6 +494,10 @@ namespace StereoscopicImageViewer
                 Settings.GlassesTimeOffset = e.TimeOffset;
             }
         }
+        private void spSplitContainer_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            Settings.Splitter = e.SplitX;
+        }
         private void bOpen_MouseEnter(object sender, EventArgs e)
         {
             ttControls.Show("Open video file", (IWin32Window)sender, 5000);
@@ -550,6 +554,7 @@ namespace StereoscopicImageViewer
         }
         private void LoadSettingsToControls()
         {
+            spSplitContainer.SplitterDistance = Settings.Splitter;
             cppComPortPanel.SelectedCOMPort = Settings.ComPort;
             cppComPortPanel.LoadPorts();
             switch (Settings.LRBoth)
