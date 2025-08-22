@@ -331,7 +331,6 @@ namespace StereoscopicImageViewer
                         {
                             Settings.FolderPath = folderpath;
                             LoadStereoImages();
-                            SetMainState((cppComPortPanel.IsCOMPortSelected) ? eMainStates.Stopped : eMainStates.COMPortNotSelected);
                         }
                     }
                 }
@@ -342,11 +341,7 @@ namespace StereoscopicImageViewer
             bool isDirectoryExists = Directory.Exists(Settings.FolderPath);
             if (mLastIsDirectoryExists != isDirectoryExists)
             {
-                if (isDirectoryExists)
-                {
-                    SetMainState((cppComPortPanel.IsCOMPortSelected) ? eMainStates.Stopped : eMainStates.COMPortNotSelected);
-                }
-                else
+                if (!isDirectoryExists)
                 {
                     SetMainState(eMainStates.ImagesFolderNotOpened);
                 }
@@ -405,14 +400,6 @@ namespace StereoscopicImageViewer
             string temp = OpenFolder();
             Settings.FolderPath = (temp == string.Empty) ? Settings.FolderPath : temp;
             LoadStereoImages();
-            if (Directory.Exists(Settings.FolderPath))
-            {
-                SetMainState((cppComPortPanel.IsCOMPortSelected) ? eMainStates.Stopped : eMainStates.COMPortNotSelected);
-            }
-            else
-            {
-                SetMainState(eMainStates.ImagesFolderNotOpened);
-            }
         }
         private void pbVideoPanel_SizeChanged(object sender, EventArgs e)
         {
@@ -550,7 +537,6 @@ namespace StereoscopicImageViewer
                     tsslFrequency.Visible = true;
                     break;
             }
-
         }
         private void LoadSettingsToControls()
         {
