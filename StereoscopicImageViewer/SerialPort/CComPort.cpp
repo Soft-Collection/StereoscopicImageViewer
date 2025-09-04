@@ -2,7 +2,7 @@
 #include "CComPort.h"
 #include "../Common/CTools.h"
 
-#define BAUD_RATE CBR_9600
+#define BAUD_RATE CBR_19200
 
 CComPort::CComPort(std::wstring comPortName)
 {
