@@ -21,7 +21,7 @@ int main(void)
 void setup()
 {
     StereoGlassesController::begin();
-    USART::begin(nullptr, OnSync, OnDelayedSync, 9600);
+    USART::begin(nullptr, OnSync, OnDelayedSync, 19200);
 }
 
 void loop()
